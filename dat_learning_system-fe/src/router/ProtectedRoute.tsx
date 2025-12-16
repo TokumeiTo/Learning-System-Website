@@ -10,7 +10,7 @@ export const ProtectedRoute = ({ children }: Props) => {
   const { user } = useAuth();
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/signin" replace />;
   }
 
   return <>{children}</>;

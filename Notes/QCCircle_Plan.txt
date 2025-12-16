@@ -1,0 +1,344 @@
+🔥 PHASE 1 — Project Foundation (Week 1)
+1. Requirements Collection
+
+Gather company rules (HR, Training, Manager approvals)
+
+Determine user roles
+
+Admin
+
+HR
+
+Employee
+
+Manager
+
+Expert
+
+Trainer
+
+Define KPIs for expert calculation reports
+
+Define LMS modules:
+
+Course → Lesson → Assessment
+
+Certification
+
+Progress tracking
+
+Attendance (optional)
+
+Notifications
+
+🔥 PHASE 2 — System Architecture (Week 1–2)
+2. High-Level Architecture
+
+Hybrid backend:
+
+ASP.NET Core (REST API)
+Node.js (Realtime + Workers)
+React + MUI (Frontend)
+Oracle DB
+
+
+API Gateway → NGINX or reverse proxy
+
+3. Module Architecture
+
+User & Role Management
+
+Course Management
+
+Enrollment & Learning Flow
+
+Expert Calculation Module
+
+Admin Panel
+
+Notification System
+
+Reporting System
+
+File Upload (documents, videos)
+
+Certificates
+
+🔥 PHASE 3 — Database & ERD (Week 2)
+4. ERD Creation (Oracle)
+
+Main tables:
+
+Auth Tables
+
+Users
+
+Roles
+
+UserRoles
+
+LMS Tables
+
+Courses
+
+Lessons
+
+LessonFiles
+
+Enrollments
+
+Progress
+
+Assessments
+
+QuizQuestions
+
+QuizAnswers
+
+Certificates
+
+Expert/Report Tables
+
+ExpertRules
+
+KPIValues
+
+Reports
+
+ReportSnapshots
+
+Notification & Logs
+
+Notifications
+
+ActivityLogs
+
+🔥 PHASE 4 — Backend Setup (Week 3–4)
+5. ASP.NET Core REST API
+
+Folder structure:
+
+Controllers/
+Services/
+Repositories/
+Models/
+DTOs/
+DbContext/
+Mappers/
+
+6. Choose Tech
+
+EF Core → CRUD operations
+
+ADO.NET → Expert reports, heavy queries
+
+JWT Authentication
+
+Role-based + policy-based authorization
+
+FluentValidation
+
+7. API Modules to Build
+Authentication & User APIs
+
+Register
+
+Login
+
+Refresh token
+
+Assign roles
+
+Get permissions
+
+Course APIs
+
+Create course
+
+Add lessons
+
+Upload lesson materials
+
+Publish/unpublish
+
+Enrollment & Progress APIs
+
+Enroll user
+
+Track progress
+
+Mark lesson as completed
+
+Generate certificate
+
+Expert Calculation Module
+
+Upload calculation rules
+
+Process KPI
+
+Export reports
+
+Reporting APIs
+
+Dashboard metrics
+
+Attendance summary
+
+Score analysis
+
+User learning performance
+
+🔥 PHASE 5 — Node.js Realtime & Worker Services (Week 4–5)
+8. Node.js Services
+
+Use NestJS or Express + Socket.IO.
+
+Realtime Notification Server
+
+New course available
+
+Manager approval required
+
+Certificate issued
+
+Report ready
+
+Worker Services
+
+Queue for long calculations
+
+Queue for sending emails
+
+File processing
+
+Report generation (large datasets)
+
+Message Queue
+
+Use:
+
+Redis
+
+RabbitMQ
+
+🔥 PHASE 6 — Frontend Development (React + MUI) (Week 5–8)
+9. Core UI Pages
+Public / Login
+
+Login
+
+Forgot password
+
+User Dashboard
+
+My Courses
+
+My Certificates
+
+My Progress
+
+Course Module
+
+Course list
+
+Course details
+
+Lesson viewer
+
+Quiz pages
+
+Assessment results
+
+Admin Panel (HR + Admin)
+
+User Management
+
+Role Management
+
+Course Management
+
+Report Management
+
+Expert rule editor
+
+Notifications UI (WebSocket)
+
+Real time notifications
+
+Unread counts
+
+🔥 PHASE 7 — Integration (Week 8–9)
+10. Connect all layers
+
+React ↔ ASP.NET Core
+
+React ↔ Node.js (WebSocket)
+
+ASP.NET Core ↔ Oracle
+
+Node.js workers ↔ Oracle
+
+Shared JWT token validation
+
+Role-based UI rendering
+
+🔥 PHASE 8 — Testing (Week 10)
+11. Testing Strategy
+
+xUnit for .NET
+
+Jest for Node.js
+
+Playwright for frontend (your specialty 😉)
+
+Load testing for expert reports
+
+Database performance testing
+
+Security tests (JWT, roles)
+
+🔥 PHASE 9 — Deployment (Week 11)
+12. Deployment Plan
+
+Docker for all services
+
+Reverse proxy (NGINX)
+
+CI/CD pipeline
+
+Environment configs
+
+Oracle cloud/on-prem server
+
+🔥 PHASE 10 — Maintenance & Scaling
+13. Scaling Strategy
+
+Split .NET into modules if needed
+
+Add microservices when traffic grows
+
+Scale Node.js realtime server
+
+Caching using Redis
+
+Periodic cleanup jobs
+
+
+10-phase enterprise plan that covers:
+
+✔ Requirements → Architecture → Database → Backend → Node.js → Frontend → Testing → Deployment → Scaling
+✔ Includes EF Core + ADO.NET hybrid
+✔ Oracle-compatible
+✔ REST API (ASP.NET Core)
+✔ Realtime system with Node.js
+✔ Ready for company-wide LMS rollout
+
+✔ ERD
+✔ Backend folder structure
+✔ API endpoint list
+✔ Node.js module structure
+✔ Oracle database script
+✔ Full architecture diagram
+✔ Role & permission matrix
+✔ Sprint breakdown
