@@ -4,28 +4,55 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import RegisterForm from './RegisterForm';
 import RegisteredList from './RegisteredList';
-import PaymentForm from './PaymentForm';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { SitemarkIcon } from '../../components/custom-icons/CustomIcons';
+import { Roles, type RoleType } from '../../utils/constants';
+import SmartRegisterForm from './EmployeeRegisterForm';
 
-type Role = 'ceo' | 'admin' | 'employee';
+type Role = 'employee' | 'admin' | 'divh' | 'depth' | 'sech' | 'pm';
 const roleLabels: Record<Role, string> = {
-    ceo: 'CEO',
     admin: 'Admin',
+    divh: 'Division Head',
+    depth: 'Department Head',
+    sech: 'Section Head',
+    pm: 'Project Manager',
     employee: 'Employee',
 };
 
+function mapRole(role: Role): RoleType {
+    switch (role) {
+        case 'admin':
+            return Roles.ADMIN;
+        case 'divh':
+            return Roles.DIVISION_HEAD;
+        case 'depth':
+            return Roles.DEPARTMENT_HEAD;
+        case 'sech':
+            return Roles.SECTION_HEAD;
+        case 'pm':
+            return Roles.PROJECT_MANAGER;
+        case 'employee':
+        default:
+            return Roles.EMPLOYEE;
+    }
+}
+
 function getRoleForm(role: Role) {
     switch (role) {
-        case 'ceo':
-            return <RegisterForm />;
         case 'admin':
-            return <PaymentForm />;
+            return <SmartRegisterForm role={mapRole(role)} />;
+        case 'divh':
+            return <SmartRegisterForm role={mapRole(role)} />;
+        case 'depth':
+            return <SmartRegisterForm role={mapRole(role)} />;
+        case 'sech':
+            return <SmartRegisterForm role={mapRole(role)} />;
+        case 'pm':
+            return <SmartRegisterForm role={mapRole(role)} />;
         case 'employee':
-            return <RegisterForm />;
+            return <SmartRegisterForm role={mapRole(role)} />;
         default:
             return null;
     }
@@ -78,8 +105,6 @@ export default function RegisterPage() {
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    pt: { xs: 4, sm: 16 },
-                    px: { xs: 2, sm: 10 },
                     width: '100%',
                     gap: 6,
                     justifyContent: 'center',
@@ -87,7 +112,7 @@ export default function RegisterPage() {
                 }}
             >
                 {/* ROLE TOGGLER */}
-                <Box sx={{ maxWidth: 600, width: '100%' }}>
+                <Box sx={{ width: '100%'}}>
                     <ToggleButtonGroup
                         value={role}
                         exclusive

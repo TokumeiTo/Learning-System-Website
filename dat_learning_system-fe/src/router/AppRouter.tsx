@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Dashboard } from "../pages/dashboard/Dashboard";
 import { useAuth } from "../hooks/useAuth";
-import { ProtectedRoute } from "./ProtectedRoute";
-import SignIn from '../pages/auth/SignIn';
+// import { ProtectedRoute } from "./ProtectedRoute";
+import SignIn from "../pages/auth/SignInPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 
 export const AppRouter = () => {
