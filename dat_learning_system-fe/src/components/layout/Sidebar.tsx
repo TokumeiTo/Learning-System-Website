@@ -23,6 +23,8 @@ import CastForEducationIcon from '@mui/icons-material/CastForEducation';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import StyleIcon from '@mui/icons-material/Style';
 import ReportIcon from '@mui/icons-material/Report';
+import TranslateIcon from '@mui/icons-material/Translate';
+import BookIcon from '@mui/icons-material/Book';
 
 import BasicSelect from "../common/Select";
 import UserProfileMenu from "../UserProfileMenu";
@@ -100,7 +102,7 @@ export const mainNavItems = [
     icon: <QuizIcon color="primary" />,
   },
   {
-    label: "Ebooks",
+    label: "Test books",
     path: "/dashboard/path",
     icon: <MenuBookIcon color="primary" />,
   },
@@ -113,6 +115,16 @@ export const mainNavItems = [
     label: "Video Lessons",
     path: "/dashboard/path",
     icon: <CastForEducationIcon color="primary" />,
+  },
+  {
+    label: "Dictionary",
+    path: "/dashboard/path",
+    icon: <BookIcon color="primary" />,
+  },
+  {
+    label: "Translation",
+    path: "/dashboard/path",
+    icon: <TranslateIcon color="primary" />,
   },
 ];
 

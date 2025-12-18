@@ -23,6 +23,9 @@ export default function KanjiDetailModal({ open, kanji, onClose }: Props) {
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{ textAlign: "center", fontSize: 40 }}>
                 {kanji.kanji}
+                <Box>
+                    {kanji.kunyomi}
+                </Box>
             </DialogTitle>
 
             <DialogContent>
@@ -33,6 +36,7 @@ export default function KanjiDetailModal({ open, kanji, onClose }: Props) {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        bgcolor: 'lightGray'
                     }}
                 >
                     <KanjiStrokeAnimation
@@ -50,14 +54,14 @@ export default function KanjiDetailModal({ open, kanji, onClose }: Props) {
 
                 <Typography component="div" sx={{ mt: 1 }}>
                     <strong>Onyomi:</strong>{" "}
-                    {kanji.onyomi.map(o => (
+                    {kanji.onyomi?.map(o => (
                         <Chip key={o} label={o} sx={{ mr: 0.5 }} />
                     ))}
                 </Typography>
 
                 <Typography component="div" sx={{ mt: 1 }}>
                     <strong>Kunyomi:</strong>{" "}
-                    {kanji.kunyomi.map(k => (
+                    {kanji.kunyomi?.map(k => (
                         <Chip key={k} label={k} sx={{ mr: 0.5 }} />
                     ))}
                 </Typography>

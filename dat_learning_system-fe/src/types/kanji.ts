@@ -10,9 +10,11 @@ export type Kanji = {
   id: string;
   kanji: string;
   jlptLevel: JLPTLevel;
-  onyomi: string[];
-  kunyomi: string[];
+  onyomi?: string[];
+  kunyomi?: string[];
+  romaji: string;
   meaning: string;
   strokes: number;
   examples: KanjiExample[];
+  radicals?: string[];
 };

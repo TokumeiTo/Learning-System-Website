@@ -1,4 +1,4 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useState } from "react";
 import { kanjiMockData } from "../../mocks/kanji.mock";
 import type { Kanji, JLPTLevel } from "../../types/kanji";
