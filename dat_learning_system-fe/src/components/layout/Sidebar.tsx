@@ -75,11 +75,6 @@ interface SidebarProps {
 
 export const mainNavItems = [
   {
-    label: "Progress",
-    path: "/dashboard",
-    icon: <AnalyticsIcon color="primary" />,
-  },
-  {
     label: "Courses",
     path: "/dashboard/courses",
     icon: <SchoolIcon color="primary" />,
@@ -90,7 +85,7 @@ export const mainNavItems = [
     icon: <EditCalendarIcon color="primary" />,
   },
   {
-    label: "Path",
+    label: "Learning path",
     path: "/dashboard/path",
     icon: <FollowTheSignsIcon color="primary" />,
   },
@@ -111,7 +106,7 @@ export const mainNavItems = [
   },
   {
     label: "Flashcards",
-    path: "/dashboard/path",
+    path: "/flashcards",
     icon: <StyleIcon color="primary" />,
   },
   {
@@ -121,7 +116,12 @@ export const mainNavItems = [
   },
 ];
 
-const otherNavItems = [
+const commonNavItems = [
+  {
+    label: "Progress",
+    path: "/dashboard",
+    icon: <AnalyticsIcon color="primary" />,
+  },
   {
     label: "Help",
     path: "/dashboard/help",
@@ -174,6 +174,12 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       {/* ---------- Main Navigation ---------- */}
       <Box sx={{ flexGrow: 1 }}>
         <List>
+          {open && (
+            <ListItemText
+              primary="Commons"
+              sx={{ px: 3, fontSize: 12, color: "text.secondary" }}
+            />
+          )}
           {mainNavItems.map((item) => (
             <ListItemButton
               key={item.label}
@@ -208,16 +214,16 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
       <Divider />
 
-      {/* ---------- Others ---------- */}
+      {/* ---------- Commons ---------- */}
       <List>
         {open && (
           <ListItemText
-            primary="Others"
+            primary="Commons"
             sx={{ px: 3, py: 1, fontSize: 12, color: "text.secondary" }}
           />
         )}
 
-        {otherNavItems.map((item) => (
+        {commonNavItems.map((item) => (
           <ListItemButton
             key={item.label}
             component={NavLink}

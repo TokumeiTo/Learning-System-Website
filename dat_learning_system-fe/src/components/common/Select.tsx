@@ -13,8 +13,8 @@ export default function BasicSelect() {
     };
 
     return (
-        <Box sx={{ minWidth: 120 }}>
-            <FormControl variant="standard" sx={{ minWidth: 200 }}>
+        <Box sx={{ display: "flex", justifyContent: 'center', minWidth: 170}}>
+            <FormControl variant="standard" sx={{ minWidth: 170 }}>
                 <InputLabel id="demo-simple-select-standard-label">Learn</InputLabel>
                 <Select
                     labelId="demo-simple-select-standard-label"

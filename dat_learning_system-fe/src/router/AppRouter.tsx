@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 // import { ProtectedRoute } from "./ProtectedRoute";
 import SignIn from "../pages/auth/SignInPage";
 import RegisterPage from "../pages/auth/RegisterPage";
+import FlashcardsPage from "../pages/flashcards/FlashcardsPage";
 
 export const AppRouter = () => {
   const { user } = useAuth();
@@ -28,6 +29,14 @@ export const AppRouter = () => {
           element={
             // <ProtectedRoute>
               <RegisterPage />
+            // </ProtectedRoute>
+          }
+        />
+         <Route
+          path="/flashcards"
+          element={
+            // <ProtectedRoute>
+              <FlashcardsPage />
             // </ProtectedRoute>
           }
         />
