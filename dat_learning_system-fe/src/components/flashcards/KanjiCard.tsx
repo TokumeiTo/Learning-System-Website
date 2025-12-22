@@ -8,7 +8,7 @@ type Props = {
 
 export default function KanjiCard({ kanji, onClick }: Props) {
   return (
-    <Card elevation={3} sx={{maxWidth: '200px', minWidth: '200px'}}>
+    <Card elevation={3} sx={{maxWidth: '200px', minWidth: '200px', height: '100%'}}>
       <CardActionArea onClick={onClick}>
         <Box sx={{ p: 3, textAlign: "center" }}>
           <Typography variant="h3">{kanji.kanji}</Typography>

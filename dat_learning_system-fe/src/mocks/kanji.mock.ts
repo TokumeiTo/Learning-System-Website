@@ -125,7 +125,7 @@ export const kanjiMockData: Kanji[] = [
             {
                 word: "酒場",
                 reading: "さかば",
-                meaning: "Japan",
+                meaning: "Bar",
             },
         ],
     },
@@ -142,7 +142,7 @@ export const kanjiMockData: Kanji[] = [
             {
                 word: "海外",
                 reading: "かいがい",
-                meaning: "Japan",
+                meaning: "Oversea",
             },
         ],
     },

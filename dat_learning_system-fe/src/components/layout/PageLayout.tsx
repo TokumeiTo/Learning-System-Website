@@ -17,7 +17,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
       <Sidebar open={open} onClose={toggleSidebar} />
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Navbar open={open} onToggle={toggleSidebar} />
-        <Box component="main" sx={{ flex: 1, p: 3 }}>
+        <Box component="main" sx={{ flex: 1, p: 3, mt: "70px" }}>
           {children}
         </Box>
       </Box>

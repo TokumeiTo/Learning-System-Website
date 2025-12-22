@@ -1,9 +1,10 @@
-import { Box, Typography, Tabs, Tab } from "@mui/material";
+import { Box, Tabs, Tab } from "@mui/material";
 import { useState } from "react";
 import PageLayout from "../../components/layout/PageLayout";
 import KanjiFlashcards from "./KanjiFlashcards";
 import KanaFlashcards from "./KanaFlashcards";
 import TabLoader from "../../components/feedback/TabLoader";
+import GrammarFlashcards from "./GrammarFlashcards";
 
 export default function FlashcardsPage() {
   const [tab, setTab] = useState(0);        // currently selected tab
@@ -21,15 +22,11 @@ export default function FlashcardsPage() {
 
   return (
     <PageLayout>
-      <Box>
-        <Typography variant="h4" sx={{ mb: 2 }}>
-          Flashcards
-        </Typography>
-
+      <Box mt="50px">
         <Tabs value={tab} onChange={handleChange}>
           <Tab label="Kanji" />
           <Tab label="Vocabulary" disabled />
-          <Tab label="Grammar" disabled />
+          <Tab label="Grammar" />
           <Tab label="Kana" />
         </Tabs>
 
@@ -37,6 +34,7 @@ export default function FlashcardsPage() {
           {loading && <TabLoader />}
 
           {!loading && activeTab === 0 && <KanjiFlashcards />}
+          {!loading && activeTab === 2 && <GrammarFlashcards />}
           {!loading && activeTab === 3 && <KanaFlashcards />}
         </Box>
       </Box>

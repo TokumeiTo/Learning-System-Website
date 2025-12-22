@@ -8,7 +8,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
 import ButtonGroup from '@mui/material/ButtonGroup';
@@ -67,7 +66,7 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
         <ButtonGroup>
            <IconButton
             color="inherit"
-            aria-label="profile"
+            aria-label="translate page"
             // onClick={}
             size="large"
           >
@@ -75,7 +74,7 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
           </IconButton>
           <IconButton
             color="inherit"
-            aria-label="profile"
+            aria-label="dark/light mode"
             // onClick={}
             size="large"
           >
@@ -92,15 +91,6 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
             </Badge>
           </IconButton>
 
-          <IconButton
-            size="large"
-            aria-label="account of current user"
-            aria-controls="primary-search-account-menu"
-            aria-haspopup="true"
-            color="inherit"
-          >
-            <AccountCircle />
-          </IconButton>
         </ButtonGroup>
       </Toolbar>
     </AppBar>

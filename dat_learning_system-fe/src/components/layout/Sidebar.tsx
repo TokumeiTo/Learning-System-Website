@@ -23,8 +23,9 @@ import CastForEducationIcon from '@mui/icons-material/CastForEducation';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import StyleIcon from '@mui/icons-material/Style';
 import ReportIcon from '@mui/icons-material/Report';
-import TranslateIcon from '@mui/icons-material/Translate';
+import DesignServicesIcon from '@mui/icons-material/DesignServices';
 import BookIcon from '@mui/icons-material/Book';
+import TranslateIcon from '@mui/icons-material/Translate';
 
 import BasicSelect from "../common/Select";
 import UserProfileMenu from "../UserProfileMenu";
@@ -77,8 +78,8 @@ interface SidebarProps {
 
 export const mainNavItems = [
   {
-    label: "Courses",
-    path: "/dashboard/courses",
+    label: "Lessons",
+    path: "/dashboard/lessons",
     icon: <SchoolIcon color="primary" />,
   },
   {
@@ -94,7 +95,7 @@ export const mainNavItems = [
   {
     label: "Pratice",
     path: "/dashboard/schedule",
-    icon: <EditCalendarIcon color="primary" />,
+    icon: <DesignServicesIcon color="primary" />,
   },
   {
     label: "Quiz",
@@ -102,7 +103,7 @@ export const mainNavItems = [
     icon: <QuizIcon color="primary" />,
   },
   {
-    label: "Test books",
+    label: "Text books",
     path: "/dashboard/path",
     icon: <MenuBookIcon color="primary" />,
   },
@@ -112,7 +113,7 @@ export const mainNavItems = [
     icon: <StyleIcon color="primary" />,
   },
   {
-    label: "Video Lessons",
+    label: "Classroom",
     path: "/dashboard/path",
     icon: <CastForEducationIcon color="primary" />,
   },
@@ -122,8 +123,8 @@ export const mainNavItems = [
     icon: <BookIcon color="primary" />,
   },
   {
-    label: "Translation",
-    path: "/dashboard/path",
+    label: "Translate",
+    path: "/translate",
     icon: <TranslateIcon color="primary" />,
   },
 ];

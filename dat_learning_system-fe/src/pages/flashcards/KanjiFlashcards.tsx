@@ -1,19 +1,16 @@
-import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { Box, FormControl, InputLabel, MenuItem, Select, Button } from "@mui/material";
 import { useState } from "react";
 import { kanjiMockData } from "../../mocks/kanji.mock";
 import type { Kanji, JLPTLevel } from "../../types/kanji";
 import KanjiCard from "../../components/flashcards/KanjiCard";
 import KanjiDetailModal from "../../components/flashcards/KanjiDetailModal";
+import KanjiCreateModal from "../../components/flashcards/KanjiCreateModal";
 import SearchBar from "../../components/common/Search";
-
-const searchOptions = kanjiMockData.map(k => ({
-  label: `${k.kanji} – ${k.meaning}`,
-}));
-
 
 export default function KanjiFlashcards() {
   const [selectedKanji, setSelectedKanji] = useState<Kanji | null>(null);
   const [level, setLevel] = useState<JLPTLevel>("N5");
+  const [openCreate, setOpenCreate] = useState(false);
 
   const filteredKanji = kanjiMockData.filter(
     kanji => kanji.jlptLevel === level
@@ -22,7 +19,7 @@ export default function KanjiFlashcards() {
   return (
     <>
       {/* Header */}
-      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between' }}>
+      <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", gap: 2 }}>
         <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel>JLPT</InputLabel>
           <Select
@@ -40,32 +37,24 @@ export default function KanjiFlashcards() {
 
         <SearchBar
           placeholder="Search kanji or meaning"
-          options={searchOptions}
+          options={kanjiMockData.map(k => ({
+            label: `${k.kanji} – ${k.meaning}`,
+          }))}
           onSelect={(value) => console.log("Selected:", value)}
         />
+
+        <Button
+          variant="contained"
+          onClick={() => setOpenCreate(true)}
+        >
+          + Create Kanji
+        </Button>
       </Box>
 
-      {/* Kanji Grid (Flex) */}
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 2,
-        }}
-      >
+      {/* Kanji Grid */}
+      <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 2 }}>
         {filteredKanji.map(kanji => (
-          <Box
-            key={kanji.id}
-            sx={{
-              minWidth: '200px',
-              width: {
-                xs: "48%",
-                sm: "31%",
-                md: "10%",
-              },
-            }}
-          >
+          <Box key={kanji.id} sx={{ minWidth: 200 }}>
             <KanjiCard
               kanji={kanji}
               onClick={() => setSelectedKanji(kanji)}
@@ -74,10 +63,17 @@ export default function KanjiFlashcards() {
         ))}
       </Box>
 
+      {/* Detail Modal */}
       <KanjiDetailModal
         open={!!selectedKanji}
         kanji={selectedKanji}
         onClose={() => setSelectedKanji(null)}
+      />
+
+      {/* Create Modal */}
+      <KanjiCreateModal
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
       />
     </>
   );

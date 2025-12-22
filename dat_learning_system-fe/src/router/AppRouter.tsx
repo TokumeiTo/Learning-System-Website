@@ -5,6 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 import SignIn from "../pages/auth/SignInPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import FlashcardsPage from "../pages/flashcards/FlashcardsPage";
+import TranslationPage from "../pages/translation/TranslationPage";
 
 export const AppRouter = () => {
   const { user } = useAuth();
@@ -20,7 +21,7 @@ export const AppRouter = () => {
           path="/dashboard"
           element={
             // <ProtectedRoute>
-              <Dashboard />
+            <Dashboard />
             // </ProtectedRoute>
           }
         />
@@ -28,15 +29,23 @@ export const AppRouter = () => {
           path="/register"
           element={
             // <ProtectedRoute>
-              <RegisterPage />
+            <RegisterPage />
             // </ProtectedRoute>
           }
         />
-         <Route
+        <Route
           path="/flashcards"
           element={
             // <ProtectedRoute>
-              <FlashcardsPage />
+            <FlashcardsPage />
+            // </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/translate"
+          element={
+            // <ProtectedRoute>
+            <TranslationPage />
             // </ProtectedRoute>
           }
         />

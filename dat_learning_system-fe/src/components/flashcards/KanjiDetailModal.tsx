@@ -23,9 +23,6 @@ export default function KanjiDetailModal({ open, kanji, onClose }: Props) {
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{ textAlign: "center", fontSize: 40 }}>
                 {kanji.kanji}
-                <Box>
-                    {kanji.kunyomi}
-                </Box>
             </DialogTitle>
 
             <DialogContent>
