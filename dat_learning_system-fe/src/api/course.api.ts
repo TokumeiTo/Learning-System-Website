@@ -7,21 +7,9 @@ export const getCourses = async (): Promise<Course[]> => {
     return res.data;
 };
 
-export const createCourse = async (courseData: any): Promise<Course> => {
-    // We convert to FormData here because of the thumbnail file
-    const formData = new FormData();
+export const createCourse = async (formData: FormData): Promise<Course> => {
+    const res = await api.post("/api/courses", formData);
     
-    Object.keys(courseData).forEach(key => {
-        if (courseData[key] !== null && courseData[key] !== undefined) {
-            formData.append(key, courseData[key]);
-        }
-    });
-
-    const res = await api.post("/api/courses", formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
     return res.data;
 };
 

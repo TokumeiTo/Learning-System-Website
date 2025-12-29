@@ -17,8 +17,8 @@ public class CoursesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Super Admin,Admin")]
-    public async Task<IActionResult> Create([FromBody] CreateCourseDto dto)
+    [Authorize(Roles = "SuperAdmin,Admin")]
+    public async Task<IActionResult> Create([FromForm] CreateCourseDto dto)
     {
         // For now, we hardcode a creator ID until we finish Auth
         var result = await _courseService.CreateCourseAsync(dto, "admin-system");

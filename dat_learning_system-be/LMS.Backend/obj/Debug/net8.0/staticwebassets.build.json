@@ -1,11 +1,58 @@
 {
   "Version": 1,
-  "Hash": "MLaI27yinnf8wxlVIapmHklb/FyrmMTGvhzua+ZXU6M=",
+  "Hash": "TMZu9fhzlsl9zlKEY/R4OANAVBpctJnT7pFiRodZQr8=",
   "Source": "LMS.Backend",
   "BasePath": "_content/LMS.Backend",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "LMS.Backend\\wwwroot",
+      "Source": "LMS.Backend",
+      "ContentRoot": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
+      "BasePath": "_content/LMS.Backend",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\2aa0a8f7-f8f0-4889-a0c6-655d5f4531eb.png",
+      "SourceId": "LMS.Backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
+      "BasePath": "_content/LMS.Backend",
+      "RelativePath": "uploads/2aa0a8f7-f8f0-4889-a0c6-655d5f4531eb.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\2aa0a8f7-f8f0-4889-a0c6-655d5f4531eb.png"
+    },
+    {
+      "Identity": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\3c6e27be-f835-4e20-8b6d-96349dfb23d7.png",
+      "SourceId": "LMS.Backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
+      "BasePath": "_content/LMS.Backend",
+      "RelativePath": "uploads/3c6e27be-f835-4e20-8b6d-96349dfb23d7.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\3c6e27be-f835-4e20-8b6d-96349dfb23d7.png"
+    }
+  ]
 }

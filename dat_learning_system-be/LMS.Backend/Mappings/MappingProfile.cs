@@ -1,6 +1,7 @@
 using AutoMapper;
 using LMS.Backend.Data.Entities;
 using LMS.Backend.DTOs.Auth;
+using LMS.Backend.DTOs.Course;
 using LMS.Backend.DTOs.OrgUnit;
 using LMS.Backend.DTOs.User;
 
@@ -26,9 +27,19 @@ public class MappingProfile : Profile
         CreateMap<ApplicationUser, LoginResponseDto>()
             .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position.ToString()));
 
-        // Orgunit response mapping
+        // Orgunit request mapping
         CreateMap<OrgUnitRequestDto, OrgUnit>();
+        // Orgunit response mapping
         CreateMap<OrgUnit, OrgUnitResponseDto>();
         CreateMap<OrgUnit, OrgUnitSelectDto>();
+
+        // Course mapping
+        // Inside MappingProfile.cs
+        CreateMap<CreateCourseDto, Course>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
+            // Ignore these as they require Enum parsing or manual logic
+            .ForMember(dest => dest.Status, opt => opt.Ignore())
+            .ForMember(dest => dest.Badge, opt => opt.Ignore())
+            .ForMember(dest => dest.Thumbnail, opt => opt.Ignore());
     }
 }

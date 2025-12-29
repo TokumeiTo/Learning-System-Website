@@ -138,6 +138,8 @@ var app = builder.Build();
 // Exception Middleware
 app.UseMiddleware<ExceptionMiddleware>();
 
+app.UseStaticFiles();
+
 app.UseRouting();
 
 // Swagger

@@ -144,3 +144,4 @@ C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\obj\Debug\net8.0\refint\LMS.
 C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\obj\Debug\net8.0\LMS.Backend.pdb
 C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\obj\Debug\net8.0\LMS.Backend.genruntimeconfig.cache
 C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\obj\Debug\net8.0\ref\LMS.Backend.dll
+c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\LMS.Backend.staticwebassets.runtime.json
