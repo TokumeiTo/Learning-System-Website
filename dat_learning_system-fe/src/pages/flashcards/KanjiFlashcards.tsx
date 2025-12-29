@@ -20,7 +20,7 @@ export default function KanjiFlashcards() {
   return (
     <>
       {/* Header */}
-      <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", gap: 2 }}>
+      <Box sx={{ mb: 5, display: "flex", justifyContent: "space-between", gap: 2 }}>
         <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel>JLPT</InputLabel>
           <Select

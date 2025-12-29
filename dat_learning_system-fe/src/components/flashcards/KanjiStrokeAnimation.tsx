@@ -30,7 +30,7 @@ export default function KanjiStrokeAnimation({
             strokeAnimationSpeed: 2,
             delayBetweenStrokes: 200,
             strokeColor: "#FF0000",       // red strokes
-            radicalColor: "#888888",
+            radicalColor: "#888888", // lightgray
             highlightColor: "#00FF00",
             strokeNumberColor: "#0000FF", // blue stroke numbers
         } as any);

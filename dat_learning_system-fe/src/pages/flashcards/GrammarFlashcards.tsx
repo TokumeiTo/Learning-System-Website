@@ -16,7 +16,7 @@ export default function FlashcardsPage() {
   return (
     <>
       {/* Header */}
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 5 }}>
         <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel>JLPT</InputLabel>
           <Select

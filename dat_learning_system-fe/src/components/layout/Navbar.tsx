@@ -1,4 +1,7 @@
 import React from 'react';
+import { useContext } from "react";
+import { CustomThemeContext } from '../../theme/ThemeProvider';
+
 import MuiAppBar from '@mui/material/AppBar';
 import type { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -6,13 +9,14 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
+
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import TranslateIcon from '@mui/icons-material/Translate';
-
+import LightModeIcon from '@mui/icons-material/LightMode';
 
 interface NavbarProps {
   open: boolean;
@@ -44,6 +48,8 @@ const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
+  const { mode, toggleColorMode } = useContext(CustomThemeContext);
+
   return (
     <AppBar position="fixed" open={open}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -56,29 +62,29 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
         >
           <MenuIcon />
         </IconButton>
+
         <Typography variant="h6" noWrap component="div">
-          <TipsAndUpdatesIcon />
+          <TipsAndUpdatesIcon sx={{ marginRight: 1 }} />
           HLMS
         </Typography>
 
-        
-
         <ButtonGroup>
-           <IconButton
+          <IconButton
             color="inherit"
             aria-label="translate page"
-            // onClick={}
             size="large"
           >
             <TranslateIcon />
           </IconButton>
+
+          {/* DARK / LIGHT MODE TOGGLE */}
           <IconButton
             color="inherit"
             aria-label="dark/light mode"
-            // onClick={}
+            onClick={toggleColorMode}   // toggles light/dark theme
             size="large"
           >
-            <DarkModeIcon />
+            {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
           </IconButton>
 
           <IconButton
@@ -90,7 +96,6 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-
         </ButtonGroup>
       </Toolbar>
     </AppBar>

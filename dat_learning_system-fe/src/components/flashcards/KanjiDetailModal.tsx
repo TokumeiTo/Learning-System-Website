@@ -6,9 +6,12 @@ import {
     Box,
     Chip,
     Divider,
+    IconButton,
 } from "@mui/material";
+import { useState } from "react";
 import { type Kanji } from "../../types/kanji";
 import KanjiStrokeAnimation from "./KanjiStrokeAnimation";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 type Props = {
     open: boolean;
@@ -18,6 +21,7 @@ type Props = {
 
 export default function KanjiDetailModal({ open, kanji, onClose }: Props) {
     if (!kanji) return null;
+    const [animationKey, setAnimationKey] = useState(0);
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -33,16 +37,31 @@ export default function KanjiDetailModal({ open, kanji, onClose }: Props) {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        bgcolor: 'lightGray',
-                        mb: '20px'
+                        bgcolor: "background.paper",
+                        mb: 2,
+                        borderRadius: 2,
+                        position: "relative", // 🔑 important
                     }}
                 >
                     <KanjiStrokeAnimation
+                        key={animationKey}   // 🔑 forces re-mount
                         kanji={kanji.kanji}
                         width={180}
                         height={180}
-                        delay={400} // optional: adjust stroke speed
                     />
+
+                    {/* Restart button */}
+                    <IconButton
+                        size="small"
+                        sx={{
+                            position: "absolute",
+                            bottom: 8,
+                            right: 8,
+                        }}
+                        onClick={() => setAnimationKey(prev => prev + 1)}
+                    >
+                        <RestartAltIcon fontSize="small" />
+                    </IconButton>
                 </Box>
 
 

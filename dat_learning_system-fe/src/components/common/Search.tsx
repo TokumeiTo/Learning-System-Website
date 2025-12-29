@@ -49,14 +49,36 @@ export default function SearchBar({
               ...params.InputProps,
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon color="action" />
+                  <SearchIcon
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  />
                 </InputAdornment>
               ),
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
-                borderRadius: "20",
-                backgroundColor: "#fff",
+                borderRadius: '10px',
+                backgroundColor: "background.paper",
+                color: "text.primary",
+
+                "& fieldset": {
+                  borderColor: "divider",
+                },
+
+                "&:hover fieldset": {
+                  borderColor: "text.secondary",
+                },
+
+                "&.Mui-focused fieldset": {
+                  borderColor: "primary.main",
+                },
+              },
+
+              "& input::placeholder": {
+                color: "text.secondary",
+                opacity: 1,
               },
             }}
           />

@@ -16,7 +16,7 @@ export default function FlashcardsPage() {
     setTimeout(() => {
       setActiveTab(newValue);  // switch content after 2s
       setLoading(false);       // stop loading
-    }, 1200);                  // 2-second delay
+    }, 1200);
     setTab(newValue);          // still update tab UI immediately
   };
 

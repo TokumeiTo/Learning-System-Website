@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Card } from "@mui/material";
 import { DateCalendar } from "@mui/x-date-pickers";
 import { Dayjs } from "dayjs";
 
@@ -12,11 +12,8 @@ export default function CalendarView({
     onChange,
 }: CalendarViewProps) {
     return (
-        <Box
+        <Card
             sx={{
-                borderRadius: 2,
-                boxShadow: 5,
-                bgcolor: "background.paper",
                 width: '480px',
                 minHeight: '480px',
             }}
@@ -29,6 +26,6 @@ export default function CalendarView({
                     transformOrigin: "top",
                 }}
             />
-        </Box>
+        </Card>
     );
 }

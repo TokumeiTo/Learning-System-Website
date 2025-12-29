@@ -63,7 +63,7 @@ export default function SignIn() {
   };
 
   return (
-    <AuthContainer direction="column" sx={{ minHeight: '80vh', justifyContent: 'center' }}>
+    <AuthContainer direction="column" sx={{ minHeight: '100vh', justifyContent: 'center' }}>
       <Card variant="outlined">
         <SitemarkIcon />
         <Typography
