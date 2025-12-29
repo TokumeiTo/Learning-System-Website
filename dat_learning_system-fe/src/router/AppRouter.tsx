@@ -6,6 +6,11 @@ import SignIn from "../pages/auth/SignInPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import FlashcardsPage from "../pages/flashcards/FlashcardsPage";
 import TranslationPage from "../pages/translation/TranslationPage";
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 3943437 (12/22/2025)
 import QuizIntroPage from "../pages/quiz/QuizIntroPage";
 import QuizPage from "../pages/quiz/QuizPage";
 import QuizResultPage from "../pages/quiz/QuizResultPage";
@@ -13,6 +18,10 @@ import QuizReviewPage from "../pages/quiz/QuizReviewPage";
 import QuizSetupPage from "../pages/quiz/QuizSetupPage";
 import QuizListPage from "../pages/quiz/QuizListPage";
 import SchedulePage from "../pages/schedules/SchedulePage";
+<<<<<<< HEAD
+=======
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
 
 export const AppRouter = () => {
   const { user } = useAuth();
@@ -41,7 +50,15 @@ export const AppRouter = () => {
           }
         />
         <Route
+<<<<<<< HEAD
           path="/dashboard/flashcards"
+=======
+<<<<<<< HEAD
+          path="/flashcards"
+=======
+          path="/dashboard/flashcards"
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
           element={
             // <ProtectedRoute>
             <FlashcardsPage />
@@ -49,7 +66,15 @@ export const AppRouter = () => {
           }
         />
         <Route
+<<<<<<< HEAD
           path="/dashboard/translate"
+=======
+<<<<<<< HEAD
+          path="/translate"
+=======
+          path="/dashboard/translate"
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
           element={
             // <ProtectedRoute>
             <TranslationPage />
@@ -57,6 +82,11 @@ export const AppRouter = () => {
           }
         />
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 3943437 (12/22/2025)
         <Route path="/quiz" element={<QuizSetupPage />} />
         <Route path="/quiz/list" element={<QuizListPage />} />
         <Route path="/quiz/intro" element={<QuizIntroPage />} />
@@ -66,6 +96,10 @@ export const AppRouter = () => {
         
         <Route path="/schedule" element={<SchedulePage />} />
 
+<<<<<<< HEAD
+=======
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
         {/* Default redirect */}
         <Route path="*" element={<Navigate to={user ? "/dashboard" : "/signIn"} />} />
       </Routes>

@@ -34,7 +34,15 @@ export default function TranslationPage() {
 
     return (
         <PageLayout>
+<<<<<<< HEAD
             <Box sx={{ maxWidth: 800 , display: "flex", flexDirection: "column", gap: 2, p: '20px' }}>
+=======
+<<<<<<< HEAD
+            <Box sx={{ maxWidth: 800 , display: "flex", flexDirection: "column", gap: 2 }}>
+=======
+            <Box sx={{ maxWidth: 800 , display: "flex", flexDirection: "column", gap: 2, p: '20px' }}>
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
                 <Box sx={{ display: "flex", gap: 2 }}>
                     <TextField
                         select

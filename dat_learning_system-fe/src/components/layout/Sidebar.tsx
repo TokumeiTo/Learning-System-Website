@@ -26,7 +26,14 @@ import ReportIcon from '@mui/icons-material/Report';
 import DesignServicesIcon from '@mui/icons-material/DesignServices';
 import BookIcon from '@mui/icons-material/Book';
 import TranslateIcon from '@mui/icons-material/Translate';
+<<<<<<< HEAD
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+=======
+<<<<<<< HEAD
+=======
+import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
 
 import BasicSelect from "../common/Select";
 import UserProfileMenu from "../UserProfileMenu";
@@ -85,7 +92,15 @@ export const mainNavItems = [
   },
   {
     label: "Schedule",
+<<<<<<< HEAD
     path: "/schedule",
+=======
+<<<<<<< HEAD
+    path: "/dashboard/schedule",
+=======
+    path: "/schedule",
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
     icon: <EditCalendarIcon color="primary" />,
   },
   {
@@ -100,7 +115,15 @@ export const mainNavItems = [
   },
   {
     label: "Quiz",
+<<<<<<< HEAD
     path: "/quiz",
+=======
+<<<<<<< HEAD
+    path: "/dashboard/path",
+=======
+    path: "/quiz",
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
     icon: <QuizIcon color="primary" />,
   },
   {
@@ -110,7 +133,15 @@ export const mainNavItems = [
   },
   {
     label: "Flashcards",
+<<<<<<< HEAD
     path: "/dashboard/flashcards",
+=======
+<<<<<<< HEAD
+    path: "/flashcards",
+=======
+    path: "/dashboard/flashcards",
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
     icon: <StyleIcon color="primary" />,
   },
   {
@@ -125,14 +156,29 @@ export const mainNavItems = [
   },
   {
     label: "Translate",
+<<<<<<< HEAD
     path: "/dashboard/translate",
     icon: <TranslateIcon color="primary" />,
   },
+=======
+<<<<<<< HEAD
+    path: "/translate",
+    icon: <TranslateIcon color="primary" />,
+  },
+=======
+    path: "/dashboard/translate",
+    icon: <TranslateIcon color="primary" />,
+  },
+>>>>>>> 3943437 (12/22/2025)
   {
     label: "Mock test",
     path: "/test",
     icon: <HistoryEduIcon color="primary" />,
   },
+<<<<<<< HEAD
+=======
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
 ];
 
 const commonNavItems = [
@@ -170,7 +216,14 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         flexShrink: 0,
         whiteSpace: "nowrap",
         boxSizing: "border-box",
+<<<<<<< HEAD
         boxShadow: 10,
+=======
+<<<<<<< HEAD
+=======
+        boxShadow: 10,
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
         ...(open ? openedMixin(theme) : closedMixin(theme)),
         "& .MuiDrawer-paper": open
           ? openedMixin(theme)
@@ -194,6 +247,18 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       {/* ---------- Main Navigation ---------- */}
       <Box sx={{ flexGrow: 1 }}>
         <List>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+          {open && (
+            <ListItemText
+              primary="Commons"
+              sx={{ px: 3, fontSize: 12, color: "text.secondary" }}
+            />
+          )}
+=======
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
           {mainNavItems.map((item) => (
             <ListItemButton
               key={item.label}

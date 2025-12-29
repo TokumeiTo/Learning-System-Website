@@ -34,7 +34,15 @@ npm install @mui/icons-material
 npm install fg-loadcss
 npm install hanzi-writer
 npm install framer-motion
+<<<<<<< HEAD
 npm install @mui/x-charts
 npm install @mui/x-date-pickers
+=======
+<<<<<<< HEAD
+=======
+npm install @mui/x-charts
+npm install @mui/x-date-pickers
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
 
 

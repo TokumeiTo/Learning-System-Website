@@ -33,8 +33,17 @@ export default function KanjiDetailModal({ open, kanji, onClose }: Props) {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+<<<<<<< HEAD
                         bgcolor: 'lightGray',
                         mb: '20px'
+=======
+<<<<<<< HEAD
+                        bgcolor: 'lightGray'
+=======
+                        bgcolor: 'lightGray',
+                        mb: '20px'
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
                     }}
                 >
                     <KanjiStrokeAnimation

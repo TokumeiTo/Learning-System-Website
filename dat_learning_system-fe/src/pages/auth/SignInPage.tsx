@@ -4,6 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+import FormLabel from '@mui/material/FormLabel';
+=======
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
@@ -63,7 +70,15 @@ export default function SignIn() {
   };
 
   return (
+<<<<<<< HEAD
     <AuthContainer direction="column" sx={{ minHeight: '80vh', justifyContent: 'center' }}>
+=======
+<<<<<<< HEAD
+    <AuthContainer direction="column">
+=======
+    <AuthContainer direction="column" sx={{ minHeight: '80vh', justifyContent: 'center' }}>
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
       <Card variant="outlined">
         <SitemarkIcon />
         <Typography

@@ -16,7 +16,15 @@ const enrolledCourses = [
 export const Dashboard = () => {
   return (
     <PageLayout>
+<<<<<<< HEAD
       <div style={{ maxWidth: 900, margin: "50px auto", padding: "0 20px" }}>
+=======
+<<<<<<< HEAD
+      <div style={{ maxWidth: 900, margin: "50px auto" }}>
+=======
+      <div style={{ maxWidth: 900, margin: "50px auto", padding: "0 20px" }}>
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
         <Typography variant="h4" gutterBottom color="primary">
           Welcome to Your Dashboard
         </Typography>

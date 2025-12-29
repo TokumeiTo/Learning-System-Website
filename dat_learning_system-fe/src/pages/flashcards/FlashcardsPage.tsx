@@ -22,7 +22,15 @@ export default function FlashcardsPage() {
 
   return (
     <PageLayout>
+<<<<<<< HEAD
       <Box mt="10px" px="20px">
+=======
+<<<<<<< HEAD
+      <Box mt="50px">
+=======
+      <Box mt="10px" px="20px">
+>>>>>>> c7ea32c (12/22/2025)
+>>>>>>> 3943437 (12/22/2025)
         <Tabs value={tab} onChange={handleChange}>
           <Tab label="Kanji" />
           <Tab label="Vocabulary" disabled />
