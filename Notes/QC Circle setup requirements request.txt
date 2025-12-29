@@ -1,0 +1,40 @@
+Backend Reqirement request
+1. ASP .NET Core 8 (.NET SDK 8 download from official website)
+- ASP .NET is completele opensource and stable
+2. Entity Frame Core (Installation through Nuget Package of .NET)
+- Can reduce Project Time(Unrequire Query base) creating Database by Code-First 
+- Can reduce Time consuming
+- Reliable scability, *flexibility and faster than ADO .NET(Code-first with query base)
+3. Visual Studio Code (Latest)
+   - C# Dev Kit
+   - C# Extension
+   - IntelliCode
+4. PostgreSQL Database (Download via Official website)
+5. pgAdmin
+6. Miscrosoft.AspNetCore.Authentication.JwtBearer
+7. Miscrosoft.AspNetCore.Identity.EntityFrameworkCore
+8. Swashbuckle.AspNetCore (Swagger for backend testing)
+9. Serilog.AspNetCore (Logging)
+10. FluentValidation.AspNetCore (Validation)
+11. AutoMapper.Extensions.Microsoft.DependencyInjection
+12. Microsoft.EntityFrameworkCore.Tools
+13. Microsoft.AspNetCore.Cors
+14. xUnit & Microsoft.AspNetCore.Mvc.Testing (Testing)
+15. Git for version control access
+
+Needs only 
+
+
+FrontEnd installation
+npm install react-router-dom axios classnames @tanstack/react-query react-hook-form yup react-icons
+npm install -D @types/react-router-dom @types/react-icons @types/yup
+npm install @mui/material @emotion/react @emotion/styled
+npm install @fontsource/roboto
+npm install @mui/icons-material
+npm install fg-loadcss
+npm install hanzi-writer
+npm install framer-motion
+npm install @mui/x-charts
+npm install @mui/x-date-pickers
+
+

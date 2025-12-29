@@ -1,0 +1,79 @@
+Front End structure
+dat_learning_system-fe/
+│
+├── public/
+│   └── logo.svg
+│
+├── src/
+│   │
+│   ├── api/                 # API calls (real or mock)
+│   │   ├── auth.api.ts
+│   │   ├── user.api.ts
+│   │   ├── course.api.ts
+│   │   └── path.api.ts
+│   │
+│   ├── mocks/               # Mock API (FE-first strategy)
+│   │   ├── auth.mock.ts
+│   │   ├── course.mock.ts
+│   │   └── path.mock.ts
+│   │
+│   ├── components/          # Reusable UI components
+│   │   ├── common/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Input.tsx
+│   │   │   └── Modal.tsx
+│   │   │
+│   │   ├── layout/
+│   │   │   ├── Sidebar.tsx
+│   │   │   ├── Navbar.tsx
+│   │   │   └── PageLayout.tsx
+│   │   │
+│   │   └── feedback/
+│   │       ├── Loader.tsx
+│   │       └── Toast.tsx
+│   │
+│   ├── pages/               # Page-level components
+│   │   ├── auth/
+│   │   │   ├── Login.tsx
+│   │   │   └── Register.tsx
+│   │   │
+│   │   ├── dashboard/
+│   │   │   └── Dashboard.tsx
+│   │   │
+│   │   ├── courses/
+│   │   │   ├── CourseList.tsx
+│   │   │   └── CourseDetail.tsx
+│   │   │
+│   │   └── paths/
+│   │       ├── PathList.tsx
+│   │       └── PathDetail.tsx
+│   │
+│   ├── context/             # Global state (Auth, Theme)
+│   │   └── AuthContext.tsx
+│   │
+│   ├── hooks/               # Custom hooks
+│   │   ├── useAuth.ts
+│   │   └── useApi.ts
+│   │
+│   ├── router/              # Routing
+│   │   ├── AppRouter.tsx
+│   │   └── ProtectedRoute.tsx
+│   │
+│   ├── types/               # TypeScript types & DTOs
+│   │   ├── auth.ts
+│   │   ├── user.ts
+│   │   ├── course.ts
+│   │   └── path.ts
+│   │
+│   ├── utils/               # Helpers
+│   │   ├── token.ts
+│   │   └── constants.ts
+│   │
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+│
+├── .env
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
