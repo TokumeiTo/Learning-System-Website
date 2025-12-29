@@ -15,7 +15,6 @@
     "@fontsource/roboto": "^5.2.9",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
-<<<<<<< HEAD
     "@mui/x-charts": "^8.22.1",
     "@mui/x-date-pickers": "^8.22.1",
     "@tanstack/react-query": "^5.90.12",
@@ -23,40 +22,13 @@
     "classnames": "^2.5.1",
     "dayjs": "^1.11.19",
     "fg-loadcss": "^3.1.0",
-=======
-<<<<<<< HEAD
-    "@tanstack/react-query": "^5.90.12",
-    "axios": "^1.13.2",
-    "classnames": "^2.5.1",
-=======
-    "@mui/x-charts": "^8.22.1",
-    "@mui/x-date-pickers": "^8.22.1",
-    "@tanstack/react-query": "^5.90.12",
-    "axios": "^1.13.2",
-    "classnames": "^2.5.1",
-    "dayjs": "^1.11.19",
-    "fg-loadcss": "^3.1.0",
->>>>>>> c7ea32c (12/22/2025)
->>>>>>> 3943437 (12/22/2025)
     "framer-motion": "^12.23.26",
     "hanzi-writer": "^3.7.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-<<<<<<< HEAD
     "react-hook-form": "^7.69.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.11.0",
-=======
-<<<<<<< HEAD
-    "react-hook-form": "^7.68.0",
-    "react-icons": "^5.5.0",
-    "react-router-dom": "^7.10.1",
-=======
-    "react-hook-form": "^7.69.0",
-    "react-icons": "^5.5.0",
-    "react-router-dom": "^7.11.0",
->>>>>>> c7ea32c (12/22/2025)
->>>>>>> 3943437 (12/22/2025)
     "yup": "^1.7.1"
   },
   "devDependencies": {
@@ -64,18 +36,9 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
-<<<<<<< HEAD
     "@types/react-icons": "^2.2.7",
     "@types/react-router-dom": "^5.3.3",
     "@types/yup": "^0.29.14",
-=======
-<<<<<<< HEAD
-=======
-    "@types/react-icons": "^2.2.7",
-    "@types/react-router-dom": "^5.3.3",
-    "@types/yup": "^0.29.14",
->>>>>>> c7ea32c (12/22/2025)
->>>>>>> 3943437 (12/22/2025)
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",

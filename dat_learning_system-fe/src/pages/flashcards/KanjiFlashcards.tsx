@@ -1,12 +1,4 @@
-<<<<<<< HEAD
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-=======
-<<<<<<< HEAD
-import { Box, FormControl, InputLabel, MenuItem, Select, Button } from "@mui/material";
-=======
-import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
->>>>>>> c7ea32c (12/22/2025)
->>>>>>> 3943437 (12/22/2025)
 import { useState } from "react";
 import { kanjiMockData } from "../../mocks/kanji.mock";
 import type { Kanji, JLPTLevel } from "../../types/kanji";
@@ -14,14 +6,7 @@ import KanjiCard from "../../components/flashcards/KanjiCard";
 import KanjiDetailModal from "../../components/flashcards/KanjiDetailModal";
 import KanjiCreateModal from "../../components/flashcards/KanjiCreateModal";
 import SearchBar from "../../components/common/Search";
-<<<<<<< HEAD
 import AddBoxIcon from '@mui/icons-material/AddBox';
-=======
-<<<<<<< HEAD
-=======
-import AddBoxIcon from '@mui/icons-material/AddBox';
->>>>>>> c7ea32c (12/22/2025)
->>>>>>> 3943437 (12/22/2025)
 
 export default function KanjiFlashcards() {
   const [selectedKanji, setSelectedKanji] = useState<Kanji | null>(null);
@@ -59,17 +44,6 @@ export default function KanjiFlashcards() {
           onSelect={(value) => console.log("Selected:", value)}
         />
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-        <Button
-          variant="contained"
-          onClick={() => setOpenCreate(true)}
-        >
-          + Create Kanji
-        </Button>
-=======
->>>>>>> 3943437 (12/22/2025)
 
         <AddBoxIcon sx={{
           cursor: 'pointer', 
@@ -81,10 +55,6 @@ export default function KanjiFlashcards() {
           }
         }} onClick={() => setOpenCreate(true)} fontSize="large" color="primary" />
 
-<<<<<<< HEAD
-=======
->>>>>>> c7ea32c (12/22/2025)
->>>>>>> 3943437 (12/22/2025)
       </Box>
 
       {/* Kanji Grid */}

@@ -1,13 +1,6 @@
 import { Card, CardActionArea, Typography } from "@mui/material";
 import type { KanaItem } from "../../types/kana";
-<<<<<<< HEAD
 import { motion } from "framer-motion";
-=======
-<<<<<<< HEAD
-=======
-import { motion } from "framer-motion";
->>>>>>> c7ea32c (12/22/2025)
->>>>>>> 3943437 (12/22/2025)
 
 type KanaCardProps = {
   kana: KanaItem;
@@ -22,47 +15,6 @@ export default function KanaCard({ kana, onClick }: KanaCardProps) {
   };
 
   return (
-<<<<<<< HEAD
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.3 }}
-      style={{ height: "100%" }}
-=======
-<<<<<<< HEAD
-    <Card
-      sx={{
-        borderRadius: 2,
-        transition: "transform 0.2s ease, box-shadow 0.2s ease",
-        "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: 4,
-        },
-      }}
->>>>>>> 3943437 (12/22/2025)
-    >
-      <Card
-        sx={{
-          borderRadius: 2,
-          transition: "transform 0.2s ease, box-shadow 0.2s ease",
-          "&:hover": {
-            transform: "translateY(-2px)",
-            boxShadow: 4,
-          },
-        }}
-      >
-<<<<<<< HEAD
-=======
-        <Typography variant="h3" sx={{ fontWeight: 500 }}>
-          {kana.char}
-        </Typography>
-        <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 0.5 }}>
-          {kana.romaji}
-        </Typography>
-      </CardActionArea>
-    </Card>
-=======
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
@@ -80,7 +32,6 @@ export default function KanaCard({ kana, onClick }: KanaCardProps) {
           },
         }}
       >
->>>>>>> 3943437 (12/22/2025)
         <CardActionArea
           onClick={() => {
             playSound();
@@ -104,9 +55,5 @@ export default function KanaCard({ kana, onClick }: KanaCardProps) {
         </CardActionArea>
       </Card>
     </motion.div>
-<<<<<<< HEAD
-=======
->>>>>>> c7ea32c (12/22/2025)
->>>>>>> 3943437 (12/22/2025)
   );
 }
