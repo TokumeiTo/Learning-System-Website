@@ -1,6 +1,6 @@
 import React from 'react';
 import { useContext } from "react";
-import { CustomThemeContext } from '../../theme/ThemeProvider';
+import { CustomThemeContext } from '../../context/theme/ThemeProvider';
 
 import MuiAppBar from '@mui/material/AppBar';
 import type { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
@@ -52,7 +52,7 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
 
   return (
     <AppBar position="fixed" open={open}>
-      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', boxShadow:'5px 0 10px rgba(0, 132, 255, 1)' }}>
         <IconButton
           color="inherit"
           aria-label="open drawer"

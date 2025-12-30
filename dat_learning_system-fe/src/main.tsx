@@ -6,7 +6,7 @@ import "./index.css";
 import { AuthProvider } from "./context/AuthContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { CustomThemeProvider } from "./theme/ThemeProvider";
+import { CustomThemeProvider } from "./context/theme/ThemeProvider";
 
 // Fonts
 import "@fontsource/roboto/300.css";

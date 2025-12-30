@@ -1,107 +1,101 @@
-import { Box, Paper, Typography } from "@mui/material";
-import CheckIcon from "@mui/icons-material/Check";
-import LockIcon from "@mui/icons-material/Lock";
-import { useTheme } from "@mui/material/styles";
-
-type Lesson = {
-  id: number;
-  title: string;
-  completed: boolean;
-  locked: boolean;
-  x: number;
-  y: number;
-};
-
-const lessons: Lesson[] = [
-  { id: 1, title: "Hiragana 1", completed: true, locked: false, x: 50, y: 50 },
-  { id: 2, title: "Hiragana 2", completed: false, locked: false, x: 200, y: 120 },
-  { id: 3, title: "Katakana 1", completed: false, locked: true, x: 80, y: 250 },
-  { id: 4, title: "Kanji Basics", completed: false, locked: true, x: 220, y: 380 },
-  { id: 5, title: "Kanji Advanced", completed: false, locked: true, x: 50, y: 500 },
-];
-
-// Helper to create snake-like curve segments
-const generateSnakePath = (lessons: Lesson[]) => {
-  let d = `M${lessons[0].x + 40} ${lessons[0].y + 40}`;
-  for (let i = 1; i < lessons.length; i++) {
-    const prev = lessons[i - 1];
-    const curr = lessons[i];
-    const midX = (prev.x + curr.x) / 2 + (Math.random() * 40 - 20);
-    const midY = (prev.y + curr.y) / 2 + (Math.random() * 40 - 20);
-    d += ` Q${midX} ${midY}, ${curr.x + 40} ${curr.y + 40}`;
-  }
-  return d;
-};
+import {
+  Box,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  useTheme,
+  type SelectChangeEvent,
+} from "@mui/material";
+import * as React from "react";
+import ListIcon from "@mui/icons-material/List";
+import PageLayout from "../../components/layout/PageLayout";
+import { LessonMap } from "../../components/lessons";
+import LessonSidebar from "../../components/lessons/LessonSidebar";
+import type { Lesson } from "../../types/lesson";
+import { generateZigZagLayout } from "../../utils/lessonLayout";
+import { lessonSidebarData, type CourseSidebarType, type LessonPlateType } from "../../mocks/lessonSidebar.mock";
 
 export default function LessonPage() {
+  const [selectedCourse, setSelectedCourse] = React.useState<string>("minna");
+  const [sidebarOpen, setSidebarOpen] = React.useState<boolean>(true);
+  const [activePlateId, setActivePlateId] = React.useState<number | null>(null);
   const theme = useTheme();
-  const path = generateSnakePath(lessons);
+
+  const handleCourseChange = (e: SelectChangeEvent) => setSelectedCourse(e.target.value);
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
+
+  // Extract all plates for map dynamically
+  const lessons: Lesson[] = React.useMemo(() => {
+    const course: CourseSidebarType | undefined = lessonSidebarData.find(
+      (c) => c.course === selectedCourse
+    );
+    if (!course) return [];
+
+    const allPlates: Lesson[] = [];
+    course.levels.forEach((level) => {
+      level.lessons.forEach((lessonItem) => {
+        lessonItem.plates.forEach((plate: LessonPlateType) => {
+          allPlates.push({
+            id: plate.id,
+            title: plate.title,
+            completed: plate.completed,
+            locked: plate.locked,
+          });
+        });
+      });
+    });
+    return allPlates;
+  }, [selectedCourse]);
+
+  const positionedLessons = React.useMemo(
+    () => generateZigZagLayout(lessons, { leftX: 50, rightX: 220, verticalGap: 120 }),
+    [lessons]
+  );
 
   return (
-    <Box sx={{ p: 4, position: "relative", width: "100%", height: 600 }}>
-      {/* Snake-like dashed path */}
-      <svg
-        width="100%"
-        height="100%"
-        style={{ position: "absolute", top: 0, left: 0 }}
-      >
-        <path
-          d={path}
-          stroke={theme.palette.primary.main}
-          strokeWidth={4}
-          fill="transparent"
-          strokeLinecap="round"
-          strokeDasharray="8 6"
-        />
-      </svg>
+    <PageLayout>
+      {/* Toolbar */}
+      <Box sx={{ display: "flex", mb: 3, justifyContent: 'space-between', alignItems: "center", gap: 2, bgcolor: theme.palette.background.paper, p: 2, borderRadius: 2 }}>
+        <FormControl variant="standard" sx={{ minWidth: 180, display: 'sticky', top: 0 }}>
+          <InputLabel>Course</InputLabel>
+          <Select value={selectedCourse} onChange={handleCourseChange}>
+            {lessonSidebarData.map((c) => (
+              <MenuItem key={c.course} value={c.course}>
+                {c.course.toUpperCase()}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-      {/* Nodes with proper labels */}
-      {lessons.map((lesson) => (
-        <Box
-          key={lesson.id}
-          sx={{
-            position: "absolute",
-            top: lesson.y,
-            left: lesson.x,
-            textAlign: "center",
-          }}
-        >
-          <Paper
-            sx={{
-              width: 80,
-              height: 80,
-              borderRadius: "50%",
-              bgcolor: lesson.completed
-                ? theme.palette.primary.main
-                : lesson.locked
-                ? theme.palette.grey[800]
-                : theme.palette.background.paper,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: lesson.completed
-                ? "0 0 25px rgba(61,167,253,0.7)"
-                : 3,
-              cursor: lesson.locked ? "not-allowed" : "pointer",
-              transition: "transform 0.2s, box-shadow 0.2s",
-              "&:hover": {
-                transform: lesson.locked ? "none" : "scale(1.1)",
-                boxShadow: lesson.locked
-                  ? "none"
-                  : "0 0 30px rgba(61,167,253,0.7)",
-              },
-            }}
-          >
-            {lesson.completed && <CheckIcon sx={{ color: "#fff" }} />}
-            {lesson.locked && <LockIcon sx={{ color: "#fff" }} />}
-          </Paper>
+        <IconButton onClick={toggleSidebar}>
+          <ListIcon />
+        </IconButton>
+      </Box>
 
-          {/* Always visible label */}
-          <Typography variant="caption" sx={{ mt: 0.5, fontWeight: 500 }}>
-            {lesson.title}
-          </Typography>
+      <Box sx={{ display: "flex", gap: 2 }}>
+        {/* Map */}
+        <Box sx={{ flex: 1 }}>
+          <LessonMap
+            lessons={positionedLessons}
+            activePlateId={activePlateId}
+          />
+
         </Box>
-      ))}
-    </Box>
+
+        {/* Sidebar */}
+        {sidebarOpen && (
+          <Box sx={{ width: 280 }}>
+            <LessonSidebar
+              selectedCourse={selectedCourse}
+              onSelectPlate={(_, __, ___, plateId) => {
+                setActivePlateId(plateId);
+              }}
+            />
+          </Box>
+        )}
+      </Box>
+    </PageLayout>
   );
 }
