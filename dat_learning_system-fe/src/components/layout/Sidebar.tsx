@@ -80,7 +80,7 @@ interface SidebarProps {
 export const mainNavItems = [
   {
     label: "Lessons",
-    path: "/dashboard/lessons",
+    path: "/lessons",
     icon: <SchoolIcon color="primary" />,
   },
   {

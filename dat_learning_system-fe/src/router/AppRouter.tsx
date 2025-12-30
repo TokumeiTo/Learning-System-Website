@@ -14,6 +14,7 @@ import QuizReviewPage from "../pages/quiz/QuizReviewPage";
 import QuizSetupPage from "../pages/quiz/QuizSetupPage";
 import QuizListPage from "../pages/quiz/QuizListPage";
 import SchedulePage from "../pages/schedules/SchedulePage";
+import LessonPage from "../pages/lessons/LessonPage";
 
 export const AppRouter = () => {
   const { user } = useAuth();
@@ -65,6 +66,7 @@ export const AppRouter = () => {
         <Route path="/quiz/review" element={<QuizReviewPage />} />
         
         <Route path="/schedule" element={<SchedulePage />} />
+        <Route path="/lessons" element={<LessonPage />} />
 
         {/* Default redirect */}
         <Route path="*" element={<Navigate to={user ? "/dashboard" : "/signIn"} />} />
