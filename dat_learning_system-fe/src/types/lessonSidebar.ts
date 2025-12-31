@@ -17,3 +17,14 @@ export type LevelType = {
 export type LessonSidebarDataType = {
   [course: string]: LevelType[];
 };
+
+export type LessonSidebarProps = {
+    selectedCourse: string;
+    activePlateId?: number;
+    onSelectPlate: (
+        course: string,
+        level: string,
+        lesson: string,
+        plateId: number
+    ) => void;
+};

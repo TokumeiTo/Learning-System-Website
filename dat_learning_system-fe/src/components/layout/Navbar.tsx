@@ -52,7 +52,7 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
 
   return (
     <AppBar position="fixed" open={open}>
-      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', boxShadow:'5px 0 10px rgba(0, 132, 255, 1)' }}>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', boxShadow: '5px 0 10px rgba(0, 132, 255, 1)' }}>
         <IconButton
           color="inherit"
           aria-label="open drawer"
@@ -63,7 +63,7 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
           <MenuIcon />
         </IconButton>
 
-        <Typography variant="h6" noWrap component="div">
+        <Typography variant="h6" noWrap component="div" sx={{ userSelect: 'none' }}>
           <TipsAndUpdatesIcon sx={{ marginRight: 1 }} />
           HLMS
         </Typography>

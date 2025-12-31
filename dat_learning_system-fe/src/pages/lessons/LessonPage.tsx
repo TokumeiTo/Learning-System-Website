@@ -11,14 +11,16 @@ import {
 import * as React from "react";
 import ListIcon from "@mui/icons-material/List";
 import PageLayout from "../../components/layout/PageLayout";
-import { LessonMap } from "../../components/lessons";
-import LessonSidebar from "../../components/lessons/LessonSidebar";
+import LessonMap from "../../components/lessons/LessonMap";
+import LessonSidebar from "../../components/lessons/LessonSidebar/LessonSidebar";
 import type { Lesson } from "../../types/lesson";
 import { generateZigZagLayout } from "../../utils/lessonLayout";
 import { lessonSidebarData, type CourseSidebarType, type LessonPlateType } from "../../mocks/lessonSidebar.mock";
+import CourseProgressSidebar from "../../components/lessons/CourseProgressSidebar/CourseProgressSidebar";
+import CalendarHeatmap from "../../components/chartAndProgress/DailyLessonChart";
 
 export default function LessonPage() {
-  const [selectedCourse, setSelectedCourse] = React.useState<string>("minna");
+  const [selectedCourse, setSelectedCourse] = React.useState<string>("minnanonihongo");
   const [sidebarOpen, setSidebarOpen] = React.useState<boolean>(true);
   const [activePlateId, setActivePlateId] = React.useState<number | null>(null);
   const theme = useTheme();
@@ -57,7 +59,21 @@ export default function LessonPage() {
   return (
     <PageLayout>
       {/* Toolbar */}
-      <Box sx={{ display: "flex", mb: 3, justifyContent: 'space-between', alignItems: "center", gap: 2, bgcolor: theme.palette.background.paper, p: 2, borderRadius: 2 }}>
+      <Box sx={{
+        display: "flex",
+        position: "sticky",
+        top: 90,
+        mb: 3,
+        justifyContent: 'space-between',
+        alignItems: "center",
+        gap: 2,
+        bgcolor: theme.palette.background.paper,
+        p: 2,
+        borderRadius: 2,
+        zIndex: 1,
+        boxShadow: "-7px 0px 1px rgba(0, 255, 149, 0.48)",
+        border: '1px solid rgba(0, 255, 149, 0.48)'
+      }}>
         <FormControl variant="standard" sx={{ minWidth: 180, display: 'sticky', top: 0 }}>
           <InputLabel>Course</InputLabel>
           <Select value={selectedCourse} onChange={handleCourseChange}>
@@ -74,28 +90,37 @@ export default function LessonPage() {
         </IconButton>
       </Box>
 
-      <Box sx={{ display: "flex", gap: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          flexDirection: { xs: "column", md: "row" }, // responsive
+        }}
+      >
         {/* Map */}
         <Box sx={{ flex: 1 }}>
-          <LessonMap
-            lessons={positionedLessons}
-            activePlateId={activePlateId}
-          />
-
+          <LessonMap lessons={positionedLessons} activePlateId={activePlateId} />
         </Box>
 
-        {/* Sidebar */}
+        {/* Right side: Sidebar + Progress */}
         {sidebarOpen && (
-          <Box sx={{ width: 280 }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+            }}
+          >
+            {/* Progress Sidebar */}
+            <CourseProgressSidebar progress={45} /> {/* Mock value 45% */}
             <LessonSidebar
               selectedCourse={selectedCourse}
-              onSelectPlate={(_, __, ___, plateId) => {
-                setActivePlateId(plateId);
-              }}
+              onSelectPlate={(_, __, ___, plateId) => setActivePlateId(plateId)}
             />
           </Box>
         )}
       </Box>
+
+
     </PageLayout>
   );
 }

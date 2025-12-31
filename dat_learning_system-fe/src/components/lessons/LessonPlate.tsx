@@ -1,6 +1,8 @@
 import { Box, Paper, Typography, Tooltip } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import LockIcon from "@mui/icons-material/Lock";
+import FactCheckIcon from '@mui/icons-material/FactCheck';
+import SpellcheckIcon from '@mui/icons-material/Spellcheck';
 import { useTheme } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 
@@ -8,6 +10,7 @@ type Props = {
   completed: boolean;
   locked: boolean;
   active?: boolean;
+  title: string;
   onClick?: () => void;
 };
 
@@ -15,6 +18,7 @@ export default function LessonPlate({
   completed,
   locked,
   active,
+  title,
   onClick,
 }: Props) {
   const theme = useTheme();
@@ -56,13 +60,13 @@ export default function LessonPlate({
             bgcolor: completed
               ? "#00b309ff"
               : locked
-              ? theme.palette.grey[800]
-              : theme.palette.primary.dark,
+                ? theme.palette.grey[800]
+                : theme.palette.primary.dark,
             boxShadow: completed
               ? "0 4px 10px rgba(34,204,0,1)"
               : locked
-              ? "0 4px 10px rgba(100,100,100,0.6)"
-              : "0 4px 10px rgba(0,128,255,0.6)",
+                ? "0 4px 10px rgba(100,100,100,0.6)"
+                : "0 4px 10px rgba(0,128,255,0.6)",
           }}
         />
 
@@ -77,8 +81,8 @@ export default function LessonPlate({
             bgcolor: completed
               ? "#00ff0dff"
               : locked
-              ? theme.palette.grey[600]
-              : theme.palette.primary.main,
+                ? theme.palette.grey[600]
+                : theme.palette.primary.main,
 
             display: "flex",
             alignItems: "center",
@@ -92,8 +96,8 @@ export default function LessonPlate({
             animation: animateUnlock
               ? "unlockPop 0.6s ease-out"
               : active
-              ? "activePulse 1.4s ease-in-out infinite"
-              : "none",
+                ? "activePulse 1.4s ease-in-out infinite"
+                : "none",
 
             "@keyframes unlockPop": {
               "0%": { transform: "scale(0.8)" },
@@ -117,8 +121,17 @@ export default function LessonPlate({
           }}
         >
           {completed && <CheckIcon sx={{ color: "#fff", fontSize: 32 }} />}
-          {!completed && !locked && (
-            <Typography sx={{ color: "#fff", fontSize: 32 }}>あ</Typography>
+          {!locked && !completed && title.includes("Review") && (
+            <FactCheckIcon sx={{ color: "#fff", fontSize: 32 }} />
+          )}
+          {!locked && !completed && title.includes("Katakana") && (
+            <Typography sx={{ color: "#fff", fontSize: 32, cursor: 'pointer', userSelect: 'none' }}>ア</Typography>
+          )}
+          {!locked && !completed && title.includes("Hiragana") && (
+            <Typography sx={{ color: "#fff", fontSize: 32, cursor: 'pointer', userSelect: 'none' }}>あ</Typography>
+          )}
+          {!locked && !completed && title.includes("Grammar") && (
+            <SpellcheckIcon sx={{ color: "#fff", fontSize: 32 }} />
           )}
           {locked && <LockIcon sx={{ color: "#fff", fontSize: 32 }} />}
         </Paper>

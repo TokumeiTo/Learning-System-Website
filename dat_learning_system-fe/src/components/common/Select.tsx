@@ -15,7 +15,7 @@ export default function BasicSelect() {
     return (
         <Box sx={{ display: "flex", justifyContent: 'center', minWidth: 170}}>
             <FormControl variant="standard" sx={{ minWidth: 170 }}>
-                <InputLabel id="demo-simple-select-standard-label">Learn</InputLabel>
+                <InputLabel id="demo-simple-select-standard-label">Choose Category</InputLabel>
                 <Select
                     labelId="demo-simple-select-standard-label"
                     id="demo-simple-select-standard"
