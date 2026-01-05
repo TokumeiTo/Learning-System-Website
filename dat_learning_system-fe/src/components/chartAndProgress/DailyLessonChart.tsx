@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Box, Stack, Typography, Tooltip as MuiTooltip } from "@mui/material";
 import data from "../../mocks/dayStreak.mock";
 import { getWeeks } from "../../utils/getWeeks";

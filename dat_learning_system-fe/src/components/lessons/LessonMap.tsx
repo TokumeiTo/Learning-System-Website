@@ -83,6 +83,7 @@ export default function LessonMap({
             locked={lesson.locked}
             active={lesson.id === activePlateId}
             title ={lesson.title}
+            description ={lesson.description}
             onClick={() => onPlateClick?.(lesson.id)}
           />
 

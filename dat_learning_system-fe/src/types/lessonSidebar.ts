@@ -25,6 +25,11 @@ export type LessonSidebarProps = {
         course: string,
         level: string,
         lesson: string,
-        plateId: number
+        plateId: number,
+        plateDescription?: string,
+        isTest?: boolean,
+        correct?: number,
+        wrong?: number
     ) => void;
 };
+

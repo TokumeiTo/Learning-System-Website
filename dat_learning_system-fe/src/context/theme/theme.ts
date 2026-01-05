@@ -10,7 +10,8 @@ export const getDesignTokens = (mode: "light" | "dark") => ({
                 background: {
                     default: "#f5f5f5",
                     paper: "#ffffff",
-                    toolbar: '#0080ffff'
+                    toolbar: '#0080ffff',
+                    blur: 'rgba(255, 255, 255, 0.43)'
                 },
                 text: { primary: "#333", secondary: "#666", tertiary: '#000000ff' },
             }
@@ -20,7 +21,8 @@ export const getDesignTokens = (mode: "light" | "dark") => ({
                 background: {
                     default: "#0b1220",
                     paper: "#111827",
-                    toolbar: '#000d26'
+                    toolbar: '#000d26',
+                    blur: '#000d26414e'
                 },
                 text: { primary: "#fff", secondary: "#9e9e9eff", tertiary: '#00e7ff', disabled: '#585858ff' },
             }),

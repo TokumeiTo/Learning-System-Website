@@ -3,10 +3,25 @@ import { ListItemButton, ListItemText } from "@mui/material";
 type Props = {
     title: string;
     active: boolean;
-    onClick: () => void;
+    description?: string; // <-- description from admin
+    isTest?: boolean;     // <-- true if plate is a test
+    correct?: number;
+    wrong?: number;
+    onClick: (info: {
+        title: string;
+        description?: string;
+        isTest?: boolean;
+        correct?: number;
+        wrong?: number;
+    }) => void;
 };
 
-export default function PlateItem({ title, active, onClick }: Props) {
+
+export default function PlateItem({ title, active, description, isTest, correct, wrong, onClick }: Props) {
+    const handleClick = () => {
+        onClick({ title, description, isTest, correct, wrong });
+    };
+
     return (
         <ListItemButton
             sx={{
@@ -16,7 +31,7 @@ export default function PlateItem({ title, active, onClick }: Props) {
                 boxShadow: active ? "0 0 8px rgba(76, 175, 80, 0.6)" : "none",
                 transition: "all 0.2s ease",
             }}
-            onClick={onClick}
+            onClick={handleClick}
         >
             <ListItemText primary={title} />
         </ListItemButton>

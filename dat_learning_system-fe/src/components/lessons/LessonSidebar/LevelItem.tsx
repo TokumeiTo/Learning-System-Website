@@ -10,8 +10,19 @@ type Props = {
     openLessons: Record<string, boolean>;
     toggleLesson: (key: string) => void;
     activePlateId?: number;
-    onSelectPlate: (lessonTitle: string, plateId: number) => void;
+    onSelectPlate: (
+        lessonTitle: string,
+        plateId: number,
+        plateInfo: {
+            title: string;
+            description?: string;
+            isTest?: boolean;
+            correct?: number;
+            wrong?: number;
+        }
+    ) => void;
 };
+
 
 export default function LevelItem({
     levelKey,
@@ -43,8 +54,8 @@ export default function LevelItem({
                                 isOpen={openLessons[lessonKey]}
                                 toggle={toggleLesson}
                                 activePlateId={activePlateId}
-                                onSelectPlate={(plateId) =>
-                                    onSelectPlate(lesson.title, plateId)
+                                onSelectPlate={(plateId, plateInfo) =>
+                                    onSelectPlate(lesson.title, plateId, plateInfo)
                                 }
                             />
                         );

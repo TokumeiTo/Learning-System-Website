@@ -15,8 +15,18 @@ type Props = {
     isOpen: boolean;
     toggle: (key: string) => void;
     activePlateId?: number;
-    onSelectPlate: (plateId: number) => void;
+    onSelectPlate: (
+        plateId: number,
+        plateInfo: {
+            title: string;
+            description?: string;
+            isTest?: boolean;
+            correct?: number;
+            wrong?: number;
+        }
+    ) => void;
 };
+
 
 export default function LessonItem({
     lessonKey,
@@ -43,11 +53,16 @@ export default function LessonItem({
                             key={plate.id}
                             title={plate.title}
                             active={plate.id === activePlateId}
-                            onClick={() => onSelectPlate(plate.id)}
+                            description={plate.description}  // <-- add
+                            isTest={plate.isTest}           // <-- add if it's a test plate
+                            correct={plate.correct}         // <-- optional
+                            wrong={plate.wrong}             // <-- optional
+                            onClick={(plateInfo) => onSelectPlate(plate.id, plateInfo)} // send full info
                         />
                     ))}
                 </List>
             </Collapse>
+
 
             <Divider sx={{ mt: 1 }} />
         </Box>

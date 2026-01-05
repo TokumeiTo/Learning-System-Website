@@ -5,6 +5,9 @@ import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
+import { useTheme } from "@mui/material";
+import CalendarHeatmap from "../../components/chartAndProgress/DailyLessonChart";
+
 
 // Mock data for enrolled courses
 const enrolledCourses = [
@@ -14,6 +17,7 @@ const enrolledCourses = [
 ];
 
 export const Dashboard = () => {
+  const theme = useTheme();
   return (
     <PageLayout>
       <div style={{ maxWidth: 900, margin: "50px auto", padding: "0 20px" }}>
@@ -58,6 +62,17 @@ export const Dashboard = () => {
               </Card>
             </Box>
           ))}
+        </Box>
+        <Box sx={{
+          bgcolor: theme.palette.background.blur,
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)", // Safari
+          px: 2,
+          pt: 2,
+          borderRadius: '10px',
+          boxShadow: '1px 1px 5px #00ffaaff',
+        }}>
+          <CalendarHeatmap />
         </Box>
       </div>
     </PageLayout>

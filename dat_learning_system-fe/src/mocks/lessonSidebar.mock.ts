@@ -3,9 +3,27 @@
 export type LessonPlateType = {
   id: number;
   title: string;
+  description?: string;
   completed: boolean;
   locked: boolean;
+
+  // ✅ add these
+  isTest?: boolean;
+  correct?: number;
+  wrong?: number;
 };
+
+// types/PlateInfo.ts
+export type PlateInfo = {
+  id: number;
+  title: string;
+  description?: string;
+
+  isTest?: boolean;
+  correct?: number;
+  wrong?: number;
+};
+
 
 export type LessonItemType = {
   id: number;
@@ -36,167 +54,105 @@ export const lessonSidebarData: CourseSidebarType[] = [
             id: 1,
             title: "Lesson 1",
             plates: [
-              { id: 1, title: "Hiragana", completed: true, locked: false },
-              { id: 2, title: "Katakana", completed: false, locked: false },
-              { id: 3, title: "Grammar", completed: false, locked: false },
-              { id: 4, title: "Reading", completed: false, locked: true },
-              { id: 5, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 6, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 7, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 8, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 9, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 10, title: "Lesson 1 Review", completed: false, locked: true },
-            ],
-          },
-          {
-            id: 2,
-            title: "Lesson 2",
-            plates: [
-              { id: 11, title: "Hiragana 2", completed: false, locked: true },
-              { id: 12, title: "Grammar 2", completed: false, locked: true },
-            ],
-          },
-        ],
-      },
-      {
-        id: 2,
-        title: "N4 - Elementary",
-        lessons: [
-          {
-            id: 1,
-            title: "Lesson 1",
-            plates: [
-              { id: 1, title: "Hiragana", completed: true, locked: false },
-              { id: 2, title: "Katakana", completed: false, locked: false },
-              { id: 3, title: "Grammar", completed: false, locked: false },
-              { id: 4, title: "Reading", completed: false, locked: true },
-              { id: 5, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 6, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 7, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 8, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 9, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 10, title: "Lesson 1 Review", completed: false, locked: true },
-            ],
-          },
-          {
-            id: 2,
-            title: "Lesson 2",
-            plates: [
-              { id: 11, title: "Hiragana 2", completed: false, locked: true },
-              { id: 12, title: "Grammar 2", completed: false, locked: true },
-              { id: 13, title: "Grammar 2", completed: false, locked: true },
-              { id: 14, title: "Grammar 2", completed: false, locked: true },
-              { id: 15, title: "Grammar 2", completed: false, locked: true },
-              { id: 16, title: "Grammar 2", completed: false, locked: true },
-              { id: 17, title: "Grammar 2", completed: false, locked: true },
-            ],
-          },
-        ],
-      },
-      {
-        id: 3,
-        title: "N3 - Intermediate",
-        lessons: [
-          {
-            id: 1,
-            title: "Lesson 1",
-            plates: [
-              { id: 1, title: "Hiragana", completed: true, locked: false },
-              { id: 2, title: "Katakana", completed: false, locked: false },
-              { id: 3, title: "Grammar", completed: false, locked: false },
-              { id: 4, title: "Reading", completed: false, locked: true },
-              { id: 5, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 6, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 7, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 8, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 9, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 10, title: "Lesson 1 Review", completed: false, locked: true },
-            ],
-          },
-          {
-            id: 2,
-            title: "Lesson 2",
-            plates: [
-              { id: 11, title: "Hiragana 2", completed: false, locked: true },
-              { id: 12, title: "Grammar 2", completed: false, locked: true },
-              { id: 13, title: "Grammar 2", completed: false, locked: true },
-              { id: 14, title: "Grammar 2", completed: false, locked: true },
-              { id: 15, title: "Grammar 2", completed: false, locked: true },
-              { id: 16, title: "Grammar 2", completed: false, locked: true },
-              { id: 17, title: "Grammar 2", completed: false, locked: true },
+              {
+                id: 1,
+                title: "Hiragana",
+                description: "Learn あ・い・う・え・お and basic pronunciation",
+                completed: true,
+                locked: false,
+              },
+              {
+                id: 2,
+                title: "Katakana",
+                description: "Master ア・イ・ウ・エ・オ and loanwords",
+                completed: false,
+                locked: false,
+              },
+              {
+                id: 3,
+                title: "Grammar",
+                description: "Basic sentence structure using です / ます",
+                completed: false,
+                locked: false,
+              },
+              {
+                id: 4,
+                title: "Reading",
+                description: "Read and understand: 私のなまえは〜です",
+                completed: false,
+                locked: false,
+              },
 
+              // 🔁 Review plates
+              {
+                id: 5,
+                title: "Lesson 1 Review",
+                description: "Review all contents from Lesson 1",
+                isTest: true,
+                completed: false,
+                locked: false,
+              },
+
+              // 🧪 Test plate
+              {
+                id: 6,
+                title: "Lesson 1 Test",
+                description: "Test your understanding of Lesson 1",
+                isTest: true,
+                correct: 7,
+                wrong: 3,
+                completed: false,
+                locked: true,
+              },
             ],
           },
-        ],
-      },
-      {
-        id: 4,
-        title: "N2 - Upper Intermediate",
-        lessons: [
-          {
-            id: 1,
-            title: "Lesson 1",
-            plates: [
-              { id: 1, title: "Hiragana", completed: true, locked: false },
-              { id: 2, title: "Katakana", completed: false, locked: false },
-              { id: 3, title: "Grammar", completed: false, locked: false },
-              { id: 4, title: "Reading", completed: false, locked: true },
-              { id: 5, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 6, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 7, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 8, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 9, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 10, title: "Lesson 1 Review", completed: false, locked: true },
-            ],
-          },
+
           {
             id: 2,
             title: "Lesson 2",
             plates: [
-              { id: 11, title: "Hiragana 2", completed: false, locked: true },
-              { id: 12, title: "Grammar 2", completed: false, locked: true },
-              { id: 13, title: "Grammar 2", completed: false, locked: true },
-              { id: 14, title: "Grammar 2", completed: false, locked: true },
-              { id: 15, title: "Grammar 2", completed: false, locked: true },
-              { id: 16, title: "Grammar 2", completed: false, locked: true },
-              { id: 17, title: "Grammar 2", completed: false, locked: true },
-
-            ],
-          },
-        ],
-      },
-      {
-        id: 5,
-        title: "N1 - Advanced",
-        lessons: [
-          {
-            id: 1,
-            title: "Lesson 1",
-            plates: [
-              { id: 1, title: "Hiragana", completed: true, locked: false },
-              { id: 2, title: "Katakana", completed: false, locked: false },
-              { id: 3, title: "Grammar", completed: false, locked: false },
-              { id: 4, title: "Reading", completed: false, locked: true },
-              { id: 5, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 5, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 5, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 5, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 5, title: "Lesson 1 Review", completed: false, locked: true },
-              { id: 5, title: "Lesson 1 Review", completed: false, locked: true },
-            ],
-          },
-          {
-            id: 2,
-            title: "Lesson 2",
-            plates: [
-              { id: 6, title: "Hiragana 2", completed: false, locked: true },
-              { id: 7, title: "Grammar 2", completed: false, locked: true },
-              { id: 7, title: "Grammar 2", completed: false, locked: true },
-              { id: 7, title: "Grammar 2", completed: false, locked: true },
-              { id: 7, title: "Grammar 2", completed: false, locked: true },
-              { id: 7, title: "Grammar 2", completed: false, locked: true },
-              { id: 7, title: "Grammar 2", completed: false, locked: true },
-
+              {
+                id: 11,
+                title: "Hiragana 2",
+                description: "Learn か・き・く・け・こ",
+                completed: false,
+                locked: true,
+              },
+              {
+                id: 12,
+                title: "Grammar 2",
+                description: "Particles は / の",
+                completed: false,
+                locked: true,
+              },
+              {
+                id: 13,
+                title: "Hiragana 2",
+                description: "Learn か・き・く・け・こ",
+                completed: false,
+                locked: true,
+              },
+              {
+                id: 14,
+                title: "Grammar 2",
+                description: "Particles は / の",
+                completed: false,
+                locked: true,
+              },
+              {
+                id: 15,
+                title: "Hiragana 2",
+                description: "Learn か・き・く・け・こ",
+                completed: false,
+                locked: true,
+              },
+              {
+                id: 16,
+                title: "Grammar 2",
+                description: "Particles は / の",
+                completed: false,
+                locked: true,
+              },
             ],
           },
         ],

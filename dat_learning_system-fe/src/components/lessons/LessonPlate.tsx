@@ -3,6 +3,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import LockIcon from "@mui/icons-material/Lock";
 import FactCheckIcon from '@mui/icons-material/FactCheck';
 import SpellcheckIcon from '@mui/icons-material/Spellcheck';
+import LocalLibraryTwoToneIcon from '@mui/icons-material/LocalLibraryTwoTone';
 import { useTheme } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 
@@ -11,6 +12,7 @@ type Props = {
   locked: boolean;
   active?: boolean;
   title: string;
+  description?: string;
   onClick?: () => void;
 };
 
@@ -19,6 +21,7 @@ export default function LessonPlate({
   locked,
   active,
   title,
+  description,
   onClick,
 }: Props) {
   const theme = useTheme();
@@ -40,7 +43,7 @@ export default function LessonPlate({
   };
 
   return (
-    <Tooltip title={locked ? "Complete previous lesson" : ""}>
+    <Tooltip title={locked ? "Complete previous lesson" : description ? description : ""}>
       <Box
         sx={{
           position: "relative",
@@ -132,6 +135,9 @@ export default function LessonPlate({
           )}
           {!locked && !completed && title.includes("Grammar") && (
             <SpellcheckIcon sx={{ color: "#fff", fontSize: 32 }} />
+          )}
+          {!locked && !completed && title.includes("Reading") && (
+            <LocalLibraryTwoToneIcon sx={{ color: "#fff", fontSize: 32 }} />
           )}
           {locked && <LockIcon sx={{ color: "#fff", fontSize: 32 }} />}
         </Paper>

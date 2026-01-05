@@ -33,11 +33,7 @@ export default function ProgressCircle({ value, streak }: Props) {
         >
           <Typography fontWeight="bold" sx={{ userSelect: 'none' }}>{value}%</Typography>
         </Box>
-
-
       </Box>
-      <Typography variant="body2" color="text.secondary" sx={{ userSelect: 'none' }}>
-        🔥 {streak} days
-      </Typography></>
+    </>
   );
 }
