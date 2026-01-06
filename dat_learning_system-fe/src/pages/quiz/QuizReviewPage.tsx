@@ -34,7 +34,7 @@ export default function QuizReviewPage() {
         </Card>
       ))}
 
-      <Button sx={{ mt: 3 }} variant="contained" onClick={() => navigate("/quiz/list")}>
+      <Button sx={{ mt: 3 }} variant="contained" onClick={() => navigate(-1)}>
         Back to Quiz List
       </Button>
     </Card>

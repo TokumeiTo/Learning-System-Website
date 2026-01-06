@@ -5,7 +5,11 @@ declare module "@mui/material/styles" {
         blur: string;
         toolbar?: string;
     }
+    interface TypeText {
+        tertiary: string;
+    }
     interface PaletteOptions {
         background?: Partial<TypeBackground>;
+        text?: Partial<TypeText>;
     }
 }

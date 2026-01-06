@@ -27,14 +27,14 @@ export default function LessonSidebar({
     return (
         <Box
             sx={{
-                position: "absolute",
+                position: { xs: "absolute", md: 'sticky' },
                 top: "200px",
                 p: 2,
                 bgcolor: "background.paper",
                 boxShadow: "0px 0px 5px rgba(0,132,255,1)",
                 borderRadius: 2,
                 overflowY: "auto",
-                minWidth: {xs: '87%', md: '200px', lg:'400px'},
+                minWidth: { xs: '80%', md: '300px', lg: '400px' },
                 height: "calc(100vh - 250px)",
                 zIndex: 5,
             }}

@@ -1,11 +1,12 @@
-import { Box, Card, IconButton, Typography } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
-
-import ClearIcon from "@mui/icons-material/Clear";
+import { useState } from "react";
+import { Box, Card, Typography } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
+import ClearIcon from "@mui/icons-material/Clear";
 import HistoryIcon from "@mui/icons-material/History";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FiberNewIcon from "@mui/icons-material/FiberNew";
+
+import QuizNav from "../../components/quiz/QuizNav";
+import QuizIntroModal from "../../components/quiz/QuizIntroModal";
 
 type TestCondition = "tested" | "testing" | "untested";
 
@@ -18,12 +19,10 @@ type Test = {
 };
 
 export default function QuizListPage() {
-    const navigate = useNavigate();
-    const { state } = useLocation() as {
-        state: { level: string; type: string };
-    };
+    const [selectedTest, setSelectedTest] = useState<Test | null>(null);
 
-    // Add correct/wrong counts for tested tests
+    const state = { level: "N5", type: "Kanji" }; // for demo
+
     const tests: Test[] = [
         { id: 1, title: `${state.level} ${state.type} Test 1`, condition: "tested", correct: 4, wrong: 1 },
         { id: 2, title: `${state.level} ${state.type} Test 2`, condition: "tested", correct: 3, wrong: 2 },
@@ -31,36 +30,20 @@ export default function QuizListPage() {
         { id: 4, title: `${state.level} ${state.type} Test 4`, condition: "untested" },
         { id: 5, title: `${state.level} ${state.type} Test 5`, condition: "untested" },
         { id: 6, title: `${state.level} ${state.type} Test 6`, condition: "testing" },
-        { id: 7, title: `${state.level} ${state.type} Test 7`, condition: "testing" },
-        { id: 8, title: `${state.level} ${state.type} Test 8`, condition: "untested" },
-        { id: 9, title: `${state.level} ${state.type} Test 9`, condition: "tested", correct: 2, wrong: 3 },
-        { id: 10, title: `${state.level} ${state.type} Test 10`, condition: "untested" },
     ];
-
-    const getConditionText = (condition: TestCondition) => {
-        switch (condition) {
-            case "tested":
-                return "Completed";
-            case "testing":
-                return "In Progress";
-            case "untested":
-            default:
-                return "Untested";
-        }
-    };
 
     const getConditionIcon = (test: Test) => {
         let bgColor: string;
         switch (test.condition) {
             case "tested":
-                bgColor = "success.main";   // green
+                bgColor = "success.main";
                 break;
             case "testing":
-                bgColor = "primary.main";   // blue
+                bgColor = "primary.main";
                 break;
             case "untested":
             default:
-                bgColor = "error.main";     // red
+                bgColor = "error.main";
                 break;
         }
 
@@ -69,24 +52,25 @@ export default function QuizListPage() {
                 <Box
                     sx={{
                         display: "flex",
-                        justifyContent: 'space-around',
+                        justifyContent: "space-around",
                         alignItems: "center",
-                        minHeight: '80px',
-                        p: 1,
+                        minHeight: 100,
+                        width: '100%',
                         bgcolor: bgColor,
                         borderRadius: 1,
-                        color: "white", // text/icons visible on colored bg
+                        color: "white",
                     }}
                 >
-                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{getConditionText(test.condition)}</Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <CheckIcon sx={{ color: 'lightgreen' }} /> {test.correct ?? 0}
+                    <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                        Completed
+                    </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <CheckIcon sx={{ color: "lightgreen" }} /> {test.correct ?? 0}
                         </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
                             <ClearIcon sx={{ color: "error.main" }} /> {test.wrong ?? 0}
                         </Box>
-                        <Typography variant="subtitle2" bgcolor='lightGreen' px={0.5} borderRadius={1}>Passed</Typography>
                     </Box>
                 </Box>
             );
@@ -98,55 +82,85 @@ export default function QuizListPage() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-around",
-                    minHeight: '80px',
-                    p: 1,
+                    minHeight: 100,
+                    width: '100%',
                     bgcolor: bgColor,
                     borderRadius: 1,
                     color: "white",
                 }}
             >
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{getConditionText(test.condition)}</Typography>
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                    {test.condition === "testing" ? "In Progress" : "Untested"}
+                </Typography>
                 {test.condition === "testing" ? <HistoryIcon /> : <FiberNewIcon />}
             </Box>
         );
     };
 
-
     return (
-        <>
-            {/* Header */}
-            <Card elevation={5} sx={{ display: "flex", alignItems: "center", mb: 2, p: 2 }}>
-                <IconButton onClick={() => navigate(-1)} sx={{ color: "primary.main", mr: 2 }}>
-                    <ArrowBackIcon fontSize="large" />
-                </IconButton>
-                <Typography variant="h4" color="primary.main" sx={{ fontWeight: "bold" }}>
-                    {state.level} – {state.type}
-                </Typography>
-            </Card>
+        <Box sx={{ height: "100vh" }}>
+            <QuizNav level={state.level} type={state.type} />
 
             {/* Test Cards */}
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, justifyContent: "center" }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    flexWrap: "wrap",
+                    gap: 3,
+                }}
+            >
                 {tests.map((test) => (
                     <Card
-                        elevation={5}
                         key={test.id}
-                        onClick={() => navigate("/quiz/intro", { state: test })}
-                        
+                        onClick={() => setSelectedTest(test)}
+                        elevation={5}
                         sx={{
                             cursor: "pointer",
                             minWidth: 200,
                             minHeight: 170,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            transition: "0.3s",
+                            "&:hover": { transform: "scale(1.05)" },
                         }}
                     >
-                        <Box sx={{ mt: '1px' }}>{getConditionIcon(test)}</Box>
-                        <Box sx={{display:'flex', justifyContent:'center', alignItems:'center', height: '40%'}}>
-                            <Typography variant="subtitle1" sx={{ textAlign: 'center', fontWeight: 'bold', color: 'primary.main' }}>
+                        {getConditionIcon(test)}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                height: "40%",
+                            }}
+                        >
+                            <Typography
+                                variant="subtitle1"
+                                sx={{
+                                    textAlign: "center",
+                                    fontWeight: "bold",
+                                    color: "primary.main",
+                                }}
+                            >
                                 {test.title}
                             </Typography>
                         </Box>
                     </Card>
                 ))}
             </Box>
-        </>
+
+            {/* ---------- Show Modal ---------- */}
+            {selectedTest && (
+                <QuizIntroModal
+                    test={selectedTest}
+                    level={state.level}
+                    type={state.type}
+                    onClose={() => setSelectedTest(null)}
+                />
+            )}
+
+        </Box>
     );
 }

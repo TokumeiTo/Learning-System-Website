@@ -8,6 +8,7 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import { styled, useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import type { CSSObject, Theme } from "@mui/material/styles";
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -124,7 +125,7 @@ export const mainNavItems = [
     icon: <BookIcon color="primary" />,
   },
   {
-    label: "Translate",
+    label: "Translation tool",
     path: "/dashboard/translate",
     icon: <TranslateIcon color="primary" />,
   },
@@ -162,6 +163,13 @@ const commonNavItems = [
 
 const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  React.useEffect(() => {
+    if (isMobile && open) {
+      onClose(); // force close when entering mobile
+    }
+  }, [isMobile, open, onClose]);
+  const isDrawerOpen = isMobile ? false : open;
 
   return (
     <MuiDrawer
@@ -171,16 +179,29 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         whiteSpace: "nowrap",
         boxSizing: "border-box",
         boxShadow: 10,
-        ...(open ? openedMixin(theme) : closedMixin(theme)),
-        "& .MuiDrawer-paper": open
-          ? openedMixin(theme)
-          : closedMixin(theme),
+        ...(isDrawerOpen ? openedMixin(theme) : closedMixin(theme)),
+
+        // ---- SCROLLBAR MUST TARGET PAPER ----
+        "& .MuiDrawer-paper": {
+          ...(isDrawerOpen ? openedMixin(theme) : closedMixin(theme)),
+          overflowY: "auto",
+
+          scrollbarWidth: "none", // hidden by default
+          scrollbarColor: "transparent transparent",
+          transition: "scrollbar-color 0.3s, scrollbar-width 0.3s",
+
+          "&:hover": {
+            scrollbarWidth: "thin",
+            scrollbarColor: ` #008cffff ${theme.palette.background.paper}`, // thumb / track
+          },
+        },
       }}
     >
+
       {/* ---------- Header ---------- */}
       <DrawerHeader>
-        {open && <BasicSelect />}
-        <IconButton onClick={onClose}>
+        {isDrawerOpen && <BasicSelect />}
+        <IconButton onClick={onClose} disabled={isMobile}>
           {theme.direction === "rtl" ? (
             <ChevronRightIcon />
           ) : (
@@ -202,7 +223,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
               sx={{
                 minHeight: 48,
                 px: 2.5,
-                justifyContent: open ? "initial" : "center",
+                justifyContent: isDrawerOpen ? "initial" : "center",
                 "&.active": {
                   backgroundColor: "action.selected",
                 },
@@ -211,7 +232,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: open ? 3 : "auto",
+                  mr: isDrawerOpen ? 3 : "auto",
                   justifyContent: "center",
                 }}
               >
@@ -219,7 +240,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
               </ListItemIcon>
               <ListItemText
                 primary={item.label}
-                sx={{ opacity: open ? 1 : 0 }}
+                sx={{ opacity: isDrawerOpen ? 1 : 0 }}
               />
             </ListItemButton>
           ))}
@@ -230,7 +251,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
       {/* ---------- Commons ---------- */}
       <List>
-        {open && (
+        {isDrawerOpen && (
           <ListItemText
             primary="Commons"
             sx={{ px: 3, py: 1, fontSize: 12, color: "text.secondary" }}
@@ -245,7 +266,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             sx={{
               minHeight: 44,
               px: 2.5,
-              justifyContent: open ? "initial" : "center",
+              justifyContent: isDrawerOpen ? "initial" : "center",
               "&.active": {
                 backgroundColor: "action.selected",
               },
@@ -254,7 +275,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             <ListItemIcon
               sx={{
                 minWidth: 0,
-                mr: open ? 3 : "auto",
+                mr: isDrawerOpen ? 3 : "auto",
                 justifyContent: "center",
               }}
             >
@@ -262,7 +283,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             </ListItemIcon>
             <ListItemText
               primary={item.label}
-              sx={{ opacity: open ? 1 : 0 }}
+              sx={{ opacity: isDrawerOpen ? 1 : 0 }}
             />
           </ListItemButton>
         ))}

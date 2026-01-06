@@ -34,12 +34,13 @@ export default function CourseProgressSidebar({
             sx={{
                 position: "sticky",
                 top: "180px",
-                width: { lg: 700, md: 500 },
-                maxHeight: "calc(100vh - 180px)",
+                width: { lg: 700, md: 400 },
+                maxHeight: "calc(100vh - 210px)",
                 overflowY: "auto",
                 display: "grid",
                 gridTemplateColumns: { xs: "1fr", lg: '1fr 1fr' },
                 gridAutoRows: "min-content",
+                justifyContent: 'end',
                 gap: 2,
                 p: 2,
             }}
@@ -61,14 +62,16 @@ export default function CourseProgressSidebar({
                         }}
                     />
 
-                    <Box sx={{ pl: 2 }}>
-                        <Typography variant="subtitle1" fontWeight={700}>
-                            {selectedPlate.isTest ? "📝 Test Review" : "📖 Lesson Overview"}
-                        </Typography>
+                    <Box sx={{ pl: 2, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+                        <Box>
+                            <Typography variant="subtitle1" fontWeight={700}>
+                                {selectedPlate.isTest ? "📝 Test Review" : "📖 Lesson Overview"}
+                            </Typography>
 
-                        <Typography variant="caption" color="text.secondary" display="block" mb={1}>
-                            {selectedPlate.title}
-                        </Typography>
+                            <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+                                {selectedPlate.title}
+                            </Typography>
+                        </Box>
 
                         {/* Content */}
                         {selectedPlate.isTest ? (
@@ -119,18 +122,46 @@ export default function CourseProgressSidebar({
                                 },
                             }}
                         >
-                            {selectedPlate.isTest ? "Review Test →" : "Start Lesson →"}
+                            {selectedPlate.isTest ? "Review Test →" : "Next Lesson →"}
+                            <br />
+                            {!selectedPlate.isTest ? nextLesson : ""}
                         </Box>
                     </Box>
                 </Box>
             )}
 
-            {/* Overall Progress */}
-            <Box sx={cardStyle(theme)} maxHeight={200}>
-                <Typography variant="subtitle1">Overall Progress</Typography>
-                <ProgressCircle value={progress} streak={streak} />
-                <Typography variant="body2">{progress}% completed</Typography>
+            {/* Skills Radar */}
+            <Box sx={{ ...cardStyle(theme), display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <Typography variant="subtitle1" mb={1}>
+                    Skills Radar
+                </Typography>
+                <RadarChart
+                    cx={150}
+                    cy={125}
+                    outerRadius={100}
+                    width={300}
+                    height={250}
+                    data={radarData}
+                    style={{
+                        fontSize: '13px',
+                        fontWeight: 'bold',
+                    }}
+                >
+                    <PolarGrid />
+                    <PolarAngleAxis dataKey="skill" />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                    <RadarShape
+                        name="Skill"
+                        dataKey="value"
+                        stroke={theme.palette.primary.main}
+                        fill={theme.palette.primary.main}
+                        fillOpacity={0.6}
+                    />
+                </RadarChart>
             </Box>
+
+
+
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {/* Daily Streak */}
@@ -164,65 +195,26 @@ export default function CourseProgressSidebar({
                     </Stack>
                 </Box>
 
-                {/* Skill Breakdown */}
-                <Box sx={{ ...cardStyle(theme), textAlign: "left" }}>
-                    <Typography variant="subtitle2" fontWeight={700} mb={1}>
-                        🎯 Skill Breakdown
-                    </Typography>
-                    <Stack spacing={1.5}>
-                        {radarData.map((r) => (
-                            <SkillRow key={r.skill} label={r.skill} value={r.value} />
-                        ))}
-                    </Stack>
+                {/* Overall Progress */}
+                <Box sx={cardStyle(theme)} maxHeight={200}>
+                    <Typography variant="subtitle1">Overall Progress</Typography>
+                    <ProgressCircle value={progress} />
+                    <Typography variant="body2">{progress}% completed</Typography>
                 </Box>
             </Box>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {/* Skills Radar */}
-                <Box sx={{ ...cardStyle(theme), display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <Typography variant="subtitle1" mb={1}>
-                        Skills Radar
-                    </Typography>
-                    <RadarChart
-                        cx={150}
-                        cy={125}
-                        outerRadius={100}
-                        width={300}
-                        height={250}
-                        data={radarData}
-                        style={{
-                            fontSize: '13px',
-                            fontWeight: 'bold',
-                        }}
-                    >
-                        <PolarGrid />
-                        <PolarAngleAxis dataKey="skill" />
-                        <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                        <RadarShape
-                            name="Skill"
-                            dataKey="value"
-                            stroke={theme.palette.primary.main}
-                            fill={theme.palette.primary.main}
-                            fillOpacity={0.6}
-                        />
-                    </RadarChart>
-                </Box>
-
-                {/* Next Lesson */}
-                <Box
-                    sx={{
-                        bgcolor: theme.palette.primary.light,
-                        borderRadius: 3,
-                        p: 2,
-                        textAlign: "center",
-                        color: theme.palette.primary.contrastText,
-                        boxShadow: `0 2px 8px ${theme.palette.primary.main}`,
-                    }}
-                >
-                    <Typography variant="subtitle2">Next Lesson</Typography>
-                    <Typography variant="body2">{nextLesson}</Typography>
-                </Box>
+            {/* Skill Breakdown */}
+            <Box sx={{ ...cardStyle(theme), textAlign: "left" }}>
+                <Typography variant="subtitle2" fontWeight={700} mb={1}>
+                    🎯 Skill Breakdown
+                </Typography>
+                <Stack spacing={1.5}>
+                    {radarData.map((r) => (
+                        <SkillRow key={r.skill} label={r.skill} value={r.value} />
+                    ))}
+                </Stack>
             </Box>
+
         </Box>
     );
 }

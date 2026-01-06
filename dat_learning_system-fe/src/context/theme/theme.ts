@@ -13,7 +13,7 @@ export const getDesignTokens = (mode: "light" | "dark") => ({
                     toolbar: '#0080ffff',
                     blur: 'rgba(255, 255, 255, 0.43)'
                 },
-                text: { primary: "#333", secondary: "#666", tertiary: '#000000ff' },
+                text: { primary: "#333", secondary: "#666", tertiary: '#7300ffff' },
             }
             : {
                 primary: { main: "#3da7fd" },

@@ -2,10 +2,9 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 
 type Props = {
   value: number;
-  streak: number;
 };
 
-export default function ProgressCircle({ value, streak }: Props) {
+export default function ProgressCircle({ value }: Props) {
   return (
     <>
       <Box position="relative" display="inline-flex">

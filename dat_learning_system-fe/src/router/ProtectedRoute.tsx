@@ -6,12 +6,12 @@ interface Props {
   children: ReactNode;
 }
 
-export const ProtectedRoute = ({ children }: Props) => {
+export function ProtectedRoute({ children }: Props) {
   const { user } = useAuth();
 
   if (!user) {
-    return <Navigate to="/signin" replace />;
+    return <Navigate to="/unauthorized" replace />;
   }
 
-  return <>{children}</>;
-};
+  return children;
+}

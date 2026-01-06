@@ -94,7 +94,11 @@ export default function LessonPage() {
       >
         {/* Left Sidebar Toggle */}
         <IconButton onClick={toggleLeftSidebar}>
-          <ListIcon />
+          <ListIcon sx={{
+            color: leftSidebarOpen
+              ? theme.palette.text.tertiary
+              : "inherit",
+          }} />
         </IconButton>
 
         {/* Course Select */}
@@ -111,12 +115,16 @@ export default function LessonPage() {
 
         {/* Right Sidebar Toggle */}
         <IconButton onClick={toggleRightSidebar}>
-          <GradingTwoToneIcon />
+          <GradingTwoToneIcon sx={{
+            color: rightSidebarOpen
+              ? theme.palette.text.tertiary
+              : "inherit",
+          }} />
         </IconButton>
       </Box>
 
       {/* Main Content */}
-      <Box sx={{ display: "flex", gap: 2 }}>
+      <Box sx={{ display: "flex", gap: 2,mt: '50px' }}>
         {/* Left Sidebar */}
         {leftSidebarOpen && <LessonSidebar selectedCourse={selectedCourse} onSelectPlate={(_, __, ___, plateId) => {
           const plate = positionedLessons.find((l) => l.id === plateId);

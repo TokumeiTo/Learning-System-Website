@@ -4,6 +4,7 @@ import {
     Tab,
     Tabs,
     Typography,
+    useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -28,6 +29,7 @@ export default function QuizSetupPage() {
     const navigate = useNavigate();
 
     const progress = progressByLevel[level];
+    const theme = useTheme();
 
     const handleClick = (type: QuizType) => {
         navigate("/quiz/list", {
@@ -38,7 +40,13 @@ export default function QuizSetupPage() {
     return (
         <PageLayout>
             {/* Quiz Type Cards */}
-            <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', minHeight: '80vh', position: 'relative', p: 6 }}>
+            <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'column',
+                minHeight: '80vh',
+                position: 'relative', p: 6
+            }}>
                 <Box
                     sx={{
                         display: "flex",
@@ -56,10 +64,11 @@ export default function QuizSetupPage() {
                                 textAlign: "center",
                                 width: "40%",
                                 p: 3,
-                                cursor: "pointer"
+                                cursor: "pointer",
+                                minWidth: '200px'
                             }}
                         >
-                            <Typography variant="h5" color="primary" sx={{ fontWeight: 'bold' }}>
+                            <Typography variant="h5" color={theme.palette.text.tertiary} sx={{ fontWeight: 'bold' }}>
                                 {item.label}
                             </Typography>
                             <Box mt={2}>

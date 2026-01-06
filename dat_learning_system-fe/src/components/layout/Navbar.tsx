@@ -9,6 +9,8 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
@@ -29,36 +31,42 @@ interface AppBarProps extends MuiAppBarProps {
 
 const drawerWidth = 240;
 
-const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop) => prop !== 'open' })<AppBarProps>(
-  ({ theme, open }) => ({
-    zIndex: theme.zIndex.drawer + 1,
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open' && prop !== 'isMobile'
+})<AppBarProps & { isMobile?: boolean }>(({ theme, open, isMobile }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(['width', 'margin'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && !isMobile && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
+      duration: theme.transitions.duration.enteringScreen,
     }),
-    ...(open && {
-      marginLeft: drawerWidth,
-      width: `calc(100% - ${drawerWidth}px)`,
-      transition: theme.transitions.create(['width', 'margin'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-    }),
-  })
+  }),
+})
 );
 
 const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
   const { mode, toggleColorMode } = useContext(CustomThemeContext);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
-    <AppBar position="fixed" open={open}>
+    <AppBar position="fixed" open={open} isMobile={isMobile}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', boxShadow: '5px 0 10px rgba(0, 132, 255, 1)' }}>
         <IconButton
           color="inherit"
           aria-label="open drawer"
           onClick={onToggle}
           edge="start"
-          sx={{ marginRight: 5, ...(open && { display: 'none' }) }}
+          sx={{
+            marginRight: 2,
+            display: isMobile || open ? "none" : "inline-flex",
+          }}
         >
           <MenuIcon />
         </IconButton>
@@ -70,7 +78,6 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
 
         <ButtonGroup>
           <IconButton
-            color="inherit"
             aria-label="translate page"
             size="large"
           >
