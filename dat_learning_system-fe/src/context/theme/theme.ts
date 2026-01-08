@@ -11,9 +11,10 @@ export const getDesignTokens = (mode: "light" | "dark") => ({
                     default: "#f5f5f5",
                     paper: "#ffffff",
                     toolbar: '#0080ffff',
-                    blur: 'rgba(255, 255, 255, 0.43)'
+                    blur: 'rgba(200, 213, 255, 0.43)',
+                    gray: '#dcdcdcff',
                 },
-                text: { primary: "#333", secondary: "#666", tertiary: '#7300ffff' },
+                text: { primary: "#333", secondary: "#666", tertiary: '#6200ffff' },
             }
             : {
                 primary: { main: "#3da7fd" },
@@ -22,7 +23,8 @@ export const getDesignTokens = (mode: "light" | "dark") => ({
                     default: "#0b1220",
                     paper: "#111827",
                     toolbar: '#000d26',
-                    blur: '#000d26414e'
+                    blur: '#000d2641',
+                    gray: '#000000ff'
                 },
                 text: { primary: "#fff", secondary: "#9e9e9eff", tertiary: '#00e7ff', disabled: '#585858ff' },
             }),

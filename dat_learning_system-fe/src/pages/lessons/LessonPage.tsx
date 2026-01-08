@@ -73,80 +73,113 @@ export default function LessonPage() {
 
   return (
     <PageLayout>
-      {/* Toolbar */}
-      <Box
-        sx={{
-          display: "flex",
-          position: "sticky",
-          top: 90,
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 2,
-          bgcolor: theme.palette.background.blur,
-          p: 2,
-          borderRadius: 2,
-          zIndex: 1,
-          boxShadow: "-7px 0px 1px rgba(0, 255, 149, 0.48)",
-          border: "1px solid rgba(0, 255, 149, 0.48)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-        }}
-      >
-        {/* Left Sidebar Toggle */}
-        <IconButton onClick={toggleLeftSidebar}>
-          <ListIcon sx={{
-            color: leftSidebarOpen
-              ? theme.palette.text.tertiary
-              : "inherit",
-          }} />
-        </IconButton>
+      <Box p={3}>
+        {/* Toolbar */}
+        <Box
+          sx={{
+            display: "flex",
+            position: "sticky",
+            top: 90,
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 2,
+            bgcolor: theme.palette.background.blur,
+            p: 2,
+            borderRadius: 2,
+            zIndex: 3,
+            boxShadow: "-7px 0px 1px rgba(0, 255, 149, 0.48)",
+            border: "1px solid rgba(0, 255, 149, 0.48)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+          }}
+        >
+          {/* Left Sidebar Toggle */}
+          <IconButton onClick={toggleLeftSidebar}>
+            <ListIcon sx={{
+              color: leftSidebarOpen
+                ? theme.palette.text.tertiary
+                : "inherit",
+            }} />
+          </IconButton>
 
-        {/* Course Select */}
-        <FormControl variant="standard" sx={{ minWidth: 180 }}>
-          <InputLabel>Course</InputLabel>
-          <Select value={selectedCourse} onChange={handleCourseChange}>
-            {lessonSidebarData.map((c) => (
-              <MenuItem key={c.course} value={c.course}>
-                {c.course.toUpperCase()}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+          {/* Course Select */}
+          <FormControl variant="standard" sx={{ minWidth: 180 }}>
+            <InputLabel>Course</InputLabel>
+            <Select value={selectedCourse} onChange={handleCourseChange}>
+              {lessonSidebarData.map((c) => (
+                <MenuItem key={c.course} value={c.course}>
+                  {c.course.toUpperCase()}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-        {/* Right Sidebar Toggle */}
-        <IconButton onClick={toggleRightSidebar}>
-          <GradingTwoToneIcon sx={{
-            color: rightSidebarOpen
-              ? theme.palette.text.tertiary
-              : "inherit",
-          }} />
-        </IconButton>
-      </Box>
-
-      {/* Main Content */}
-      <Box sx={{ display: "flex", gap: 2,mt: '50px' }}>
-        {/* Left Sidebar */}
-        {leftSidebarOpen && <LessonSidebar selectedCourse={selectedCourse} onSelectPlate={(_, __, ___, plateId) => {
-          const plate = positionedLessons.find((l) => l.id === plateId);
-          if (!plate) return;
-          setSelectedPlate(lessonToPlateInfo(plate));
-        }} />}
-
-        {/* Lesson Map */}
-        <Box sx={{ flex: 1 }}>
-          <LessonMap
-            lessons={positionedLessons}
-            activePlateId={selectedPlate?.id ?? null}
-            onPlateClick={(plateId) => {
-              const lesson = positionedLessons.find((l) => l.id === plateId);
-              if (!lesson) return;
-              setSelectedPlate(lessonToPlateInfo(lesson));
-            }}
-          />
+          {/* Right Sidebar Toggle */}
+          <IconButton onClick={toggleRightSidebar}>
+            <GradingTwoToneIcon sx={{
+              color: rightSidebarOpen
+                ? theme.palette.text.tertiary
+                : "inherit",
+            }} />
+          </IconButton>
         </Box>
 
-        {/* Right Sidebar */}
-        {rightSidebarOpen && <CourseProgressSidebar progress={45} selectedPlate={selectedPlate} />}
+        {/* Main Content */}
+        <Box sx={{ display: "flex", flexWrap: 'wrap', gap: 2, mt: '50px' }}>
+          {/* Left Sidebar */}
+          <Box
+            sx={{
+              position: { xs: "fixed", md: "sticky" },
+              display: leftSidebarOpen? "block": "none",
+              top: 200,
+              minWidth: { xs: "calc(100% - 110px)", md: "300px", lg: "400px" },
+              height: "calc(100vh - 250px)",
+              zIndex: 2,
+              transform: {
+                xs: leftSidebarOpen ? "translateY(0)" : "translateY(120%)",
+                md: "none",
+              },
+              opacity: {
+                xs: leftSidebarOpen ? 1 : 0,
+                md: 1,
+              },
+              transition: "transform 0.35s ease, opacity 0.2s ease",
+              pointerEvents: leftSidebarOpen ? "auto" : "none",
+            }}
+          >
+            <LessonSidebar
+              selectedCourse={selectedCourse}
+              activePlateId={selectedPlate?.id}
+              onSelectPlate={(_, __, ___, plateId) => {
+                const plate = positionedLessons.find((l) => l.id === plateId);
+                if (!plate) return;
+
+                setSelectedPlate(lessonToPlateInfo(plate));
+
+                // Close sidebar only on mobile
+                if (isSmallScreen) setLeftSidebarOpen(false);
+              }}
+            />
+          </Box>
+
+          {/* Lesson Map */}
+          <Box sx={{ flex: 1 }}>
+            <LessonMap
+              lessons={positionedLessons}
+              activePlateId={selectedPlate?.id ?? null}
+              onPlateClick={(plateId) => {
+                const lesson = positionedLessons.find((l) => l.id === plateId);
+                if (!lesson) return;
+                setSelectedPlate(lessonToPlateInfo(lesson));
+              }}
+            />
+          </Box>
+
+          {/* Right Sidebar */}
+          <Box>
+            {rightSidebarOpen && <CourseProgressSidebar progress={45} selectedPlate={selectedPlate} />}
+          </Box>
+        </Box>
       </Box>
     </PageLayout>
   );

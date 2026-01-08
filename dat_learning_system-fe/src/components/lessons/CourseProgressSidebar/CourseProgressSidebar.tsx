@@ -43,6 +43,7 @@ export default function CourseProgressSidebar({
                 justifyContent: 'end',
                 gap: 2,
                 p: 2,
+                borderBottom: '1px solid lightGray',
             }}
         >
             {/* Selected Plate Info */}

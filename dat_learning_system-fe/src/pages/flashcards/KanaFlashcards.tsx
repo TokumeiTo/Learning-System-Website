@@ -22,7 +22,7 @@ export default function KanaFlashcards() {
           borderRadius: 3,
         }}
       >
-        <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
+        <Typography sx={{ fontSize: { xs: '20px', lg: '30px' }, mb: 2, textAlign: "center" }}>
           Hiragana
         </Typography>
 
@@ -39,7 +39,7 @@ export default function KanaFlashcards() {
               key={kana.id}
               sx={{
                 flex: "1 1 calc(20% - 16px)",
-                minWidth: 100,
+                minWidth: { md: 100, xs: 50 },
               }}
             >
               <KanaCard kana={kana} />
@@ -58,7 +58,7 @@ export default function KanaFlashcards() {
           borderRadius: 3,
         }}
       >
-        <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
+        <Typography sx={{ fontSize: { xs: '20px', lg: '30px' }, mb: 2, textAlign: "center" }}>
           Katakana
         </Typography>
 
@@ -75,7 +75,7 @@ export default function KanaFlashcards() {
               key={kana.id}
               sx={{
                 flex: "1 1 calc(20% - 16px)",
-                minWidth: 100,
+                minWidth: { md: 100, xs: 50 },
               }}
             >
               <KanaCard kana={kana} />

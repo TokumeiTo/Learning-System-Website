@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import AppLoader from "../feedback/AppLoader";
+import { useTheme } from "@mui/material";
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -15,7 +16,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
   const toggleSidebar = () => setOpen((o) => !o);
 
   const [loading, setLoading] = useState(true);
-
+  const theme = useTheme();
   /* Minimum loader duration */
   useEffect(() => {
     const MIN_DURATION = 500;
@@ -34,7 +35,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
     <Box
       sx={{
         display: "flex",
-        flexDirection:'row',
+        flexDirection: 'row',
         minHeight: "100vh",
         bgcolor: "background.default",
       }}
@@ -51,11 +52,9 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3,
             bgcolor: "background.paper",
             position: "relative",
             display: "flex",
-            alignItems: "center",
             justifyContent: "center",
           }}
         >
@@ -73,16 +72,40 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
                 <AppLoader fullscreen={false} />
               </motion.div>
             ) : (
-              <motion.div
+              <Box
+                component={motion.div}
                 key="content"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                style={{ width: "100%" }}
+                sx={{
+                  width: "100%",
+                  maxWidth: "100%",
+                  scrollbarWidth: "none",
+                  scrollbarColor: "transparent transparent",
+                  transition: "scrollbar-color 0.3s, scrollbar-width 0.3s",
+
+                  "&:hover": {
+                    scrollbarWidth: "thin",
+                    scrollbarColor: `#008cffff ${theme.palette.background.paper}`,
+                  },
+
+                  "&::-webkit-scrollbar": {
+                    width: 6,
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: "transparent",
+                    borderRadius: 8,
+                  },
+                  "&:hover::-webkit-scrollbar-thumb": {
+                    backgroundColor: "#008cffff",
+                  },
+                }}
               >
                 {children}
-              </motion.div>
+              </Box>
+
             )}
           </AnimatePresence>
         </Box>

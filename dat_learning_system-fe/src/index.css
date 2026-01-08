@@ -18,6 +18,15 @@ html,
 body {
   padding: 0;
   margin: 0;
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s, scrollbar-width 0.3s;
+}
+
+html:hover,
+body:hover {
+  scrollbar-width: thin;
+  scrollbar-color: #008cff transparent;
 }
 
 a {

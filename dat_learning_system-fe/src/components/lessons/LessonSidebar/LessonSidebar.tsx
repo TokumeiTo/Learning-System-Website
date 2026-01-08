@@ -6,78 +6,65 @@ import LevelItem from "./LevelItem";
 import { useMemo } from "react";
 
 export default function LessonSidebar({
-    selectedCourse,
-    activePlateId,
-    onSelectPlate,
+  selectedCourse,
+  activePlateId,
+  onSelectPlate,
 }: LessonSidebarProps) {
-    const {
-        openLevels,
-        openLessons,
-        toggleLevel,
-        toggleLesson,
-    } = useLessonSidebar();
+  const { openLevels, openLessons, toggleLevel, toggleLesson } = useLessonSidebar();
 
-    const courseItem = useMemo(
-        () => lessonSidebarData.find((c) => c.course === selectedCourse),
-        [selectedCourse]
-    );
+  const courseItem = useMemo(
+    () => lessonSidebarData.find((c) => c.course === selectedCourse),
+    [selectedCourse]
+  );
 
-    if (!courseItem) return null;
+  if (!courseItem) return null;
 
-    return (
-        <Box
-            sx={{
-                position: { xs: "absolute", md: 'sticky' },
-                top: "200px",
-                p: 2,
-                bgcolor: "background.paper",
-                boxShadow: "0px 0px 5px rgba(0,132,255,1)",
-                borderRadius: 2,
-                overflowY: "auto",
-                minWidth: { xs: '80%', md: '300px', lg: '400px' },
-                height: "calc(100vh - 250px)",
-                zIndex: 5,
-            }}
+  return (
+    <Box
+      sx={{
+        p: 2,
+        bgcolor: "background.blur",
+        boxShadow: "0px 0px 5px rgba(0,132,255,1)",
+        borderRadius: 2,
+        overflowY: "auto",
+        height: "100%",
+        zIndex: 5,
+      }}
+    >
+      <Box sx={{ position: "sticky", top: -17 }}>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 700,
+            bgcolor: "background.blur",
+            zIndex: 2,
+            borderBottom: "1px solid rgba(0,132,255,0.3)",
+            p: 2,
+          }}
         >
-            <Typography
-                variant="subtitle1"
-                sx={{
-                    fontWeight: 700,
-                    position: "sticky",
-                    top: -17,
-                    bgcolor: "background.paper",
-                    zIndex: 2,
-                    borderBottom: "1px solid rgba(0,132,255,0.3)",
-                    p: 2,
-                }}
-            >
-                {courseItem.course.toUpperCase()}
-            </Typography>
+          {courseItem.course.toUpperCase()}
+        </Typography>
 
-            {courseItem.levels.map((level) => {
-                const levelKey = `${courseItem.course}-${level.id}`;
+        {courseItem.levels.map((level) => {
+          const levelKey = `${courseItem.course}-${level.id}`;
 
-                return (
-                    <LevelItem
-                        key={levelKey}
-                        levelKey={levelKey}
-                        level={level}
-                        isOpen={openLevels[levelKey]}
-                        toggleLevel={toggleLevel}
-                        openLessons={openLessons}
-                        toggleLesson={toggleLesson}
-                        activePlateId={activePlateId}
-                        onSelectPlate={(lessonTitle, plateId) =>
-                            onSelectPlate(
-                                courseItem.course,
-                                level.title,
-                                lessonTitle,
-                                plateId
-                            )
-                        }
-                    />
-                );
-            })}
-        </Box>
-    );
+          return (
+            <LevelItem
+              key={levelKey}
+              levelKey={levelKey}
+              level={level}
+              isOpen={openLevels[levelKey]}
+              toggleLevel={toggleLevel}
+              openLessons={openLessons}
+              toggleLesson={toggleLesson}
+              activePlateId={activePlateId}
+              onSelectPlate={(lessonTitle, plateId) =>
+                onSelectPlate(courseItem.course, level.title, lessonTitle, plateId)
+              }
+            />
+          );
+        })}
+      </Box>
+    </Box>
+  );
 }

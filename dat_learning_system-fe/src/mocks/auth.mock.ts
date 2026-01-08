@@ -36,4 +36,14 @@ export const mockUsers: User[] = [
     department: "Department 1",
     team: "Team 1",
   },
+  {
+    id: 5,
+    companyCode: 'test',
+    name: 'test',
+    email: 'test@example.com',
+    role: 'ADMIN',
+    division: 'test',
+    department: 'test',
+    team: 'test'
+  }
 ];

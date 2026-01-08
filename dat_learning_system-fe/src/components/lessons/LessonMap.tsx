@@ -48,20 +48,22 @@ export default function LessonMap({
       }}
     >
       {/* 🔗 PATH */}
-      <svg
-        width="100%"
-        height="100%"
-        style={{ position: "absolute", top: 0, left: 0 }}
-      >
-        <path
-          d={path}
-          stroke={theme.palette.primary.main}
-          strokeWidth={4}
-          fill="transparent"
-          strokeDasharray="8 6"
-          strokeLinecap="round"
-        />
-      </svg>
+      <Box sx={{display: {xs:'none', md:'block'}}}>
+        <svg
+          width="100%"
+          height="100%"
+          style={{ position: "absolute", top: 0, left: 0 }}
+        >
+          <path
+            d={path}
+            stroke={theme.palette.primary.main}
+            strokeWidth={4}
+            fill="transparent"
+            strokeDasharray="8 6"
+            strokeLinecap="round"
+          />
+        </svg>
+      </Box>
 
       {/* 🧩 PLATES */}
       {lessons.map((lesson) => (
@@ -71,7 +73,7 @@ export default function LessonMap({
           sx={{
             position: "absolute",
             top: lesson.y,
-            left: lesson.x,
+            left: { md: lesson.x, xs: `calc(${lesson.x}px + 15%)` },
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -82,8 +84,8 @@ export default function LessonMap({
             completed={lesson.completed}
             locked={lesson.locked}
             active={lesson.id === activePlateId}
-            title ={lesson.title}
-            description ={lesson.description}
+            title={lesson.title}
+            description={lesson.description}
             onClick={() => onPlateClick?.(lesson.id)}
           />
 
@@ -98,7 +100,8 @@ export default function LessonMap({
             {lesson.title}
           </Typography>
         </Box>
-      ))}
-    </Box>
+      ))
+      }
+    </Box >
   );
 }

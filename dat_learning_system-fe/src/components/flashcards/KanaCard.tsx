@@ -40,13 +40,13 @@ export default function KanaCard({ kana, onClick }: KanaCardProps) {
           sx={{
             p: 2,
             textAlign: "center",
-            height: 120,
+            height:{md: 120, xs: 70},
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
           }}
         >
-          <Typography variant="h3" sx={{ fontWeight: 500 }}>
+          <Typography sx={{ fontWeight: 500, fontSize: {xs: 28, md: 48} }}>
             {kana.char}
           </Typography>
           <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 0.5 }}>
