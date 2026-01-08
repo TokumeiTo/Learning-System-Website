@@ -24,6 +24,14 @@ Backend Reqirement request
 
 Needs only 
 
+BackEnd API
+dotnet new webapi -n Project2.Backend
+
+BackEnd installation
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet tool install --global dotnet-ef
+
 
 FrontEnd installation
 npm install react-router-dom axios classnames @tanstack/react-query react-hook-form yup react-icons

@@ -77,3 +77,68 @@ dat_learning_system-fe/
 ├── package.json
 ├── tsconfig.json
 └── vite.config.ts
+
+
+
+Backend Folderstructures
+LMS.Backend
+│
+├── Controllers
+│   ├── AuthController.cs
+│   ├── UsersController.cs
+│   └── CoursesController.cs
+│
+├── Data
+│   ├── DbContext
+│   │   └── AppDbContext.cs
+│   │
+│   ├── Entities
+│   │   ├── User.cs
+│   │   ├── Role.cs
+│   │   └── Course.cs
+│   │
+│   └── Configurations
+│       └── UserConfiguration.cs
+│
+├── DTOs
+│   ├── Auth
+│   │   ├── LoginRequestDto.cs
+│   │   └── RegisterRequestDto.cs
+│   │
+│   ├── User
+│   │   └── UserResponseDto.cs
+│   │
+│   └── Course
+│       └── CourseDto.cs
+│
+├── Services
+│   ├── Interfaces
+│   │   ├── IAuthService.cs
+│   │   └── IUserService.cs
+│   │
+│   └── Implementations
+│       ├── AuthService.cs
+│       └── UserService.cs
+│
+├── Validators
+│   ├── LoginRequestValidator.cs
+│   └── RegisterRequestValidator.cs
+│
+├── Mappings
+│   └── AutoMapperProfile.cs
+│
+├── Middlewares
+│   └── ExceptionMiddleware.cs
+│
+├── Helpers
+│   ├── JwtHelper.cs
+│   └── PasswordHasher.cs
+│
+├── Extensions
+│   ├── ServiceCollectionExtensions.cs
+│   └── ApplicationBuilderExtensions.cs
+│
+├── appsettings.json
+├── appsettings.Development.json
+├── Program.cs
+└── LMS.Backend.csproj
