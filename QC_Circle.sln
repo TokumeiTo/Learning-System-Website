@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dat_learning_system-be", "dat_learning_system-be", "{6629A875-21A7-5B67-10A6-BA25D5235143}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.Backend", "dat_learning_system-be\LMS.Backend\LMS.Backend.csproj", "{FA536E0E-6C02-D768-D784-0867648894C1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FA536E0E-6C02-D768-D784-0867648894C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA536E0E-6C02-D768-D784-0867648894C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA536E0E-6C02-D768-D784-0867648894C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA536E0E-6C02-D768-D784-0867648894C1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FA536E0E-6C02-D768-D784-0867648894C1} = {6629A875-21A7-5B67-10A6-BA25D5235143}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9F54DCED-4EA8-4CFD-8C3F-21513D1F9D41}
+	EndGlobalSection
+EndGlobal

@@ -142,3 +142,6 @@ LMS.Backend
 ├── appsettings.Development.json
 ├── Program.cs
 └── LMS.Backend.csproj
+
+Recommendation: Use a "cached" KPI table that updates once a night, rather than calculating 1,000+ employees' progress every time a Division Head hits "Refresh."
+

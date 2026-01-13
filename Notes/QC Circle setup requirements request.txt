@@ -22,7 +22,7 @@ Backend Reqirement request
 14. xUnit & Microsoft.AspNetCore.Mvc.Testing (Testing)
 15. Git for version control access
 
-Needs only 
+
 
 BackEnd API
 dotnet new webapi -n Project2.Backend
@@ -30,7 +30,11 @@ dotnet new webapi -n Project2.Backend
 BackEnd installation
 dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
 dotnet add package Microsoft.EntityFrameworkCore.Design
-dotnet tool install --global dotnet-ef
+dotnet tool install dotnet-ef --version 8.* --add-source https://api.nuget.org/v3/index.json
+
+
+
+
 
 
 FrontEnd installation
@@ -47,3 +51,15 @@ npm install @mui/x-date-pickers
 npm install recharts
 
 
+Chat gpt
+⚠️ Intentionally NOT installed yet (good move):
+
+Redis
+
+MediatR
+
+Background jobs
+
+Caching libs
+
+We don’t need them yet.
