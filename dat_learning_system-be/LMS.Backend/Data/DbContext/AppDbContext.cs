@@ -1,24 +1,41 @@
 using LMS.Backend.Data.Entities;
+using LMS.Backend.Data.Seeders;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace LMS.Backend.Data.DbContext;
+namespace LMS.Backend.Data.Dbcontext;
 
-public class AppDbContext : IdentityDbContext<User, Role, int>
+public class AppDbContext : IdentityDbContext<ApplicationUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
-
     }
 
-    public DbSet<User> Users { get; set; } = null!;
-    public DbSet<Role> Roles { get; set; } = null!;
+    public DbSet<OrgUnit> OrgUnits { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        // Must call base for Identity tables to be created
         base.OnModelCreating(builder);
 
-        builder.Entity<User>().ToTable("Users");
-        builder.Entity<Role>().ToTable("Roles");
+        // 1. Configure OrgUnit Hierarchy (Self-Reference)
+        builder.Entity<OrgUnit>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+
+            // One Parent -> Many Children
+            entity.HasOne(d => d.Parent)
+                .WithMany(p => p.Children)
+                .HasForeignKey(d => d.ParentId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent accidental cascading deletes
+        });
+
+        // 2. Configure ApplicationUser mapping to OrgUnit
+        builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+        // 3. Seed initial management data
+        DbSeeder.SeedOrgUnits(builder);
+        DbSeeder.SeedRoles(builder);
     }
 }
