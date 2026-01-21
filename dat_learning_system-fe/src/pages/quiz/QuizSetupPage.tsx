@@ -80,7 +80,7 @@ export default function QuizSetupPage() {
                 </Box>
 
                 {/* Level Tabs */}
-                <Box bgcolor="primary.main" sx={{ position: 'absolute', bottom: '10px', borderRadius: '0px 20px 0 20px', boxShadow: 3 }}>
+                <Box bgcolor="primary.main" sx={{ position: 'absolute', bottom: '-20px', borderRadius: '0px 20px 0 20px', boxShadow: 3 }}>
                     <Tabs
                         value={level}
                         onChange={(_, v: Level) => setLevel(v)}

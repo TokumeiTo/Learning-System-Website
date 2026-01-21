@@ -34,7 +34,7 @@ export default function CourseProgressSidebar({
             sx={{
                 position: "sticky",
                 top: "180px",
-                width: { lg: 700, md: 400 },
+                width: { lg: 700, md: '100%' },
                 maxHeight: "calc(100vh - 210px)",
                 overflowY: "auto",
                 display: "grid",

@@ -73,13 +73,13 @@ export default function LessonPage() {
 
   return (
     <PageLayout>
-      <Box p={3}>
+      <Box p={3} pt={0}>
         {/* Toolbar */}
         <Box
           sx={{
             display: "flex",
             position: "sticky",
-            top: 90,
+            top: 100,
             justifyContent: "space-between",
             alignItems: "center",
             gap: 2,
@@ -125,7 +125,7 @@ export default function LessonPage() {
         </Box>
 
         {/* Main Content */}
-        <Box sx={{ display: "flex", flexWrap: 'wrap', gap: 2, mt: '50px' }}>
+        <Box sx={{ display: "flex", flexWrap: 'wrap', gap: 2 }}>
           {/* Left Sidebar */}
           <Box
             sx={{

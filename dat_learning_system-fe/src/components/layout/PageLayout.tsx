@@ -53,6 +53,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
           sx={{
             flexGrow: 1,
             bgcolor: "background.paper",
+            paddingTop: '100px',
             position: "relative",
             display: "flex",
             justifyContent: "center",
@@ -63,8 +64,8 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
             {loading ? (
               <motion.div
                 key="loader"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 100 }}
+                animate={{ opacity: 1, y: 100 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 style={{ width: "100%" }}
