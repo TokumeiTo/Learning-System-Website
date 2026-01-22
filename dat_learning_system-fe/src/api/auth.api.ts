@@ -1,14 +1,9 @@
-import { mockUsers } from "../mocks/auth.mock";
+import axios from "axios";
+import type { LoginRequest, LoginResponse } from "../types/auth";
 
-export async function mockLogin(companyCode: string, password: string) {
-  const user = mockUsers.find(u => u.companyCode === companyCode);
+const API_URL = import.meta.env.VITE_API_URL;
 
-  if (!user || password !== "password123") {
-    throw new Error("Invalid credentials");
-  }
-
-  return {
-    token: "mock-jwt-token",
-    user,
-  };
-}
+export const login = async (payload: LoginRequest): Promise<LoginResponse> => {
+  const res = await axios.post(`${API_URL}/api/Auth/login`, payload);
+  return res.data;
+};

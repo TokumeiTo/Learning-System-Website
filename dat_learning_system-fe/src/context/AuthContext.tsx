@@ -1,28 +1,44 @@
-import { createContext, useState } from "react";
-import type { User } from "../types/user";
-import { mockLogin } from "../api/auth.api";
+import React, { createContext, useState } from "react";
+import { login as loginApi } from "../api/auth.api";
+import { setToken, getToken, clearToken } from "../utils/token";
 
-interface AuthContextType {
-  user: User | null;
+type AuthUser = {
+  fullName: string;
+  position: string;
+};
+
+type AuthContextType = {
+  user: AuthUser | null;
+  isAuthenticated: boolean;
   login: (companyCode: string, password: string) => Promise<void>;
   logout: () => void;
-}
+};
 
-export const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+
+  const isAuthenticated = !!getToken();
 
   const login = async (companyCode: string, password: string) => {
-    const result = await mockLogin(companyCode, password);
-    setUser(result.user);
+    const res = await loginApi({ companyCode, password });
+
+    setToken(res.token);
+    setUser({
+      fullName: res.fullName,
+      position: res.position,
+    });
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    clearToken();
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};

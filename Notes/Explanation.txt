@@ -4,75 +4,195 @@ dat_learning_system-fe/
 ├── public/
 │   └── logo.svg
 │
-├── src/
-│   │
-│   ├── api/                 # API calls (real or mock)
-│   │   ├── auth.api.ts
-│   │   ├── user.api.ts
-│   │   ├── course.api.ts
-│   │   └── path.api.ts
-│   │
-│   ├── mocks/               # Mock API (FE-first strategy)
-│   │   ├── auth.mock.ts
-│   │   ├── course.mock.ts
-│   │   └── path.mock.ts
-│   │
-│   ├── components/          # Reusable UI components
-│   │   ├── common/
-│   │   │   ├── Button.tsx
-│   │   │   ├── Input.tsx
-│   │   │   └── Modal.tsx
-│   │   │
-│   │   ├── layout/
-│   │   │   ├── Sidebar.tsx
-│   │   │   ├── Navbar.tsx
-│   │   │   └── PageLayout.tsx
-│   │   │
-│   │   └── feedback/
-│   │       ├── Loader.tsx
-│   │       └── Toast.tsx
-│   │
-│   ├── pages/               # Page-level components
-│   │   ├── auth/
-│   │   │   ├── Login.tsx
-│   │   │   └── Register.tsx
-│   │   │
-│   │   ├── dashboard/
-│   │   │   └── Dashboard.tsx
-│   │   │
-│   │   ├── courses/
-│   │   │   ├── CourseList.tsx
-│   │   │   └── CourseDetail.tsx
-│   │   │
-│   │   └── paths/
-│   │       ├── PathList.tsx
-│   │       └── PathDetail.tsx
-│   │
-│   ├── context/             # Global state (Auth, Theme)
-│   │   └── AuthContext.tsx
-│   │
-│   ├── hooks/               # Custom hooks
-│   │   ├── useAuth.ts
-│   │   └── useApi.ts
-│   │
-│   ├── router/              # Routing
-│   │   ├── AppRouter.tsx
-│   │   └── ProtectedRoute.tsx
-│   │
-│   ├── types/               # TypeScript types & DTOs
-│   │   ├── auth.ts
-│   │   ├── user.ts
-│   │   ├── course.ts
-│   │   └── path.ts
-│   │
-│   ├── utils/               # Helpers
-│   │   ├── token.ts
-│   │   └── constants.ts
-│   │
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── index.css
-│
+????src
+    ?   App.tsx
+    ?   index.css
+    ?   main.tsx
+    ?
+    ????api
+    ?       auth.api.ts
+    ?       course.api.ts
+    ?       path.api.ts
+    ?       user.api.ts
+    ?
+    ????components
+    ?   ?   UserProfileMenu.tsx
+    ?   ?
+    ?   ????auth
+    ?   ?       ForgetPassword.tsx
+    ?   ?
+    ?   ????calendar
+    ?   ?       CalendarView.tsx
+    ?   ?
+    ?   ????chartAndProgress
+    ?   ?       DailyLessonChart.tsx
+    ?   ?       ProgressCircle.tsx
+    ?   ?
+    ?   ????common
+    ?   ?       Badge.tsx
+    ?   ?       Button.tsx
+    ?   ?       Card.tsx
+    ?   ?       Input.tsx
+    ?   ?       Modal.tsx
+    ?   ?       Search.tsx
+    ?   ?       Select.tsx
+    ?   ?
+    ?   ????custom-icons
+    ?   ?       CustomIcons.tsx
+    ?   ?
+    ?   ????feedback
+    ?   ?       AppLoader.tsx
+    ?   ?       PageLoaderOverlay.tsx
+    ?   ?       TabLoader.tsx
+    ?   ?
+    ?   ????flashcards
+    ?   ?       GrammarCard.tsx
+    ?   ?       GrammarDetailModal.tsx
+    ?   ?       KanaCard.tsx
+    ?   ?       KanjiCard.tsx
+    ?   ?       KanjiCreateModal.tsx
+    ?   ?       KanjiDetailModal.tsx
+    ?   ?       KanjiStrokeAnimation.tsx
+    ?   ?
+    ?   ????layout
+    ?   ?       Navbar.tsx
+    ?   ?       PageLayout.tsx
+    ?   ?       Sidebar.tsx
+    ?   ?
+    ?   ????lessons
+    ?   ?   ?   LessonMap.tsx
+    ?   ?   ?   LessonPlate.tsx
+    ?   ?   ?
+    ?   ?   ????CourseProgressSidebar
+    ?   ?   ?       CourseProgressSidebar.tsx
+    ?   ?   ?       SkillRow.tsx
+    ?   ?   ?       Stat.tsx
+    ?   ?   ?
+    ?   ?   ????LessonSidebar
+    ?   ?           index.ts
+    ?   ?           LessonItem.tsx
+    ?   ?           LessonSidebar.tsx
+    ?   ?           LevelItem.tsx
+    ?   ?           PlateItem.tsx
+    ?   ?           useLessonSidebar.ts
+    ?   ?
+    ?   ????quiz
+    ?   ?       OptionList.tsx
+    ?   ?       QuestionCard.tsx
+    ?   ?       QuizIntroModal.tsx
+    ?   ?       QuizNav.tsx
+    ?   ?       QuizProgress.tsx
+    ?   ?       QuizResultSummary.tsx
+    ?   ?       QuizTimer.tsx
+    ?   ?
+    ?   ????schedules
+    ?           ScheduleItemCard.tsx
+    ?
+    ????context
+    ?   ?   AppTheme.tsx
+    ?   ?   AuthContext.tsx
+    ?   ?
+    ?   ????theme
+    ?           mui.d.ts
+    ?           theme.ts
+    ?           ThemeProvider.tsx
+    ?
+    ????hooks
+    ?       useApi.ts
+    ?       useAuth.ts
+    ?
+    ????mocks
+    ?       auth.mock.ts
+    ?       calendar.mock.ts
+    ?       course.mock.ts
+    ?       dayStreak.mock.ts
+    ?       department.mock.ts
+    ?       division.mock.ts
+    ?       grammar.mock.ts
+    ?       kana.mock.ts
+    ?       kanji.mock.ts
+    ?       lessonSidebar.mock.ts
+    ?       org.mock.ts
+    ?       path.mock.ts
+    ?       quiz.mock.ts
+    ?       schedule.mock.ts
+    ?
+    ????pages
+    ?   ????auth
+    ?   ?       AuthContainer.tsx
+    ?   ?       EmployeeRegisterForm.tsx
+    ?   ?       NotFoundPage.tsx
+    ?   ?       PaymentForm.tsx
+    ?   ?       RegisteredList.tsx
+    ?   ?       RegisterPage.tsx
+    ?   ?       SignInPage.tsx
+    ?   ?       UnauthorizedPage.tsx
+    ?   ?
+    ?   ????courses
+    ?   ????dashboard
+    ?   ?       CourseDetail.tsx
+    ?   ?       CourseList.tsx
+    ?   ?       Dashboard.tsx
+    ?   ?
+    ?   ????flashcards
+    ?   ?       FlashcardsPage.tsx
+    ?   ?       GrammarFlashcards.tsx
+    ?   ?       KanaFlashcards.tsx
+    ?   ?       KanjiFlashcards.tsx
+    ?   ?
+    ?   ????lessons
+    ?   ?       LessonPage.tsx
+    ?   ?
+    ?   ????paths
+    ?   ?       PathDetail.tsx
+    ?   ?       PathList.tsx
+    ?   ?
+    ?   ????quiz
+    ?   ?       QuizListPage.tsx
+    ?   ?       QuizPage.tsx
+    ?   ?       QuizResultPage.tsx
+    ?   ?       QuizReviewPage.tsx
+    ?   ?       QuizSetupPage.tsx
+    ?   ?
+    ?   ????schedules
+    ?   ?       SchedulePage.tsx
+    ?   ?
+    ?   ????translation
+    ?           LanguageSelect.tsx
+    ?           TranslationPage.tsx
+    ?           TranslationResult.tsx
+    ?
+    ????router
+    ?       AppRouter.tsx
+    ?       ProtectedRoute.tsx
+    ?
+    ????types
+    ?       auth.ts
+    ?       calendar.ts
+    ?       course.ts
+    ?       department.ts
+    ?       division.ts
+    ?       kana.ts
+    ?       kanji.ts
+    ?       lesson.ts
+    ?       lessonSidebar.ts
+    ?       path.ts
+    ?       quiz.ts
+    ?       schedule.ts
+    ?       section.ts
+    ?       team.ts
+    ?       user.ts
+    ?
+    ????utils
+            constants.ts
+            dateUtils.ts
+            getWeeks.ts
+            lessonLayout.ts
+            lessonPath.ts
+            lessonToPlateInfo.ts
+            roleFormConfig.ts
+            token.ts
+            unlockRules.ts
 ├── .env
 ├── package.json
 ├── tsconfig.json
@@ -144,102 +264,3 @@ LMS.Backend
 └── LMS.Backend.csproj
 
 Recommendation: Use a "cached" KPI table that updates once a night, rather than calculating 1,000+ employees' progress every time a Division Head hits "Refresh."
-
---- Org structure
-[
-  {
-    "id": 1,
-    "name": "Management Division",
-    "level": 0,
-    "parentId": null,
-    "children": [
-      {
-        "id": 2,
-        "name": "HR & Admin",
-        "level": 1,
-        "parentId": 1,
-        "children": [
-          {
-            "id": 6,
-            "name": "HR & Payroll",
-            "level": 2,
-            "parentId": 2,
-            "children": []
-          },
-          {
-            "id": 7,
-            "name": "Recruitment",
-            "level": 2,
-            "parentId": 2,
-            "children": []
-          }
-        ]
-      },
-      {
-        "id": 3,
-        "name": "Finance Dept",
-        "level": 1,
-        "parentId": 1,
-        "children": []
-      },
-      {
-        "id": 4,
-        "name": "PMO and Staff Development",
-        "level": 1,
-        "parentId": 1,
-        "children": []
-      },
-      {
-        "id": 5,
-        "name": "Auditor",
-        "level": 1,
-        "parentId": 1,
-        "children": []
-      }
-    ]
-  },
-  {
-    "id": 8,
-    "name": "System Development Division",
-    "level": 0,
-    "parentId": null,
-    "children": [
-      {
-        "id": 10,
-        "name": "Infrastructure Implementation and Operation Dept",
-        "level": 1,
-        "parentId": 8,
-        "children": []
-      },
-      {
-        "id": 9,
-        "name": "Application Development Dept",
-        "level": 1,
-        "parentId": 8,
-        "children": [
-          {
-            "id": 13,
-            "name": "Offshore Development Dept-2",
-            "level": 1,
-            "parentId": 9,
-            "children": []
-          },
-          {
-            "id": 12,
-            "name": "Offshore Development Dept-1",
-            "level": 1,
-            "parentId": 9,
-            "children": []
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": 11,
-    "name": "Offshore Development Division",
-    "level": 0,
-    "parentId": null,
-    "children": []
-  }
-]
