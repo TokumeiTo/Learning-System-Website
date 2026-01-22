@@ -11,11 +11,15 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StyledBadge from "./common/Badge";
+import SettingsIcon from "@mui/icons-material/Settings";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 interface UserProfileMenuProps {
     name: string;
     email: string;
     avatarUrl?: string;
+    position: string;
     onLogout?: () => void;
 }
 
@@ -23,6 +27,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({
     name,
     email,
     avatarUrl,
+    position,
     onLogout,
 }) => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -53,7 +58,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({
 
             <Box sx={{ flexGrow: 1 }}>
                 <Typography variant="body2" fontSize={10} fontWeight={1000} color="success">
-                    Employee
+                    {position}
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
                     {name}
@@ -76,15 +81,19 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>Settings</MenuItem>
+                <MenuItem onClick={handleClose}>
+                    <AccountCircleIcon fontSize="small"/> | Profile
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                    <SettingsIcon fontSize="small"/> | Settings
+                </MenuItem>
                 <MenuItem
                     onClick={() => {
                         handleClose();
                         onLogout?.();
                     }}
                 >
-                    Logout
+                    <LogoutIcon fontSize="small" /> | Logout
                 </MenuItem>
             </Menu>
         </Stack>

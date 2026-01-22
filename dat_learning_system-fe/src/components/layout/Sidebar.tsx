@@ -16,7 +16,6 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import SchoolIcon from "@mui/icons-material/School";
-import SettingsIcon from "@mui/icons-material/Settings";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
 import QuizIcon from '@mui/icons-material/Quiz';
@@ -33,6 +32,8 @@ import BasicSelect from "../common/Select";
 import UserProfileMenu from "../UserProfileMenu";
 
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 const drawerWidth = 240;
 
@@ -152,11 +153,6 @@ const commonNavItems = [
     path: "/dashboard/help",
     icon: <ReportIcon color="primary" />,
   },
-  {
-    label: "Settings",
-    path: "/dashboard/settings",
-    icon: <SettingsIcon color="primary" />,
-  },
 ]
 
 /* ---------------- component ---------------- */
@@ -164,6 +160,15 @@ const commonNavItems = [
 const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
+
+  const handleLogout = () => {
+    logout();              // clear token + user
+    navigate("/auth/login"); // redirect
+  };
+
+
   React.useEffect(() => {
     if (isMobile && open) {
       onClose(); // force close when entering mobile
@@ -294,10 +299,11 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       {/* ---------- Footer / Profile ---------- */}
       <Box sx={{ p: 1 }}>
         <UserProfileMenu
-          name="Riley Carter"
-          email="riley@email.com"
+          name={user?.fullName ?? "Unknown user"}
+          email={user?.email ?? "Unknown email"}
           avatarUrl="/static/images/avatar/7.jpg"
-          onLogout={() => console.log("logout")}
+          position={user?.position ?? "Unknown position"}
+          onLogout={handleLogout}
         />
       </Box>
     </MuiDrawer>

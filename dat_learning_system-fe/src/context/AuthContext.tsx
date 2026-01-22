@@ -5,6 +5,7 @@ import { setToken, getToken, clearToken } from "../utils/token";
 type AuthUser = {
   fullName: string;
   position: string;
+  email: string;
 };
 
 type AuthContextType = {
@@ -28,6 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser({
       fullName: res.fullName,
       position: res.position,
+      email: res.email
     });
   };
 
