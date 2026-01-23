@@ -35,4 +35,29 @@ public class OrgUnitService : IOrgUnitService
 
         return _mapper.Map<IEnumerable<OrgUnitResponseDto>>(rootUnits);
     }
+
+    public async Task<IEnumerable<OrgUnitSelectDto>> GetAllTeams()
+    {
+        var units = await _unitRepo.GetAllTeams();
+        return _mapper.Map<IEnumerable<OrgUnitSelectDto>>(units);
+    }
+
+    public async Task<IEnumerable<OrgUnitSelectDto>> GetAllDivisions()
+    {
+        var units = await _unitRepo.GetAllDivisions();
+        return _mapper.Map<IEnumerable<OrgUnitSelectDto>>(units);
+    }
+
+    public async Task<IEnumerable<OrgUnitSelectDto>> GetAllDepartments()
+    {
+        var units = await _unitRepo.GetAllDepartments();
+        return _mapper.Map<IEnumerable<OrgUnitSelectDto>>(units);
+    }
+
+    public async Task<IEnumerable<OrgUnitSelectDto>> GetAllSections()
+    {
+        var units = await _unitRepo.GetAllSections();
+        return _mapper.Map<IEnumerable<OrgUnitSelectDto>>(units);
+    }
+
 }

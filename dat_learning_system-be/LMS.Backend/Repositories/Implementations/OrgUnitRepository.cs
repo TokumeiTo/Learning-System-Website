@@ -1,3 +1,4 @@
+using LMS.Backend.Common;
 using LMS.Backend.Data.Dbcontext;
 using LMS.Backend.Data.Entities;
 using LMS.Backend.Repo.Interface;
@@ -20,7 +21,24 @@ public class OrgUnitRepository : IOrgUnitRepository
 
     public async Task<IEnumerable<OrgUnit>> GetAllAsync()
     {
-        return await _context.OrgUnits.Include(u=>u.Children).ToListAsync();
+        return await _context.OrgUnits.Include(u => u.Children).ToListAsync();
+    }
+
+    public async Task<IEnumerable<OrgUnit>> GetAllTeams()
+    {
+        return await _context.OrgUnits.Where(u=>u.Level == OrgLevel.Team).ToListAsync();
+    }
+    public async Task<IEnumerable<OrgUnit>> GetAllDivisions()
+    {
+        return await _context.OrgUnits.Where(u=>u.Level == OrgLevel.Division).ToListAsync();
+    }
+    public async Task<IEnumerable<OrgUnit>> GetAllDepartments()
+    {
+        return await _context.OrgUnits.Where(u=>u.Level == OrgLevel.Department).ToListAsync();
+    }
+    public async Task<IEnumerable<OrgUnit>> GetAllSections()
+    {
+        return await _context.OrgUnits.Where(u=>u.Level == OrgLevel.Section).ToListAsync();
     }
 
     public async Task<OrgUnit?> GetByIdAsync(int id)
@@ -32,6 +50,6 @@ public class OrgUnitRepository : IOrgUnitRepository
     {
         return await _context.OrgUnits
             .Where(u => u.ParentId == parentId)
-            .Select(u=>u.Id).ToListAsync();
+            .Select(u => u.Id).ToListAsync();
     }
 }

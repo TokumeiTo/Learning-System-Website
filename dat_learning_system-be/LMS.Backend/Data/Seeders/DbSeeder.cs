@@ -53,14 +53,14 @@ public static class DbSeeder
     }
     public static void SeedRoles(ModelBuilder modelBuilder)
     {
-        string adminRoleId = "r1";
+        string superAdminRoleId = "r1";
         string staffRoleId = "r2";
-        string hrRoleId = "r3";
+        string adminRoleId = "r3";
 
         modelBuilder.Entity<IdentityRole>().HasData(
-            new IdentityRole { Id = adminRoleId, Name = "SuperAdmin", NormalizedName = "SUPERADMIN" },
+            new IdentityRole { Id = superAdminRoleId, Name = "SuperAdmin", NormalizedName = "SUPERADMIN" },
             new IdentityRole { Id = staffRoleId, Name = "Staff", NormalizedName = "STAFF" },
-            new IdentityRole { Id = hrRoleId, Name = "HR", NormalizedName = "HR" }
+            new IdentityRole { Id = adminRoleId, Name = "Admin", NormalizedName = "ADMIN" }
         );
 
         modelBuilder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>

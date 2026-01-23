@@ -65,7 +65,7 @@ export default function SignIn() {
   return (
     <AuthContainer direction="column" sx={{ minHeight: '100vh', justifyContent: 'center' }}>
       <Card variant="outlined">
-        <SitemarkIcon />
+        <img src="\public\dat logo.png" width={50}></img>
         <Typography
           component="h1"
           variant="h4"

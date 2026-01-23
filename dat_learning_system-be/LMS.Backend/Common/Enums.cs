@@ -7,7 +7,7 @@ public enum Position {
     SecHead,
     ProjectManager,
     Employee,
-    HR,
+    Admin,
     Auditor
 }
 

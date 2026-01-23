@@ -59,7 +59,7 @@ public class AuthService : IAuthService
             string roleName = dto.Position switch
             {
                 Position.SuperAdmin => "SuperAdmin",
-                Position.HR => "HR",
+                Position.Admin => "Admin",
                 _ => "Staff" // Everyone else (DivHead, DepHead, etc.) gets "Staff" role for security
             };
 

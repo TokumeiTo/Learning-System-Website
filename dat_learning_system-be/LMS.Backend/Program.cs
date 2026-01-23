@@ -1,9 +1,12 @@
 // Builder and Configuration
 using System.Text;
+using FluentValidation;
 using LMS.Backend.Data.Dbcontext;
 using LMS.Backend.Data.Entities;
 using LMS.Backend.Extensions;
 using LMS.Backend.Helpers;
+using LMS.Backend.Middlewares;
+using LMS.Backend.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,15 +19,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 /* Controllers */
 builder.Services.AddControllers();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
 // Swagger and Open Api
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "LMS API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "LMS API", Version = "v1" });
 
     // 1. Define the Security Scheme
-    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
@@ -35,14 +40,14 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     // 2. Make Swagger use that scheme
-    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            new OpenApiSecurityScheme
             {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference // Fixed name here
+                Reference = new OpenApiReference // Fixed name here
                 {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
                 }
             },
@@ -117,6 +122,11 @@ var app = builder.Build();
 
 /* Middleware Pipeline */
 
+// Exception Middleware
+app.UseMiddleware<ExceptionMiddleware>();
+
+app.UseRouting();
+
 // Swagger
 if (app.Environment.IsDevelopment())
 {
@@ -125,7 +135,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Security and HTTP
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors("AllowReactApp");
 
 // Auth

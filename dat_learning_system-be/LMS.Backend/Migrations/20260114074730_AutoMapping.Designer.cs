@@ -253,8 +253,8 @@ namespace LMS.Backend.Migrations
                         new
                         {
                             Id = "r3",
-                            Name = "HR",
-                            NormalizedName = "HR"
+                            Name = "admin",
+                            NormalizedName = "ADMIN"
                         });
                 });
 

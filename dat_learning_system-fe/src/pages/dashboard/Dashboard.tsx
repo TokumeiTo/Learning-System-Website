@@ -8,6 +8,9 @@ import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material";
 import CalendarHeatmap from "../../components/chartAndProgress/DailyLessonChart";
 
+import { useState } from "react";
+import RegisterModal from "../../components/auth/RegisterModal";
+
 
 // Mock data for enrolled courses
 const enrolledCourses = [
@@ -18,6 +21,7 @@ const enrolledCourses = [
 
 export const Dashboard = () => {
   const theme = useTheme();
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   return (
     <PageLayout>
       <div style={{ maxWidth: 900, margin: "50px auto", padding: "0 20px" }}>
@@ -74,7 +78,20 @@ export const Dashboard = () => {
         }}>
           <CalendarHeatmap />
         </Box>
+        <Button
+          variant="contained"
+          color="secondary"
+          sx={{ mb: 3 }}
+          onClick={() => setIsRegisterOpen(true)}
+        >
+          Create New User
+        </Button>
       </div>
+
+      <RegisterModal
+        open={isRegisterOpen}
+        onClose={() => setIsRegisterOpen(false)}
+      />
     </PageLayout>
   );
 };

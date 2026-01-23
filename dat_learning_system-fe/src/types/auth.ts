@@ -9,3 +9,19 @@ export interface LoginResponse {
     position: string;
     email: string;
 }
+
+export interface RegisterRequest {
+    fullName: string;
+    email: string;
+    password: string;
+    position: string;
+    companyCode: string;
+    orgUnitId: number;
+}
+
+export interface RegisterResponse {
+    isSuccess: boolean;
+    message: string;
+    companyCode?: string;
+    userPosition?: string;
+}

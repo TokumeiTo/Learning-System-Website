@@ -263,4 +263,71 @@ LMS.Backend
 ├── Program.cs
 └── LMS.Backend.csproj
 
-Recommendation: Use a "cached" KPI table that updates once a night, rather than calculating 1,000+ employees' progress every time a Division Head hits "Refresh."
+Frontend (React) 
+  |
+  | POST /api/Auth/register   or   POST /api/Auth/login
+  v
+ASP.NET Core Controller
+  |
+  | [FromBody] DTO received
+  v
+FluentValidation Middleware (Auto via AddValidatorsFromAssemblyContaining)
+  |_ RegisterRequestValidator or LoginRequestValidator
+      - Checks required fields, email format, password length, etc.
+      - If fails --> throws ValidationException
+      - ExceptionMiddleware catches and returns JSON error
+  |
+  v
+ExceptionMiddleware
+  |_ Catches ValidationException or other unhandled exceptions
+  |_ Formats JSON:
+      {
+          message: "Validation Failed",
+          errors: { "Email": ["Email required"], "Password": ["Min 6 chars"] }
+      }
+  |
+  v
+AuthService
+  |_ RegisterAsync(dto)
+      - Maps DTO to ApplicationUser
+      - UserManager.CreateAsync(user, password)
+      - Assigns Role based on Position
+      - Returns RegisterResponseDto { IsSuccess, Message, CompanyCode, UserPosition }
+  |_ LoginAsync(dto)
+      - Checks user exists by CompanyCode
+      - Validates password via UserManager.CheckPasswordAsync
+      - Gets Roles
+      - Generates JWT via JwtHelper
+      - Returns LoginResponseDto { fullName, email, position, token }
+  |
+  v
+Controller returns response
+  |_ Success: 200 OK with DTO (includes JWT for login)
+  |_ Failure: 400 BadRequest (validation) or 500 InternalServerError (unexpected)
+  |
+  v
+Frontend receives JSON
+  |_ Stores JWT in localStorage (token.ts)
+  |_ Sets user state in AuthContext
+  |_ Uses token in subsequent API calls (useApi.ts adds Authorization header)
+
+Admin (frontend)
+  |
+  | Opens RegisterModal
+  | Fills out new user's info (FullName, Email, Password, Position, CompanyCode)
+  v
+Frontend calls registerApi (POST /api/Auth/register)
+  |
+  v
+Backend Controller
+  |_ FluentValidation -> if any field invalid -> ExceptionMiddleware returns 400 JSON
+  |_ AuthService.RegisterAsync
+       - Maps DTO to ApplicationUser
+       - UserManager.CreateAsync(user, password)
+       - Assigns role based on Position
+       - Returns RegisterResponseDto
+  v
+Frontend receives RegisterResponse
+  |_ If isSuccess = true -> show MessagePopup("User registered successfully", success)
+  |_ If isSuccess = false -> show MessagePopup("Email already exists", error)
+  |_ Form stays for creating more users if needed

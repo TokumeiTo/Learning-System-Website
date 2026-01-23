@@ -49,6 +49,7 @@ npm install framer-motion
 npm install @mui/x-charts
 npm install @mui/x-date-pickers
 npm install recharts
+npm install @hookform/resolvers yup
 
 
 Chat gpt

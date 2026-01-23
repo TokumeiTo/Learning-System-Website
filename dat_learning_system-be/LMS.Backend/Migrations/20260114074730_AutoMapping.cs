@@ -37,7 +37,7 @@ namespace LMS.Backend.Migrations
                 {
                     { "r1", null, "SuperAdmin", "SUPERADMIN" },
                     { "r2", null, "Staff", "STAFF" },
-                    { "r3", null, "HR", "HR" }
+                    { "r3", null, "admin", "ADMIN" }
                 });
 
             migrationBuilder.UpdateData(

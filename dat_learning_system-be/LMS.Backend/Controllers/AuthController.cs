@@ -1,5 +1,6 @@
 using LMS.Backend.DTOs.Auth;
 using LMS.Backend.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LMS.Backend.Controllers;
@@ -26,7 +27,7 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
     [HttpPost("register")]
-    // Later we can add [Authorize(Roles = "SuperAdmin")] to protect this
+    [Authorize(Roles = "SuperAdmin,Admin")]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto)
     {
         var result = await _authService.RegisterAsync(dto);

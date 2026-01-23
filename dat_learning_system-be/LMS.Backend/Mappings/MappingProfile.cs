@@ -29,5 +29,6 @@ public class MappingProfile : Profile
         // Orgunit response mapping
         CreateMap<OrgUnitRequestDto, OrgUnit>();
         CreateMap<OrgUnit, OrgUnitResponseDto>();
+        CreateMap<OrgUnit, OrgUnitSelectDto>();
     }
 }

@@ -9,11 +9,11 @@ namespace LMS.Backend.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Roles = "SuperAdmin")]
-public class OrgUnitController : ControllerBase
+public class OrgUnitsController : ControllerBase
 {
     private readonly IOrgUnitService _orgUnitService;
 
-    public OrgUnitController(IOrgUnitService orgUnitService)
+    public OrgUnitsController(IOrgUnitService orgUnitService)
     {
         _orgUnitService = orgUnitService;
     }
@@ -23,6 +23,33 @@ public class OrgUnitController : ControllerBase
     {
         var result = await _orgUnitService.GetHierarchyAsync();
         return Ok(result);
+    }
+
+    [HttpGet("divisions")]
+    public async Task<IActionResult> GetDivisions()
+    {
+        var result = await _orgUnitService.GetAllDivisions();
+        return Ok(result);
+    }
+
+    [HttpGet("departments")]
+    public async Task<IActionResult> GetDepartments()
+    {
+        var result = await _orgUnitService.GetAllDepartments();
+        return Ok(result);
+    }
+
+    [HttpGet("sections")]
+    public async Task<IActionResult> GetSections()
+    {
+        var result = await _orgUnitService.GetAllSections();
+        return Ok(result);
+    }
+
+    [HttpGet("teams")]
+    public async Task<IActionResult> GetTeams()
+    {
+        return Ok(await _orgUnitService.GetAllTeams());
     }
 
     [HttpPost]

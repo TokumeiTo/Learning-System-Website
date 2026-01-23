@@ -18,11 +18,15 @@ public class JwtHelper
     {
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
-            new Claim("FullName", user.FullName),
-            new Claim("Position", user.Position.ToString()),
-            new Claim("OrgUnitId", user.OrgUnitId?.ToString() ?? string.Empty)
+            // Identity / standard
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName ?? string.Empty),
+            
+            // Business context
+            new Claim("companyCode", user.CompanyCode),
+            new Claim("fullName", user.FullName),
+            new Claim("position", user.Position.ToString()),
+            new Claim("orgUnitId", user.OrgUnitId?.ToString() ?? string.Empty),
         };
 
         // Add roles to the claims list
@@ -31,14 +35,17 @@ public class JwtHelper
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "default_secret_key_32_characters_long"));
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "default_secret_key_32_characters_long"
+        ));
+
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
             issuer: _config["Jwt:Issuer"],
             audience: _config["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(1),
+            expires: DateTime.UtcNow.AddHours(8),
             signingCredentials: creds
         );
 
