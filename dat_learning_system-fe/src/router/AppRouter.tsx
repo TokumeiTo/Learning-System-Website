@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { useAuth } from "../hooks/useAuth";
 
 /* Pages */
-import { Dashboard } from "../pages/dashboard/Dashboard";
 import SignIn from "../pages/auth/SignInPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 
@@ -21,6 +20,15 @@ import LessonPage from "../pages/lessons/LessonPage";
 /* System pages */
 import NotFoundPage from "../pages/auth/NotFoundPage";
 import UnauthorizedPage from "../pages/auth/UnauthorizedPage";
+import ProgressPage from "../pages/dashboard/ProgressPage";
+import Home from "../pages/dashboard/DashboardPage";
+import EBooksPage from "../pages/ebooks/LibraryPage";
+import DictionaryPage from "../pages/dictionaryPage/DictionaryPage";
+import ClassroomPage from "../pages/classroom/ClassroomPage";
+import SupportCenter from "../pages/feedbacks/FAQsPage";
+import MockTestPage from "../pages/mock_tests/MockTestPage";
+import CoursesPage from "../pages/courses/CoursePage";
+import UserManagementPage from "../pages/auth/UserManagementPage";
 
 /* Guards */
 // import { ProtectedRoute } from "./ProtectedRoute";
@@ -37,10 +45,19 @@ export const AppRouter = () => {
 
         {/* ---------- Protected ---------- */}
         <Route
-          path="/dashboard"
+          path="/home"
           element={
             // <ProtectedRoute>
-              <Dashboard />
+            <Home />
+            // </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/progress"
+          element={
+            // <ProtectedRoute>
+            <ProgressPage />
             // </ProtectedRoute>
           }
         />
@@ -49,7 +66,7 @@ export const AppRouter = () => {
           path="/dashboard/flashcards"
           element={
             // <ProtectedRoute>
-              <FlashcardsPage />
+            <FlashcardsPage />
             // </ProtectedRoute>
           }
         />
@@ -58,7 +75,7 @@ export const AppRouter = () => {
           path="/dashboard/translate"
           element={
             // <ProtectedRoute>
-              <TranslationPage />
+            <TranslationPage />
             // </ProtectedRoute>
           }
         />
@@ -67,7 +84,7 @@ export const AppRouter = () => {
           path="/schedule"
           element={
             // <ProtectedRoute>
-              <SchedulePage />
+            <SchedulePage />
             // </ProtectedRoute>
           }
         />
@@ -76,7 +93,34 @@ export const AppRouter = () => {
           path="/lessons"
           element={
             // <ProtectedRoute>
-              <LessonPage />
+            <LessonPage />
+            // </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/classroom"
+          element={
+            // <ProtectedRoute>
+            <ClassroomPage />
+            // </ProtectedRoute>
+          }
+        />   
+
+        <Route
+          path="/courses"
+          element={
+            // <ProtectedRoute>
+            <CoursesPage />
+            // </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/umanage"
+          element={
+            // <ProtectedRoute>
+            <UserManagementPage />
             // </ProtectedRoute>
           }
         />
@@ -89,7 +133,7 @@ export const AppRouter = () => {
           path="/quiz/start"
           element={
             // <ProtectedRoute>
-              <QuizPage />
+            <QuizPage />
             // </ProtectedRoute>
           }
         />
@@ -98,7 +142,7 @@ export const AppRouter = () => {
           path="/quiz/result"
           element={
             // <ProtectedRoute>
-              <QuizResultPage />
+            <QuizResultPage />
             // </ProtectedRoute>
           }
         />
@@ -107,7 +151,43 @@ export const AppRouter = () => {
           path="/quiz/review"
           element={
             // <ProtectedRoute>
-              <QuizReviewPage />
+            <QuizReviewPage />
+            // </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/ebooks"
+          element={
+            // <ProtectedRoute>
+            <EBooksPage />
+            // </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/mock_test"
+          element={
+            // <ProtectedRoute>
+            <MockTestPage />
+            // </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dictionary"
+          element={
+            // <ProtectedRoute>
+            <DictionaryPage />
+            // </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/help"
+          element={
+            // <ProtectedRoute>
+            <SupportCenter />
             // </ProtectedRoute>
           }
         />

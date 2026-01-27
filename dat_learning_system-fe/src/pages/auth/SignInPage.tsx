@@ -12,7 +12,6 @@ import Card from '../../components/common/Card';
 import AuthContainer from './AuthContainer';
 import ForgotPassword from '../../components/auth/ForgetPassword';
 import { useAuth } from '../../hooks/useAuth';
-import { SitemarkIcon } from '../../components/custom-icons/CustomIcons';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -56,7 +55,7 @@ export default function SignIn() {
     try {
       setError('');
       await login(companyCode, password);
-      navigate('/dashboard');
+      navigate('/home');
     } catch (err: any) {
       setError(err.message || 'Login failed');
     }

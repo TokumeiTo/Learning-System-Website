@@ -9,7 +9,7 @@ export const getDesignTokens = (mode: "light" | "dark") => ({
                 secondary: { main: "#ff9800" },
                 background: {
                     default: "#f5f5f5",
-                    paper: "#ffffff",
+                    paper: "#f8fafc",
                     toolbar: '#0080ffff',
                     blur: 'rgba(200, 213, 255, 0.43)',
                     gray: '#dcdcdcff',

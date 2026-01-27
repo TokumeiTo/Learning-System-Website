@@ -14,7 +14,7 @@ export interface RegisterRequest {
     fullName: string;
     email: string;
     password: string;
-    position: string;
+    position: number;
     companyCode: string;
     orgUnitId: number;
 }

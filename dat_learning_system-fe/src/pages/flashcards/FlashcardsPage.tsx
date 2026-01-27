@@ -22,12 +22,13 @@ export default function FlashcardsPage() {
 
   return (
     <PageLayout>
-      <Box sx={{ px: '24px' }}>
-        <Tabs value={tab} onChange={handleChange} sx={{position: 'sticky'}}>
+      <Box sx={{ p: '24px' }}>
+        <Tabs value={tab} onChange={handleChange} sx={{position: 'sticky', top: '70px'}}>
           <Tab label="Kanji" />
           <Tab label="Vocabulary" disabled />
           <Tab label="Grammar" />
           <Tab label="Kana" />
+          <Tab label="Onomatopoeia" disabled />
         </Tabs>
 
         <Box sx={{ mt: 3 }}>

@@ -12,3 +12,12 @@ export interface User {
     section?: string;
     team?: string;
 }
+
+export interface UserListItem {
+  id: string;
+  fullName: string;
+  email: string;
+  positionName: string; // The label, e.g., "Project Manager"
+  orgUnitName: string;  // The label, e.g., "Team Alpha"
+  position: number;     // The ID value
+}

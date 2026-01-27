@@ -16,14 +16,13 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import SchoolIcon from "@mui/icons-material/School";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
 import QuizIcon from '@mui/icons-material/Quiz';
 import CastForEducationIcon from '@mui/icons-material/CastForEducation';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
+import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import StyleIcon from '@mui/icons-material/Style';
-import ReportIcon from '@mui/icons-material/Report';
-import DesignServicesIcon from '@mui/icons-material/DesignServices';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import HomeFilledIcon from '@mui/icons-material/HomeFilled';
 import BookIcon from '@mui/icons-material/Book';
 import TranslateIcon from '@mui/icons-material/Translate';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
@@ -79,50 +78,48 @@ interface SidebarProps {
 
 /* ---------------- navigation config ---------------- */
 
-export const mainNavItems = [
-  {
-    label: "Lessons",
-    path: "/lessons",
-    icon: <SchoolIcon color="primary" />,
-  },
-  {
-    label: "Schedule",
-    path: "/schedule",
-    icon: <EditCalendarIcon color="primary" />,
-  },
+const mainNavItems = [
+  // --- CORE LEARNING ---
   {
     label: "Learning path",
     path: "/dashboard/path",
     icon: <FollowTheSignsIcon color="primary" />,
   },
   {
-    label: "Pratice",
-    path: "/dashboard/schedule",
-    icon: <DesignServicesIcon color="primary" />,
+    label: "Courses",
+    path: "/courses",
+    icon: <CastForEducationIcon color="primary" />,
   },
   {
-    label: "Quiz",
-    path: "/quiz",
-    icon: <QuizIcon color="primary" />,
+    label: "Schedule",
+    path: "/schedule",
+    icon: <EditCalendarIcon color="primary" />,
   },
-  {
-    label: "Text books",
-    path: "/dashboard/path",
-    icon: <MenuBookIcon color="primary" />,
-  },
+  // --- PRACTICE & ASSESSMENT ---
   {
     label: "Flashcards",
     path: "/dashboard/flashcards",
     icon: <StyleIcon color="primary" />,
   },
   {
-    label: "Classroom",
-    path: "/dashboard/path",
-    icon: <CastForEducationIcon color="primary" />,
+    label: "Quizs & Pratice",
+    path: "/quiz",
+    icon: <QuizIcon color="primary" />,
+  },
+  {
+    label: "Mock test",
+    path: "/mock_test",
+    icon: <HistoryEduIcon color="primary" />,
+  },
+  // --- RESOURCES & TOOLS ---
+  {
+    label: "Library",
+    path: "/ebooks",
+    icon: <LocalLibraryIcon color="primary" />,
   },
   {
     label: "Dictionary",
-    path: "/dashboard/path",
+    path: "/dictionary",
     icon: <BookIcon color="primary" />,
   },
   {
@@ -130,30 +127,30 @@ export const mainNavItems = [
     path: "/dashboard/translate",
     icon: <TranslateIcon color="primary" />,
   },
-  {
-    label: "Mock test",
-    path: "/test",
-    icon: <HistoryEduIcon color="primary" />,
-  },
 ];
 
 const commonNavItems = [
   {
+    label: "Home",
+    path: "/home",
+    icon: <HomeFilledIcon color="primary" />,
+  },
+  {
     label: "Progress",
-    path: "/dashboard",
+    path: "/progress",
     icon: <AnalyticsIcon color="primary" />,
   },
   {
-    label: "Help",
-    path: "/dashboard/help",
-    icon: <HelpOutlineIcon color="primary" />,
+    label: "Support Center",
+    path: "/help",
+    icon: <SupportAgentIcon color="primary" />,
   },
   {
-    label: "Report",
-    path: "/dashboard/help",
-    icon: <ReportIcon color="primary" />,
+    label: "Users",
+    path: "/umanage",
+    icon: <SupportAgentIcon color="primary" />,
   },
-]
+];
 
 /* ---------------- component ---------------- */
 

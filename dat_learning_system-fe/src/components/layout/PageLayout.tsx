@@ -53,7 +53,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
           sx={{
             flexGrow: 1,
             bgcolor: "background.paper",
-            paddingTop: '100px',
+            paddingTop: '65px',
             position: "relative",
             display: "flex",
             justifyContent: "center",
