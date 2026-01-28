@@ -1,146 +1,192 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import Link from '@mui/material/Link';
-import Card from '../../components/common/Card';
+import {
+  Box,
+  Button,
+  FormControl,
+  TextField,
+  Typography,
+  Divider,
+  Link,
+  Paper,
+  InputAdornment,
+  IconButton,
+  Alert,
+  Stack
+} from '@mui/material';
+import { motion } from 'framer-motion';
+import { 
+  MdVisibility, 
+  MdVisibilityOff, 
+  MdFingerprint, 
+  MdCorporateFare 
+} from 'react-icons/md';
+import Diversity3Icon from '@mui/icons-material/Diversity3';
+
 import AuthContainer from './AuthContainer';
 import ForgotPassword from '../../components/auth/ForgetPassword';
 import { useAuth } from '../../hooks/useAuth';
-import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 export default function SignIn() {
   const [companyCode, setCompanyCode] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
-
-  const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleClickOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const handleLogin = async () => {
-    if (!companyCode) {
-      setError('Company code is required');
-      return;
-    }
-    if (!password || password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!companyCode) return setError('Company code is required');
+    if (password.length < 6) return setError('Password must be at least 6 characters');
 
     try {
+      setIsLoading(true);
       setError('');
       await login(companyCode, password);
       navigate('/home');
     } catch (err: any) {
-      setError(err.message || 'Login failed');
+      setError(err.message || 'Invalid credentials. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <AuthContainer direction="column" sx={{ minHeight: '100vh', justifyContent: 'center' }}>
-      <Card variant="outlined">
-        <img src="\public\dat logo.png" width={50}></img>
-        <Typography
-          component="h1"
-          variant="h4"
-          sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', margin: '10px' }}
+    <AuthContainer sx={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)' 
+    }}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Paper
+          elevation={10}
+          sx={{
+            p: { xs: 4, md: 6 },
+            width: '100%',
+            maxWidth: '450px',
+            borderRadius: 4,
+            textAlign: 'center',
+            backdropFilter: 'blur(10px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          }}
         >
-          Sign in
-        </Typography>
-
-        <Box
-          component="form"
-          onSubmit={(e) => { e.preventDefault(); handleLogin(); }}
-          sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-        >
-          <FormControl>
-            <TextField
-              id="outlined-required"
-              name="companyCode"
-              label="Company ID"
-              value={companyCode}
-              onChange={(e) => setCompanyCode(e.target.value)}
-              required
-              fullWidth
+          {/* Logo Section */}
+          <Box sx={{ mb: 3 }}>
+            <motion.img 
+              src="/dat logo.png" 
+              width={60} 
+              alt="Logo"
+              whileHover={{ scale: 1.1 }}
+              style={{ filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.1))' }}
             />
-          </FormControl>
-
-          <FormControl>
-            <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-            <OutlinedInput
-              id="outlined-adornment-password"
-              type={showPassword ? 'text' : 'password'}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label={
-                      showPassword ? 'hide the password' : 'display the password'
-                    }
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                    onMouseUp={handleMouseUpPassword}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              }
-              label="Password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </FormControl>
-
-          <Button type="submit" fullWidth variant="contained">
-            Sign in
-          </Button>
-
-          <Link
-            component="button"
-            type="button"
-            onClick={handleClickOpen}
-            variant="body2"
-            sx={{ alignSelf: 'center' }}
-          >
-            Forgot your password?
-          </Link>
+            <Typography variant="h5" sx={{ fontWeight: 800, mt: 2, color: 'primary.main' }}>
+              LMS Portal
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Enter your credentials to access your dashboard
+            </Typography>
+          </Box>
 
           {error && (
-            <Typography color="error" sx={{ mt: 1 }}>
-              {error}
-            </Typography>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                {error}
+              </Alert>
+            </motion.div>
           )}
-        </Box>
 
-        <Divider sx={{ my: 2 }}>or</Divider>
-        {/* Optional social login buttons can be added here if needed */}
-      </Card>
+          <Box component="form" onSubmit={handleLogin} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+            <TextField
+              fullWidth
+              label="Company ID"
+              variant="outlined"
+              value={companyCode}
+              onChange={(e) => setCompanyCode(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MdCorporateFare color="#666" size={20} />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+            />
 
-      <ForgotPassword open={open} handleClose={handleClose} />
+            <TextField
+              fullWidth
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MdFingerprint color="#666" size={20} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+            />
+
+            <Stack direction="row" justifyContent="flex-end">
+              <Link
+                component="button"
+                type="button"
+                variant="body2"
+                onClick={() => setOpen(true)}
+                sx={{ fontWeight: 600, textDecoration: 'none' }}
+              >
+                Forgot Password?
+              </Link>
+            </Stack>
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              size="large"
+              disabled={isLoading}
+              sx={{
+                py: 1.5,
+                borderRadius: 2,
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                textTransform: 'none',
+                boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+              }}
+            >
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </Button>
+          </Box>
+
+          <Divider sx={{ my: 4 }}>
+            <Diversity3Icon sx={{ color: 'text.disabled', mx: 1 }} />
+          </Divider>
+
+          <Typography variant="caption" color="text.secondary">
+            © 2026 DAT Learning Management System
+          </Typography>
+        </Paper>
+      </motion.div>
+
+      <ForgotPassword open={open} handleClose={() => setOpen(false)} />
     </AuthContainer>
   );
 }

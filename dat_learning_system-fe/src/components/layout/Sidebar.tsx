@@ -1,42 +1,29 @@
 import * as React from "react";
+import { styled, useTheme, type Theme, type CSSObject } from "@mui/material/styles";
+import {
+  Box, List, Divider, IconButton, ListItemButton,
+  ListItemIcon, ListItemText, Typography, useMediaQuery
+} from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import Box from "@mui/material/Box";
-import { styled, useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import type { CSSObject, Theme } from "@mui/material/styles";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
+// Icons
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
-import EditCalendarIcon from "@mui/icons-material/EditCalendar";
-import SchoolIcon from "@mui/icons-material/School";
-import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
-import QuizIcon from '@mui/icons-material/Quiz';
-import CastForEducationIcon from '@mui/icons-material/CastForEducation';
-import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
-import StyleIcon from '@mui/icons-material/Style';
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
-import HomeFilledIcon from '@mui/icons-material/HomeFilled';
-import BookIcon from '@mui/icons-material/Book';
-import TranslateIcon from '@mui/icons-material/Translate';
-import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 
+// Custom Components & Config
 import BasicSelect from "../common/Select";
 import UserProfileMenu from "../UserProfileMenu";
-
-import { NavLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { LEARNING_NAV, MANAGEMENT_NAV } from "../../config/Navigation";
 
 const drawerWidth = 240;
 
-/* ---------------- drawer mixins ---------------- */
+/* ---------------- Drawer Mixins ---------------- */
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -59,8 +46,6 @@ const closedMixin = (theme: Theme): CSSObject => ({
   },
 });
 
-/* ---------------- styled components ---------------- */
-
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -69,109 +54,63 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-/* ---------------- types ---------------- */
+/* ---------------- Common Items (Always Visible) ---------------- */
+
+const commonNavItems = [
+  { label: "Home", path: "/home", icon: <HomeFilledIcon color="primary" /> },
+  { label: "Progress", path: "/progress", icon: <AnalyticsIcon color="primary" /> },
+  { label: "Support", path: "/help", icon: <SupportAgentIcon color="primary" /> },
+];
+
+/* ---------------- Sidebar Component ---------------- */
 
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
 }
 
-/* ---------------- navigation config ---------------- */
-
-const mainNavItems = [
-  // --- CORE LEARNING ---
-  {
-    label: "Learning path",
-    path: "/dashboard/path",
-    icon: <FollowTheSignsIcon color="primary" />,
-  },
-  {
-    label: "Courses",
-    path: "/courses",
-    icon: <CastForEducationIcon color="primary" />,
-  },
-  {
-    label: "Schedule",
-    path: "/schedule",
-    icon: <EditCalendarIcon color="primary" />,
-  },
-  // --- PRACTICE & ASSESSMENT ---
-  {
-    label: "Flashcards",
-    path: "/dashboard/flashcards",
-    icon: <StyleIcon color="primary" />,
-  },
-  {
-    label: "Quizs & Pratice",
-    path: "/quiz",
-    icon: <QuizIcon color="primary" />,
-  },
-  {
-    label: "Mock test",
-    path: "/mock_test",
-    icon: <HistoryEduIcon color="primary" />,
-  },
-  // --- RESOURCES & TOOLS ---
-  {
-    label: "Library",
-    path: "/ebooks",
-    icon: <LocalLibraryIcon color="primary" />,
-  },
-  {
-    label: "Dictionary",
-    path: "/dictionary",
-    icon: <BookIcon color="primary" />,
-  },
-  {
-    label: "Translation tool",
-    path: "/dashboard/translate",
-    icon: <TranslateIcon color="primary" />,
-  },
-];
-
-const commonNavItems = [
-  {
-    label: "Home",
-    path: "/home",
-    icon: <HomeFilledIcon color="primary" />,
-  },
-  {
-    label: "Progress",
-    path: "/progress",
-    icon: <AnalyticsIcon color="primary" />,
-  },
-  {
-    label: "Support Center",
-    path: "/help",
-    icon: <SupportAgentIcon color="primary" />,
-  },
-  {
-    label: "Users",
-    path: "/umanage",
-    icon: <SupportAgentIcon color="primary" />,
-  },
-];
-
-/* ---------------- component ---------------- */
+/* ---------------- Sidebar Component ---------------- */
 
 const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout, user } = useAuth();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const handleLogout = () => {
-    logout();              // clear token + user
-    navigate("/auth/login"); // redirect
+  // 1. Initialize from localStorage so it survives a Refresh
+  const [category, setCategory] = React.useState(() => {
+    return localStorage.getItem("sidebar_category") || "learn";
+  });
+
+  // 2. Auto-detect Mode from URL (Survives direct Navigation)
+  React.useEffect(() => {
+    // List your management routes here
+    const managementRoutes = ["/umanage", "/org_units", "/admin"];
+    const isManagementPage = managementRoutes.some(path => location.pathname.startsWith(path));
+
+    if (isManagementPage) {
+      setCategory("manage");
+      localStorage.setItem("sidebar_category", "manage");
+    } else {
+      // Optional: auto-switch back to learn if on a learning page
+      // setCategory("learn");
+    }
+  }, [location.pathname]);
+
+  // 3. Helper to handle manual dropdown changes
+  const handleCategoryChange = (newVal: string) => {
+    setCategory(newVal);
+    localStorage.setItem("sidebar_category", newVal);
   };
 
-
-  React.useEffect(() => {
-    if (isMobile && open) {
-      onClose(); // force close when entering mobile
-    }
-  }, [isMobile, open, onClose]);
+  const dynamicNavItems = category === 'manage' ? MANAGEMENT_NAV : LEARNING_NAV;
   const isDrawerOpen = isMobile ? false : open;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/auth/login");
+  };
 
   return (
     <MuiDrawer
@@ -180,44 +119,43 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         flexShrink: 0,
         whiteSpace: "nowrap",
         boxSizing: "border-box",
-        boxShadow: 10,
         ...(isDrawerOpen ? openedMixin(theme) : closedMixin(theme)),
-
-        // ---- SCROLLBAR MUST TARGET PAPER ----
         "& .MuiDrawer-paper": {
           ...(isDrawerOpen ? openedMixin(theme) : closedMixin(theme)),
           overflowY: "auto",
-
-          scrollbarWidth: "none", // hidden by default
-          scrollbarColor: "transparent transparent",
-          transition: "scrollbar-color 0.3s, scrollbar-width 0.3s",
-
-          "&:hover": {
-            scrollbarWidth: "thin",
-            scrollbarColor: ` #008cffff ${theme.palette.background.paper}`, // thumb / track
-          },
+          boxShadow: 4,
+          scrollbarWidth: "none",
+          "&:hover": { scrollbarWidth: "thin" },
+          "&::-webkit-scrollbar": { width: "5px" },
+          "&::-webkit-scrollbar-thumb": { backgroundColor: theme.palette.primary.main, borderRadius: "10px" }
         },
       }}
     >
-
-      {/* ---------- Header ---------- */}
       <DrawerHeader>
-        {isDrawerOpen && <BasicSelect />}
+        {/* Pass the custom handler instead of just setCategory */}
+        {isDrawerOpen ? (
+          <BasicSelect value={category} onChange={handleCategoryChange} />
+        ) : (
+          <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <img src="/dat logo.png" width={30} alt="logo" />
+          </Box>
+        )}
         <IconButton onClick={onClose} disabled={isMobile}>
-          {theme.direction === "rtl" ? (
-            <ChevronRightIcon />
-          ) : (
-            <ChevronLeftIcon />
-          )}
+          {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </IconButton>
       </DrawerHeader>
 
       <Divider />
 
-      {/* ---------- Main Navigation ---------- */}
+      {/* DYNAMIC NAVIGATION SECTION */}
       <Box sx={{ flexGrow: 1 }}>
         <List>
-          {mainNavItems.map((item) => (
+          {isDrawerOpen && (
+            <Typography variant="overline" sx={{ px: 3, fontWeight: 'bold', color: 'text.secondary' }}>
+              {category === 'manage' ? "Management Tools" : "Learning Core"}
+            </Typography>
+          )}
+          {dynamicNavItems.map((item) => (
             <ListItemButton
               key={item.label}
               component={NavLink}
@@ -227,39 +165,27 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
                 px: 2.5,
                 justifyContent: isDrawerOpen ? "initial" : "center",
                 "&.active": {
-                  backgroundColor: "action.selected",
+                  bgcolor: "action.selected",
+                  borderRight: `4px solid ${theme.palette.primary.main}`,
+                  "& .MuiListItemIcon-root": { color: theme.palette.primary.main },
+                  "& .MuiListItemText-primary": { color: theme.palette.primary.main, fontWeight: 'bold' }
                 },
               }}
             >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: isDrawerOpen ? 3 : "auto",
-                  justifyContent: "center",
-                }}
-              >
+              <ListItemIcon sx={{ minWidth: 0, mr: isDrawerOpen ? 3 : "auto", justifyContent: "center" }}>
                 {item.icon}
               </ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                sx={{ opacity: isDrawerOpen ? 1 : 0 }}
-              />
+              <ListItemText primary={item.label} sx={{ opacity: isDrawerOpen ? 1 : 0 }} />
             </ListItemButton>
           ))}
         </List>
       </Box>
 
+      {/* ... Rest of your component (Common items, Profile) is perfect as it is ... */}
+
       <Divider />
-
-      {/* ---------- Commons ---------- */}
       <List>
-        {isDrawerOpen && (
-          <ListItemText
-            primary="Commons"
-            sx={{ px: 3, py: 1, fontSize: 12, color: "text.secondary" }}
-          />
-        )}
-
+        {isDrawerOpen && <Typography variant="overline" sx={{ px: 3, color: 'text.secondary', fontWeight: '500' }}>General</Typography>}
         {commonNavItems.map((item) => (
           <ListItemButton
             key={item.label}
@@ -269,37 +195,20 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
               minHeight: 44,
               px: 2.5,
               justifyContent: isDrawerOpen ? "initial" : "center",
-              "&.active": {
-                backgroundColor: "action.selected",
-              },
+              "&.active": { bgcolor: "action.selected" },
             }}
           >
-            <ListItemIcon
-              sx={{
-                minWidth: 0,
-                mr: isDrawerOpen ? 3 : "auto",
-                justifyContent: "center",
-              }}
-            >
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText
-              primary={item.label}
-              sx={{ opacity: isDrawerOpen ? 1 : 0 }}
-            />
+            <ListItemIcon sx={{ minWidth: 0, mr: isDrawerOpen ? 3 : "auto", justifyContent: "center" }}>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.label} sx={{ opacity: isDrawerOpen ? 1 : 0 }} />
           </ListItemButton>
         ))}
       </List>
-
       <Divider />
-
-      {/* ---------- Footer / Profile ---------- */}
       <Box sx={{ p: 1 }}>
         <UserProfileMenu
-          name={user?.fullName ?? "Unknown user"}
-          email={user?.email ?? "Unknown email"}
-          avatarUrl="/static/images/avatar/7.jpg"
-          position={user?.position ?? "Unknown position"}
+          name={user?.fullName ?? "Guest User"}
+          email={user?.email ?? ""}
+          position={user?.position ?? "Student"}
           onLogout={handleLogout}
         />
       </Box>

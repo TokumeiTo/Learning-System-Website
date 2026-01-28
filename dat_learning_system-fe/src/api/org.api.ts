@@ -1,4 +1,5 @@
 import api from "../hooks/useApi";
+import type { OrgUnit } from "../types/org";
 
 export interface OrgUnitSelect {
   id: number;
@@ -24,3 +25,8 @@ export const getTeams = async (): Promise<OrgUnitSelect[]> => {
   const res = await api.get("/api/OrgUnits/teams");
   return res.data;
 };
+
+export const fetchOrgHierarchy = async () : Promise<OrgUnit[]> => {
+  const res = await api.get("/api/OrgUnits");
+  return res.data;
+}

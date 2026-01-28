@@ -233,7 +233,7 @@ const UserManagementPage = () => {
                         </TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
-                          <Chip label={user.positionName} size="small" sx={{ fontWeight: 600, bgcolor: '#dbeafe', color: '#1e40af' }} />
+                          <Chip label={user.position} size="small" sx={{ fontWeight: 600, bgcolor: '#dbeafe', color: '#1e40af' }} />
                         </TableCell>
                         <TableCell>{user.orgUnitName}</TableCell>
                         <TableCell align="right">

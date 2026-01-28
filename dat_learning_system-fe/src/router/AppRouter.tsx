@@ -29,6 +29,8 @@ import SupportCenter from "../pages/feedbacks/FAQsPage";
 import MockTestPage from "../pages/mock_tests/MockTestPage";
 import CoursesPage from "../pages/courses/CoursePage";
 import UserManagementPage from "../pages/auth/UserManagementPage";
+import OrgPage from "../pages/orgUnits/OrgUnitPage";
+import AdminDashboard from "../pages/dashboard/AdminDashboardPage";
 
 /* Guards */
 // import { ProtectedRoute } from "./ProtectedRoute";
@@ -105,22 +107,13 @@ export const AppRouter = () => {
             <ClassroomPage />
             // </ProtectedRoute>
           }
-        />   
+        />
 
         <Route
           path="/courses"
           element={
             // <ProtectedRoute>
             <CoursesPage />
-            // </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/umanage"
-          element={
-            // <ProtectedRoute>
-            <UserManagementPage />
             // </ProtectedRoute>
           }
         />
@@ -203,6 +196,34 @@ export const AppRouter = () => {
 
         {/* ---------- 404 ---------- */}
         <Route path="*" element={<NotFoundPage />} />
+
+        {/* ---------- Admin ----------- */}
+        <Route
+          path="admin/dashboard"
+          element={
+            // <ProtectedRoute>
+            <AdminDashboard />
+            // </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin/user_management"
+          element={
+            // <ProtectedRoute>
+            <UserManagementPage />
+            // </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin/org_units"
+          element={
+            // <ProtectedRoute>
+            <OrgPage />
+            // </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

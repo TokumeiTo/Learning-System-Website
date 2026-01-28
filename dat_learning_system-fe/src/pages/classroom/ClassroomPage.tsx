@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   Box, Typography, Stack, Paper, Tab, Tabs, Button, 
-  List, ListItem, ListItemButton, ListItemIcon, ListItemText, 
-  Avatar, TextField, Chip, IconButton 
+  List, ListItem, ListItemButton, ListItemIcon, ListItemText, TextField
 } from '@mui/material';
 import { 
-  PlayCircle, ChevronRight, Lock, AttachFile, CheckCircle, Article, Send 
+  PlayCircle, Lock, AttachFile, CheckCircle 
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+
+// 1. Define the dynamic Content Block structure
+interface LessonContent {
+  id: string;
+  type: 'text' | 'image' | 'video';
+  body: string; // Text content or URL
+}
 
 interface Lesson {
   id: number;
@@ -15,70 +21,63 @@ interface Lesson {
   time: string;
   done: boolean;
   locked: boolean;
-  description: string;
-  type: 'video' | 'reading';
+  contents: LessonContent[]; // The array that allows "Free Will" ordering
 }
 
-// 1. Define the full curriculum data here
-const lessons: Lesson[] = [
+// 2. Mock Data with sequential content blocks
+const mockLessons: Lesson[] = [
   { 
     id: 1, 
-    title: "Intro to Business JP", 
-    time: "5:00", 
+    title: "Introduction to Hiragana", 
+    time: "10:00", 
     done: true, 
     locked: false,
-    description: "An overview of the cultural expectations in a Japanese corporate environment.",
-    type: 'video'
+    contents: [
+      {
+        id: 'c1',
+        type: 'text',
+        body: `What is Hiragana?\n          hello, In this lesson we are about to Japanese traditional writing.....\n  There are 3 types of writing styles in Japanese,\n        1. Hiragana\n        2. Katakana\n        3. Kanji`
+      },
+      {
+        id: 'c2',
+        type: 'image',
+        body: 'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&q=80&w=800'
+      },
+      {
+        id: 'c3',
+        type: 'text',
+        body: `Above is a visual reference for your studies.\nKeep in mind that Hiragana is used for native Japanese words and grammar particles.`
+      }
+    ]
   },
   { 
     id: 2, 
     title: "The IT Hierarchy", 
     time: "12:00", 
-    done: true, 
-    locked: false,
-    description: "Understanding who's who in a tech team, from Junior Devs to the CTO (Shachou).",
-    type: 'reading'
-  },
-  { 
-    id: 3, 
-    title: "Keigo in Sales", 
-    time: "15:20", 
-    done: false,
-    locked: false,
-    description: "Nuances of using honorifics specifically during technical software demonstrations.",
-    type: 'video'
-  },
-  { 
-    id: 4, 
-    title: "Client Email Etiquette", 
-    time: "08:45", 
     done: false, 
     locked: false,
-    description: "How to draft professional follow-up emails after a successful sales pitch.",
-    type: 'reading'
-  },
-  { 
-    id: 5, 
-    title: "Live Demo Scenario", 
-    time: "20:00", 
-    done: false, 
-    locked: true, 
-    description: "Practical simulation of a live product demo in Japanese.",
-    type: 'video'
+    contents: [
+      {
+        id: 'c4',
+        type: 'video',
+        body: 'https://www.youtube.com/embed/dQw4w9WgXcQ' // Mock video link
+      },
+      {
+        id: 'c5',
+        type: 'text',
+        body: "Understanding who's who in a tech team, from Junior Devs to the CTO (Shachou)."
+      }
+    ]
   }
 ];
 
 const ClassroomPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
-
-  // 2. Set the state to the FIRST lesson (or whichever you want to start with)
-  const [currentLesson, setCurrentLesson] = useState<Lesson>(lessons[0]);
+  const [currentLesson, setCurrentLesson] = useState<Lesson>(mockLessons[0]);
 
   const handleLessonSelect = (lesson: Lesson) => {
-    if (!lesson.locked) {
-      setCurrentLesson(lesson);
-    }
+    if (!lesson.locked) setCurrentLesson(lesson);
   };
 
   return (
@@ -105,34 +104,57 @@ const ClassroomPage = () => {
 
       <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', lg: 'row' } }}>
         
-        {/* Main Content Area */}
+        {/* Main Content Area (The "Free Will" Renderer) */}
         <Box sx={{ flex: 2, width: '100%' }}>
-          <Paper 
-            elevation={24} 
-            sx={{ 
-              width: '100%', aspectRatio: '16/9', bgcolor: 'black', 
-              borderRadius: 6, overflow: 'hidden', mb: 3,
-              border: '1px solid rgba(255,255,255,0.1)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}
-          >
-             {currentLesson.type === 'video' ? (
-                <PlayCircle sx={{ fontSize: 80, opacity: 0.5, color: '#6366f1' }} />
-             ) : (
-                <Article sx={{ fontSize: 80, opacity: 0.5, color: '#10b981' }} />
-             )}
-          </Paper>
+          <Stack spacing={4}>
+            {currentLesson.contents.map((block) => (
+              <Box key={block.id} sx={{ width: '100%' }}>
+                
+                {block.type === 'text' && (
+                  <Typography sx={{ 
+                    whiteSpace: 'pre-wrap', // This keeps the creator's spaces and enters
+                    lineHeight: 1.8, 
+                    fontSize: '1.1rem',
+                    color: 'rgba(255,255,255,0.85)',
+                    fontFamily: 'monospace' // Optional: use monospace if they want exact alignment
+                  }}>
+                    {block.body}
+                  </Typography>
+                )}
 
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-            <Typography variant="h6" fontWeight={800}>
-                {currentLesson.type === 'video' ? 'Video Lesson' : 'Reading Material'}
-            </Typography>
-            <Chip label="Assignment Due in 2 days" color="warning" size="small" sx={{ fontWeight: 700 }} />
+                {block.type === 'video' && (
+                  <Paper sx={{ 
+                    width: '100%', aspectRatio: '16/9', bgcolor: 'black', 
+                    borderRadius: 4, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' 
+                  }}>
+                    <iframe 
+                      width="100%" height="100%" 
+                      src={block.body} 
+                      title="Video Player" 
+                      frameBorder="0" 
+                      allowFullScreen 
+                    />
+                  </Paper>
+                )}
+
+                {block.type === 'image' && (
+                  <Box 
+                    component="img" 
+                    src={block.body} 
+                    sx={{ width: '100%', borderRadius: 4, boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }} 
+                  />
+                )}
+
+              </Box>
+            ))}
+            
+            {/* Navigation Buttons for Lesson Flow */}
+            <Stack direction="row" spacing={2} sx={{ pt: 4 }}>
+               <Button variant="contained" sx={{ borderRadius: 3, px: 4, py: 1.5, fontWeight: 800 }}>
+                 Mark as Completed
+               </Button>
+            </Stack>
           </Stack>
-          
-          <Typography sx={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, fontSize: '1.1rem' }}>
-            {currentLesson.description}
-          </Typography>
         </Box>
 
         {/* Sidebar Command Center */}
@@ -140,27 +162,23 @@ const ClassroomPage = () => {
           flex: 1, minWidth: { lg: 400 }, borderRadius: 6, 
           bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(20px)', 
           border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden',
-          display: 'flex', flexDirection: 'column', height: 'fit-content', maxH: '85vh'
+          display: 'flex', flexDirection: 'column', height: 'fit-content'
         }}>
           <Tabs 
             value={activeTab} 
             onChange={(_, v) => setActiveTab(v)} 
             variant="fullWidth" 
-            sx={{ 
-              borderBottom: '1px solid rgba(255,255,255,0.1)',
-              '& .MuiTab-root': { color: 'rgba(255,255,255,0.5)', fontWeight: 700, fontSize: '0.75rem' },
-              '& .Mui-selected': { color: '#6366f1 !important' }
-            }}
+            sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
           >
-            <Tab label="Curriculum" />
-            <Tab label="Classwork" />
-            <Tab label="Chat" />
+            <Tab label="Curriculum" sx={{ fontWeight: 700, fontSize: '0.75rem' }} />
+            <Tab label="Classwork" sx={{ fontWeight: 700, fontSize: '0.75rem' }} />
+            <Tab label="Chat" sx={{ fontWeight: 700, fontSize: '0.75rem' }} />
           </Tabs>
 
-          <Box sx={{ p: 2, flex: 1, overflowY: 'auto' }}>
+          <Box sx={{ p: 2, flex: 1, overflowY: 'auto', maxHeight: '70vh' }}>
             {activeTab === 0 && (
               <List disablePadding>
-                {lessons.map((item) => (
+                {mockLessons.map((item) => (
                   <ListItem disablePadding key={item.id} sx={{ mb: 1 }}>
                     <ListItemButton 
                       onClick={() => handleLessonSelect(item)}
@@ -169,19 +187,17 @@ const ClassroomPage = () => {
                         borderRadius: 3, 
                         bgcolor: currentLesson.id === item.id ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
                         border: currentLesson.id === item.id ? '1px solid #6366f1' : '1px solid transparent',
-                        "&.Mui-disabled": { opacity: 0.4, color: 'white' }
                       }}
                     >
                       <ListItemIcon sx={{ minWidth: 40, color: item.done ? '#10b981' : 'white' }}>
-                        {item.done ? <CheckCircle fontSize="small" /> : item.locked ? <Lock fontSize="small" /> : <PlayCircle fontSize="small" />}
+                        {item.done ? <CheckCircle /> : item.locked ? <Lock /> : <PlayCircle />}
                       </ListItemIcon>
                       <ListItemText 
                         primary={item.title} 
                         secondary={item.time} 
-                        primaryTypographyProps={{ fontWeight: 700, fontSize: '0.9rem', color: 'white' }}
+                        primaryTypographyProps={{ fontWeight: 700, color: 'white' }}
                         secondaryTypographyProps={{ sx: { color: 'rgba(255,255,255,0.4)' } }} 
                       />
-                      {currentLesson.id === item.id && <ChevronRight sx={{ color: '#6366f1' }} />}
                     </ListItemButton>
                   </ListItem>
                 ))}
@@ -189,34 +205,24 @@ const ClassroomPage = () => {
             )}
 
             {activeTab === 1 && (
-              <Stack spacing={3}>
-                <Box sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 4 }}>
-                  <Typography variant="subtitle2" fontWeight={800} gutterBottom>Submit {currentLesson.title} Task</Typography>
-                  <Button fullWidth variant="contained" startIcon={<AttachFile />} sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 700 }}>
-                    Upload Submission
-                  </Button>
-                </Box>
-              </Stack>
+              <Box sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 4 }}>
+                <Typography variant="subtitle2" fontWeight={800} gutterBottom>Assignments</Typography>
+                <Button fullWidth variant="contained" startIcon={<AttachFile />} sx={{ borderRadius: 3 }}>
+                  Upload File
+                </Button>
+              </Box>
             )}
 
             {activeTab === 2 && (
-              <Stack sx={{ height: 400 }}>
-                <Box sx={{ flex: 1, overflowY: 'auto', mb: 2 }}>
-                   <Stack direction="row" spacing={1}>
-                      <Avatar sx={{ width: 24, height: 24, bgcolor: 'primary.main', fontSize: 10 }}>T</Avatar>
-                      <Paper sx={{ p: 1.5, bgcolor: 'rgba(255,255,255,0.1)', color: 'white', borderRadius: '0 12px 12px 12px' }}>
-                        <Typography variant="caption" fontWeight={800}>Teacher</Typography>
-                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>Ask anything about "{currentLesson.title}" here!</Typography>
-                      </Paper>
-                    </Stack>
+              <Stack spacing={2}>
+                <Box sx={{ height: 200, overflowY: 'auto', bgcolor: 'rgba(0,0,0,0.2)', p: 2, borderRadius: 2 }}>
+                  <Typography variant="caption" color="primary.light">System: Chat is ready.</Typography>
                 </Box>
                 <TextField 
-                  fullWidth placeholder="Ask a question..." 
-                  variant="outlined" size="small"
-                  InputProps={{ 
-                    sx: { borderRadius: 3, color: 'white', bgcolor: 'rgba(255,255,255,0.05)', fontSize: '0.8rem' },
-                    endAdornment: <IconButton color="primary"><Send fontSize="small" /></IconButton>
-                  }} 
+                  fullWidth placeholder="Message teacher..." 
+                  size="small"
+                  variant="outlined"
+                  InputProps={{ sx: { borderRadius: 3, color: 'white', bgcolor: 'rgba(255,255,255,0.05)' }}}
                 />
               </Stack>
             )}

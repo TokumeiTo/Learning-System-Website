@@ -101,9 +101,9 @@ const Home: React.FC = () => {
                                 <Paper sx={{ p: 3, borderRadius: 5, bgcolor: 'background.paper', color: 'white',border: '1px solid #e2e8f0' }}>
                                     <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
                                         <Leaderboard sx={{ color: '#fbbf24' }} />
-                                        <Typography variant="subtitle1" fontWeight={700}>Department Ranking</Typography>
+                                        <Typography color='text.primary' variant="subtitle1" fontWeight={700}>Department Ranking</Typography>
                                     </Stack>
-                                    <Stack spacing={1.5}>
+                                    <Stack color='text.primary' spacing={1.5}>
                                         <RankingItem name="Engineering" score="4,200 pts" pos={1} />
                                         <RankingItem name="Sales Dept" score="3,850 pts" pos={2} />
                                         <RankingItem name="HR Team" score="2,100 pts" pos={3} />
@@ -133,7 +133,7 @@ const Home: React.FC = () => {
 const RankingItem = ({ name, score, pos }: { name: string, score: string, pos: number }) => (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Stack direction="row" spacing={1.5} alignItems="center">
-            <Typography variant="body2" fontWeight={800} color={pos === 1 ? '#fbbf24' : 'white'}>{pos}.</Typography>
+            <Typography variant="body2" fontWeight={800} color={pos === 1 ? '#fbbf24' : pos ===2 ? 'text.primary' : 'text.secondary'}>{pos}.</Typography>
             <Typography variant="body2">{name}</Typography>
         </Stack>
         <Typography variant="caption" sx={{ opacity: 0.7 }}>{score}</Typography>
