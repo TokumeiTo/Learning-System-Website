@@ -3,6 +3,7 @@ using System.Text;
 using FluentValidation;
 using LMS.Backend.Data.Dbcontext;
 using LMS.Backend.Data.Entities;
+using LMS.Backend.Data.Interceptors;
 using LMS.Backend.Extensions;
 using LMS.Backend.Helpers;
 using LMS.Backend.Middlewares;
@@ -18,7 +19,15 @@ var builder = WebApplication.CreateBuilder(args);
 /////////////////////Builder Created/////////////////////////////////
 
 /* Controllers */
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // FIXES THE "0" ISSUE:
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+
+        // PREVENTS INFINITE LOOP CRASH:
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
@@ -58,9 +67,12 @@ builder.Services.AddSwaggerGen(options =>
 
 /* Application services (Helpers, Services, etc.) */
 // EFCore Postgre SQL
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<AppDbContext>((sp, options) =>
+{
+    var auditInterceptor = sp.GetRequiredService<AuditInterceptor>();
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
+            .AddInterceptors(auditInterceptor);
+});
 
 // Hash Password
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -78,6 +90,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 // Singletons
 builder.Services.AddSingleton<JwtHelper>();
+builder.Services.AddSingleton<AuditInterceptor>();
 // Helper Services
 builder.Services.AddApplicationServices();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);

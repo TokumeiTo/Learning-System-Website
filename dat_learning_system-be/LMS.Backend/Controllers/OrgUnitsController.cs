@@ -8,7 +8,6 @@ namespace LMS.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "SuperAdmin")]
 public class OrgUnitsController : ControllerBase
 {
     private readonly IOrgUnitService _orgUnitService;

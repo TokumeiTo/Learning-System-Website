@@ -86,7 +86,7 @@ const HeroCarousel: React.FC = () => {
   };
 
   return (
-    <Box sx={{ position: 'relative', width: '100%', mb: 5, height: 320, overflow: 'hidden', borderRadius: 5 }}>
+    <Box sx={{ position: 'relative', width: '100%', mb: 5, minHeight: 350, overflow: 'hidden', borderRadius: 5 }}>
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={index}
@@ -119,7 +119,7 @@ const HeroCarousel: React.FC = () => {
                   label={BANNERS[index].tag} 
                   color={BANNERS[index].color} 
                   variant="filled" 
-                  sx={{ width: 'fit-content', fontWeight: 700, bgcolor: 'background.paper', backdropFilter: 'blur(4px)', color: 'white' }} 
+                  sx={{ width: 'fit-content', p:'10px', fontWeight: 700, bgcolor: 'black', backdropFilter: 'blur(4px)', color: 'white' }} 
                 />
                 <Typography variant="h3" fontWeight={800} sx={{ letterSpacing: -1 }}>
                   {BANNERS[index].title}

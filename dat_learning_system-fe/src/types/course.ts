@@ -1,14 +1,17 @@
+import type { Topic } from "./topic";
+
 export interface Course {
-  id: string;
-  category: "Japanese" | "IT" | "English" | "Custom"; // Category
-  title: string;
-  isMandatory: boolean; // Mandatory?
-  thumbnail: string; // CourseProfileImage
-  description: string;
-  certificationImage: string; // Certification
-  totalHours: number;
-  rating: number; // Rating
-  badge: "Beginner" | "Intermediate" | "Advanced"; // Badge
-  enrolledCount: number; // Users Count
-  status: "Published" | "Draft";
+    id: string;
+    category: string;
+    title: string;
+    isMandatory: boolean;
+    thumbnail: string;
+    description: string;
+    certificationImage?: string;
+    totalHours: number;
+    rating: number;
+    badge: string | number;
+    enrolledCount: number;
+    status: string | number;
+    topics?: Topic[];
 }

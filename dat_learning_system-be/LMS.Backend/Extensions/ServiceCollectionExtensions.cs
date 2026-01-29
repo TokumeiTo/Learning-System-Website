@@ -13,11 +13,16 @@ public static class ServiceCollectionExtensions
         // Repos
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IOrgUnitRepository, OrgUnitRepository>();
+        services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<ITopicRepository, TopicRepository>();
+        services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+        services.AddScoped<ISubmissionRepository, SubmissionRepository>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IOrgUnitService, OrgUnitService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ICourseService, CourseService>();
 
         // Helpers
         services.AddSingleton<JwtHelper>();

@@ -191,7 +191,7 @@ export const AppRouter = () => {
         {/* ---------- Root ---------- */}
         <Route
           path="/"
-          element={<Navigate to={user ? "/dashboard" : "/signIn"} replace />}
+          element={<Navigate to={user ? "/home" : "/signIn"} replace />}
         />
 
         {/* ---------- 404 ---------- */}

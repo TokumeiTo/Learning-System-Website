@@ -1,6 +1,7 @@
 namespace LMS.Backend.Common;
 
-public enum Position {
+public enum Position
+{
     SuperAdmin,
     DivHead,
     DepHead,
@@ -18,3 +19,5 @@ public enum OrgLevel
     Section,
     Team
 }
+public enum CourseStatus { Published, Draft, Closed }
+public enum CourseBadge { Beginner, Intermediate, Advanced }

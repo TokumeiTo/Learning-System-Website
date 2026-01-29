@@ -115,7 +115,7 @@ namespace LMS.Backend.Migrations
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
                             CompanyCode = "00-0000",
-                            ConcurrencyStamp = "cd1d1594-3977-450d-a2b3-cac04551746b",
+                            ConcurrencyStamp = "912ae83d-5ad7-4057-bf4e-25042a8b382a",
                             Email = "admin@lms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin",
@@ -124,13 +124,205 @@ namespace LMS.Backend.Migrations
                             NormalizedEmail = "ADMIN@LMS.COM",
                             NormalizedUserName = "00-0000",
                             OrgUnitId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAEFvlTRoLOz117y4i1CAyWnI8dg0lniFd/4HMtOk+T5+rb6zrXUQ/N+pbDQ+eeRfsSQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEH3vQy2GBWspXMCyqQylKVHmmx5hX46YP2rZ6jd2P6q33xbTBvrRlQOM4OoPsmitEQ==",
                             PhoneNumberConfirmed = false,
                             Position = 0,
-                            SecurityStamp = "aa2ba43a-b2fe-4b6e-b50c-37d8fafc47c6",
+                            SecurityStamp = "b51a563c-982f-4f1a-9d67-266248d33f60",
                             TwoFactorEnabled = false,
                             UserName = "00-0000"
                         });
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Assignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("TopicId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("Assignments");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.AuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("EntityId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("EntityName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("NewData")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OldData")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PerformedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntityId");
+
+                    b.HasIndex("PerformedBy");
+
+                    b.ToTable("AuditLogs");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Course", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Badge")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CertificationImage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("EnrolledCount")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsMandatory")
+                        .HasColumnType("boolean");
+
+                    b.Property<double>("Rating")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Thumbnail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<double>("TotalHours")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Lesson", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDone")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Time")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("SortOrder");
+
+                    b.ToTable("Lessons");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.LessonContent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("LessonId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LessonId");
+
+                    b.HasIndex("SortOrder");
+
+                    b.ToTable("LessonContents");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.OrgUnit", b =>
@@ -207,6 +399,60 @@ namespace LMS.Backend.Migrations
                             Name = "Recruitment",
                             ParentId = 2
                         });
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Submission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssignmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContentText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("StudentId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Submissions");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Topic", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Topics");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -345,7 +591,7 @@ namespace LMS.Backend.Migrations
                         new
                         {
                             UserId = "b74ddd14-6340-4840-95c2-db12554843e5",
-                            RoleId = "r1"
+                            RoleId = "r3"
                         });
                 });
 
@@ -378,6 +624,47 @@ namespace LMS.Backend.Migrations
                     b.Navigation("OrgUnit");
                 });
 
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Assignment", b =>
+                {
+                    b.HasOne("LMS.Backend.Data.Entities.Topic", "Topic")
+                        .WithMany("Assignments")
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Topic");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.AuditLog", b =>
+                {
+                    b.HasOne("LMS.Backend.Data.Entities.ApplicationUser", "AdminUser")
+                        .WithMany()
+                        .HasForeignKey("PerformedBy")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AdminUser");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Lesson", b =>
+                {
+                    b.HasOne("LMS.Backend.Data.Entities.Course", "Course")
+                        .WithMany("Lessons")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.LessonContent", b =>
+                {
+                    b.HasOne("LMS.Backend.Data.Entities.Lesson", null)
+                        .WithMany("Contents")
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("LMS.Backend.Data.Entities.OrgUnit", b =>
                 {
                     b.HasOne("LMS.Backend.Data.Entities.OrgUnit", "Parent")
@@ -386,6 +673,36 @@ namespace LMS.Backend.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Submission", b =>
+                {
+                    b.HasOne("LMS.Backend.Data.Entities.Assignment", "Assignment")
+                        .WithMany("Submissions")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LMS.Backend.Data.Entities.ApplicationUser", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Assignment");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Topic", b =>
+                {
+                    b.HasOne("LMS.Backend.Data.Entities.Course", "Course")
+                        .WithMany("Topics")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -439,11 +756,33 @@ namespace LMS.Backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Assignment", b =>
+                {
+                    b.Navigation("Submissions");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Course", b =>
+                {
+                    b.Navigation("Lessons");
+
+                    b.Navigation("Topics");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Lesson", b =>
+                {
+                    b.Navigation("Contents");
+                });
+
             modelBuilder.Entity("LMS.Backend.Data.Entities.OrgUnit", b =>
                 {
                     b.Navigation("Children");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Topic", b =>
+                {
+                    b.Navigation("Assignments");
                 });
 #pragma warning restore 612, 618
         }

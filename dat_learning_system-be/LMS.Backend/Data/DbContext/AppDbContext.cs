@@ -12,6 +12,13 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<OrgUnit> OrgUnits { get; set; }
+    public DbSet<Course> Courses { get; set; }
+    public DbSet<Lesson> Lessons { get; set; }
+    public DbSet<LessonContent> LessonContents { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }
+    public DbSet<Topic> Topics { get; set; }
+    public DbSet<Assignment> Assignments { get; set; }
+    public DbSet<Submission> Submissions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
