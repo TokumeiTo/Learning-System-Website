@@ -1,0 +1,161 @@
+import { useState } from 'react';
+import {
+    ListItem, ListItemButton, ListItemIcon, ListItemText,
+    Typography, TextField, Stack, IconButton
+} from '@mui/material';
+import {
+    CheckCircle, PlayCircle, DragIndicator as DragIcon,
+    Edit as EditIcon, DeleteOutline as DeleteIcon
+} from '@mui/icons-material';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import type { Lesson } from '../../types/classroom';
+
+type SortableItemProps = {
+    item: Lesson;
+    isEditMode: boolean;
+    currentLessonId?: string;
+    onSelect: (item: Lesson) => void;
+    onUpdate: (id: string, title: string, time: string) => Promise<void>;
+    onDelete: (id: string) => void;
+};
+
+const SortableLessonItem = ({ 
+    item, 
+    isEditMode, 
+    currentLessonId, 
+    onSelect, 
+    onUpdate, 
+    onDelete 
+}: SortableItemProps) => {
+    // Local state for inline editing
+    const [isEditing, setIsEditing] = useState(false);
+    const [editTitle, setEditTitle] = useState(item.title);
+    const [editTime, setEditTime] = useState(item.time);
+
+    const {
+        attributes, listeners, setNodeRef, transform, transition, isDragging
+    } = useSortable({ 
+        id: item.id, 
+        disabled: !isEditMode || isEditing // Disable drag while typing
+    });
+
+    const style = {
+        color: 'white',
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 1000 : 0,
+        opacity: isDragging ? 0.6 : 1,
+    };
+
+    const handleSave = async () => {
+        if (editTitle.trim() !== item.title || editTime !== item.time) {
+            await onUpdate(item.id, editTitle, editTime);
+        }
+        setIsEditing(false);
+    };
+
+    return (
+        <ListItem
+            ref={setNodeRef}
+            style={style}
+            disablePadding
+            sx={{ 
+                mb: 0.5,
+                // Show action buttons only on hover when in edit mode
+                '&:hover .item-actions': { opacity: 1 } 
+            }}
+        >
+            <ListItemButton
+                disabled={item.isLocked && !isEditMode}
+                selected={currentLessonId === item.id}
+                onClick={() => !isEditing && onSelect(item)}
+                sx={{
+                    borderRadius: 2,
+                    px: 1,
+                    transition: '0.2s',
+                    '&.Mui-selected': { 
+                        bgcolor: 'rgba(99, 102, 241, 0.15)',
+                        borderRight: '3px solid #6366f1'
+                    },
+                }}
+            >
+                {/* 1. Drag Handle (Left) */}
+                {isEditMode && !isEditing && (
+                    <ListItemIcon 
+                        {...attributes} {...listeners} 
+                        sx={{ minWidth: 28, color: 'rgba(255,255,255,0.2)', cursor: 'grab' }}
+                    >
+                        <DragIcon fontSize="small" />
+                    </ListItemIcon>
+                )}
+
+                {/* 2. Status Icon */}
+                <ListItemIcon sx={{ minWidth: 32, color: item.isDone ? '#10b981' : 'rgba(255,255,255,0.3)' }}>
+                    {item.isDone ? <CheckCircle fontSize="small" /> : <PlayCircle fontSize="small" />}
+                </ListItemIcon>
+                
+                {/* 3. Content (Text or Input) */}
+                <ListItemText
+                    primary={
+                        isEditing ? (
+                            <TextField 
+                                variant="standard" fullWidth autoFocus
+                                value={editTitle}
+                                onChange={(e) => setEditTitle(e.target.value)}
+                                onBlur={handleSave}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+                                InputProps={{ disableUnderline: true, sx: { color: 'white', fontSize: '0.875rem', fontWeight: 600 } }}
+                            />
+                        ) : (
+                            <Typography variant="body2" sx={{ color: 'white', fontWeight: currentLessonId === item.id ? 700 : 500 }}>
+                                {item.title}
+                            </Typography>
+                        )
+                    }
+                    secondary={
+                        isEditing ? (
+                            <TextField 
+                                variant="standard" fullWidth
+                                value={editTime}
+                                onChange={(e) => setEditTime(e.target.value)}
+                                onBlur={handleSave}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+                                InputProps={{ disableUnderline: true, sx: { color: 'rgb(255, 255, 255)', fontSize: '0.75rem' } }}
+                            />
+                        ) : (
+                            <Typography variant="caption" sx={{ opacity: 0.5 }}>{item.time}</Typography>
+                        )
+                    }
+                />
+
+                {/* 4. Action Buttons (Right) */}
+                {isEditMode && !isEditing && (
+                    <Stack 
+                        direction="row" 
+                        spacing={0.5} 
+                        className="item-actions" 
+                        sx={{ opacity: 0, transition: '0.2s' }}
+                    >
+                        <IconButton 
+                            size="small" 
+                            onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
+                            sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#6366f1' } }}
+                        >
+                            <EditIcon sx={{ fontSize: 18 }} />
+                        </IconButton>
+                        <IconButton 
+                            size="small" 
+                            onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
+                            sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#f43f5e' } }}
+                        >
+                            <DeleteIcon sx={{ fontSize: 18 }} />
+                        </IconButton>
+                    </Stack>
+                )}
+            </ListItemButton>
+        </ListItem>
+    );
+};
+
+export default SortableLessonItem;

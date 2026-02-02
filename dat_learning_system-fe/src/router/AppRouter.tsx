@@ -3,7 +3,6 @@ import { useAuth } from "../hooks/useAuth";
 
 /* Pages */
 import SignIn from "../pages/auth/SignInPage";
-import RegisterPage from "../pages/auth/RegisterPage";
 
 import FlashcardsPage from "../pages/flashcards/FlashcardsPage";
 import TranslationPage from "../pages/translation/TranslationPage";
@@ -43,7 +42,6 @@ export const AppRouter = () => {
       <Routes>
         {/* ---------- Public ---------- */}
         <Route path="/signIn" element={<SignIn />} />
-        <Route path="/register" element={<RegisterPage />} />
 
         {/* ---------- Protected ---------- */}
         <Route

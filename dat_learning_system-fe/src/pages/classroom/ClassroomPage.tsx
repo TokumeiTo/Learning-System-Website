@@ -1,23 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Box, Typography, Stack, Paper, Tab, Tabs, Button, 
-  List, ListItem, ListItemButton, ListItemIcon, ListItemText, TextField, CircularProgress 
-} from '@mui/material';
-import { PlayCircle, Lock, AttachFile, CheckCircle } from '@mui/icons-material';
-
-// Import your API service (Assume you created this in step 6 of the previous response)
+import { Box, Typography, Stack, CircularProgress, Button, Paper } from '@mui/material';
+import { Edit, Visibility } from '@mui/icons-material';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { fetchClassroomData } from '../../api/classroom.api';
 import type { ClassroomView, Lesson } from '../../types/classroom';
 
+import LessonContentSection from '../../components/classroom/LessonContentSection';
+import LessonContentViewer from '../../components/classroom/LessonContentViewer';
+import ClassroomSidebar from '../../components/classroom/ClassroomSidebar';
+
 const ClassroomPage = () => {
-  const { id } = useParams<{ id: string }>(); // Grabs the GUID from URL
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
-  const [activeTab, setActiveTab] = useState(0);
+
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ClassroomView | null>(null);
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
+
+  // New State: Toggle between Builder (Edit) and Viewer (Read)
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -25,18 +27,16 @@ const ClassroomPage = () => {
       fetchClassroomData(id)
         .then((res) => {
           setData(res);
-          // Set the first lesson as active by default
-          if (res.lessons.length > 0) {
+          // Auto-select first lesson if none selected
+          if (res.lessons.length > 0 && !currentLesson) {
             setCurrentLesson(res.lessons[0]);
           }
         })
+        .catch(err => console.error("Error loading classroom:", err))
         .finally(() => setLoading(false));
     }
+    // Removed currentLesson from dependencies to avoid re-fetching on selection
   }, [id]);
-
-  const handleLessonSelect = (lesson: Lesson) => {
-    if (!lesson.isLocked) setCurrentLesson(lesson);
-  };
 
   if (loading) return (
     <Box sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: '#0f172a' }}>
@@ -44,80 +44,93 @@ const ClassroomPage = () => {
     </Box>
   );
 
-  if (!data) return <Typography>Course Not Found</Typography>;
+  if (!data) return <Typography color="white">Course Not Found</Typography>;
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#0f172a', color: 'white', p: { xs: 2, md: 4 } }}>
-      
-      {/* Header - Real Data */}
+
+      {/* Top Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
         <Box>
-          <Typography variant="h5" fontWeight={900}>
-            {data.courseTitle}
-          </Typography>
+          <Typography variant="h5" fontWeight={900}>{data.courseTitle}</Typography>
           <Typography variant="caption" sx={{ color: 'primary.light', fontWeight: 700 }}>
-            Current: {currentLesson?.title || 'Select a Lesson'}
+            {currentLesson?.title || 'Overview'}
           </Typography>
         </Box>
-        <Button onClick={() => navigate('/courses')} sx={{ color: 'white' }}>Exit</Button>
+
+        {/* --- TOGGLE CONTROLS --- */}
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Stack direction="row" sx={{ bgcolor: '#1e293b', p: 0.5, borderRadius: 2 }}>
+            <Button
+              size="small"
+              onClick={() => setIsEditMode(false)}
+              startIcon={<Visibility />}
+              sx={{
+                color: !isEditMode ? 'white' : 'rgba(255,255,255,0.4)',
+                bgcolor: !isEditMode ? '#6366f1' : 'transparent',
+                '&:hover': { bgcolor: !isEditMode ? '#4f46e5' : 'rgba(255,255,255,0.05)' },
+                borderRadius: 1.5, textTransform: 'none', px: 2
+              }}
+            >
+              Preview
+            </Button>
+            <Button
+              size="small"
+              onClick={() => setIsEditMode(true)}
+              startIcon={<Edit />}
+              sx={{
+                color: isEditMode ? 'white' : 'rgba(255,255,255,0.4)',
+                bgcolor: isEditMode ? '#6366f1' : 'transparent',
+                '&:hover': { bgcolor: isEditMode ? '#4f46e5' : 'rgba(255,255,255,0.05)' },
+                borderRadius: 1.5, textTransform: 'none', px: 2
+              }}
+            >
+              Edit
+            </Button>
+          </Stack>
+
+          <Button
+            variant="outlined"
+            onClick={() => navigate('/courses')}
+            sx={{ color: '#405d8b', borderColor: 'rgba(255,255,255,0.2)' }}
+          >
+            <ExitToAppIcon fontSize='medium'/>Exit Classroom
+          </Button>
+        </Stack>
       </Stack>
 
+      {/* Main Layout Grid */}
       <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', lg: 'row' } }}>
-        
-        {/* Main Content Renderer */}
+
+        {/* Left: Content Renderer (Dynamic Mode) */}
         <Box sx={{ flex: 2, width: '100%' }}>
-          <Stack spacing={4}>
-            {currentLesson?.contents.map((block) => (
-              <Box key={block.id} sx={{ width: '100%' }}>
-                {block.contentType === 'text' && (
-                  <Typography sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.8 }}>
-                    {block.body}
-                  </Typography>
-                )}
-                {block.contentType === 'video' && (
-                  <Paper sx={{ width: '100%', aspectRatio: '16/9', bgcolor: 'black' }}>
-                    <iframe width="100%" height="100%" src={block.body} frameBorder="0" allowFullScreen />
-                  </Paper>
-                )}
-                {block.contentType === 'image' && (
-                  <Box component="img" src={block.body} sx={{ width: '100%', borderRadius: 4 }} />
-                )}
-              </Box>
-            ))}
-          </Stack>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              bgcolor: isEditMode ? 'transparent' : '#1e293b',
+              borderRadius: 3,
+              border: isEditMode ? 'none' : '1px solid rgba(255,255,255,0.05)'
+            }}
+          >
+            {isEditMode ? (
+              <LessonContentSection currentLesson={currentLesson} />
+            ) : (
+              <LessonContentViewer contents={currentLesson?.contents || []} />
+            )}
+          </Paper>
         </Box>
 
-        {/* Sidebar - Real Curriculum */}
-        <Paper sx={{ flex: 1, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 6 }}>
-          <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)} variant="fullWidth">
-            <Tab label="Curriculum" />
-            <Tab label="Classwork" />
-            <Tab label="Chat" />
-          </Tabs>
-
-          <Box sx={{ p: 2 }}>
-            {activeTab === 0 && (
-              <List>
-                {data.lessons.map((item) => (
-                  <ListItem disablePadding key={item.id} sx={{ mb: 1 }}>
-                    <ListItemButton 
-                      onClick={() => handleLessonSelect(item)}
-                      disabled={item.isLocked}
-                      selected={currentLesson?.id === item.id}
-                      sx={{ borderRadius: 3 }}
-                    >
-                      <ListItemIcon sx={{ color: item.isDone ? '#10b981' : 'white' }}>
-                        {item.isDone ? <CheckCircle /> : item.isLocked ? <Lock /> : <PlayCircle />}
-                      </ListItemIcon>
-                      <ListItemText primary={item.title} secondary={item.time} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            )}
-            {/* Classwork and Chat tabs remain as you had them... */}
-          </Box>
-        </Paper>
+        {/* Right: Sidebar */}
+        <Box sx={{ flex: 1, width: '100%' }}>
+          <ClassroomSidebar
+            data={data}
+            setData={setData}
+            currentLesson={currentLesson}
+            setCurrentLesson={setCurrentLesson}
+            isEditMode={isEditMode}
+          />
+        </Box>
       </Box>
     </Box>
   );

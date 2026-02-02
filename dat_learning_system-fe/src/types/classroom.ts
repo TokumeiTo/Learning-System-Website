@@ -23,3 +23,30 @@ export interface ClassroomView {
     lessons: Lesson[];
 }
 
+export interface CreateLessonRequest {
+    courseId: string;
+    title: string;
+    sortOrder: number;
+    time: string;
+}
+
+export interface ReOrderLessonsRequest {
+    courseId: string;
+    lessonIds: string[];
+}
+
+export type UpsertContentRequest = {
+  contentType: string;
+  body: string;
+};
+
+export type BulkSaveContentsRequest = {
+  lessonId: string;
+  contents: UpsertContentRequest[];
+};
+
+export interface UpdateLessonRequest {
+    id: string;    // Matches the Guid on the backend
+    title: string;
+    time: string;  // Defaults to "-:--" or "5:00"
+}
