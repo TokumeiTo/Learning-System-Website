@@ -101,7 +101,7 @@ export const AppRouter = () => {
         />
 
         <Route
-          path="/classroom"
+          path="/classroom/:id"
           element={
             // <ProtectedRoute>
             <ClassroomPage />
@@ -117,6 +117,7 @@ export const AppRouter = () => {
             // </ProtectedRoute>
           }
         />
+        
 
         {/* ---------- Quiz (semi-public) ---------- */}
         <Route path="/quiz" element={<QuizSetupPage />} />

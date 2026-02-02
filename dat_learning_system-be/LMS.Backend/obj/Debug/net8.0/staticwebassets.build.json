@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "TMZu9fhzlsl9zlKEY/R4OANAVBpctJnT7pFiRodZQr8=",
+  "Hash": "4Pyuh5bsUd9weVJ4+d786Tg9H0E7J3GkESJ9062Z3Xc=",
   "Source": "LMS.Backend",
   "BasePath": "_content/LMS.Backend",
   "Mode": "Default",
@@ -53,6 +53,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\uploads\\3c6e27be-f835-4e20-8b6d-96349dfb23d7.png"
+    },
+    {
+      "Identity": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\57e4d0c6-8c8c-4182-bdbd-5dc217b86022.png",
+      "SourceId": "LMS.Backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
+      "BasePath": "_content/LMS.Backend",
+      "RelativePath": "uploads/57e4d0c6-8c8c-4182-bdbd-5dc217b86022.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\57e4d0c6-8c8c-4182-bdbd-5dc217b86022.png"
     }
   ]
 }

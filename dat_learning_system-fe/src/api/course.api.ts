@@ -3,13 +3,11 @@ import type { Course } from "../types/course";
 
 export const getCourses = async (): Promise<Course[]> => {
     const res = await api.get("/api/courses");
-    console.log(res);
     return res.data;
 };
 
 export const createCourse = async (formData: FormData): Promise<Course> => {
     const res = await api.post("/api/courses", formData);
-    
     return res.data;
 };
 

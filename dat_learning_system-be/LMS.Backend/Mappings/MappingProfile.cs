@@ -4,6 +4,7 @@ using LMS.Backend.DTOs.Auth;
 using LMS.Backend.DTOs.Course;
 using LMS.Backend.DTOs.OrgUnit;
 using LMS.Backend.DTOs.User;
+using LMS.Backend.DTOs.Classroom;
 
 namespace LMS.Backend.Helpers;
 
@@ -41,5 +42,12 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.Ignore())
             .ForMember(dest => dest.Badge, opt => opt.Ignore())
             .ForMember(dest => dest.Thumbnail, opt => opt.Ignore());
+        
+        // Classroom Profile
+        CreateMap<LessonContent, ClassroomContentDto>();
+        CreateMap<Lesson, ClassroomLessonDto>();
+        CreateMap<Course, ClassroomViewDto>()
+            .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.CourseTitle, opt => opt.MapFrom(src => src.Title));
     }
 }

@@ -17,12 +17,14 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITopicRepository, TopicRepository>();
         services.AddScoped<IAssignmentRepository, AssignmentRepository>();
         services.AddScoped<ISubmissionRepository, SubmissionRepository>();
+        services.AddScoped<ILessonRepository, LessonRepository>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IOrgUnitService, OrgUnitService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICourseService, CourseService>();
+        services.AddScoped<ILessonService, LessonService>();
 
         // Helpers
         services.AddSingleton<JwtHelper>();

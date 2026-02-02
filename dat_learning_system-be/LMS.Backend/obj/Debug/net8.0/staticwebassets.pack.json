@@ -9,6 +9,10 @@
       "PackagePath": "staticwebassets\\uploads\\3c6e27be-f835-4e20-8b6d-96349dfb23d7.png"
     },
     {
+      "Id": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\57e4d0c6-8c8c-4182-bdbd-5dc217b86022.png",
+      "PackagePath": "staticwebassets\\uploads\\57e4d0c6-8c8c-4182-bdbd-5dc217b86022.png"
+    },
+    {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.LMS.Backend.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },
