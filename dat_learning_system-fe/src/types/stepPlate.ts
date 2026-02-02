@@ -1,4 +1,4 @@
-export type Lesson = {
+export type stepPlate = {
   id: number;
   title: string;
   description?: string;

@@ -1,12 +1,12 @@
-import type { Lesson } from "../types/lesson";
+import type { stepPlate } from "../types/stepPlate";
 
-export type PositionedLesson = Lesson & {
+export type Positionedsteps = stepPlate & {
     x: number;
     y: number;
 };
 
 export const generateZigZagLayout = (
-    lessons: Lesson[],
+    lessons: stepPlate[],
     options?: {
         startY?: number;
         verticalGap?: number;
@@ -14,7 +14,7 @@ export const generateZigZagLayout = (
         rightX?: number;
         jitter?: number;
     }
-): PositionedLesson[] => {
+): Positionedsteps[] => {
     const {
         startY = 40,
         verticalGap = 120,

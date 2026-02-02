@@ -1,7 +1,6 @@
-// src/utils/unlockRules.ts
-import type { Lesson } from "../types/lesson";
+import type { stepPlate } from "../types/stepPlate";
 
-export function applyUnlockRules(plates: Lesson[]): Lesson[] {
+export function applyUnlockRules(plates: stepPlate[]): stepPlate[] {
   let canUnlock = true;
 
   return plates.map((plate) => {

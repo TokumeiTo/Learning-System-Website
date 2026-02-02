@@ -1,6 +1,6 @@
-import type { PositionedLesson } from "./lessonLayout";
+import type { Positionedsteps } from "./stepLayout";
 
-export const generateSnakePath = (lessons: PositionedLesson[]) => {
+export const generateSnakePath = (lessons: Positionedsteps[]) => {
   if (lessons.length === 0) return "";
 
   let d = `M${lessons[0].x + 40} ${lessons[0].y + 40}`;

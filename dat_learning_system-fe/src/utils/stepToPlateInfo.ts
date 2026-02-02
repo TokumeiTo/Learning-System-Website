@@ -1,10 +1,10 @@
 // utils/lessonToPlateInfo.ts
 
 import type { PlateInfo } from "../mocks/lessonSidebar.mock";
-import type { Lesson } from "../types/lesson";
+import type { stepPlate } from "../types/stepPlate";
 
 
-export function lessonToPlateInfo(lesson: Lesson): PlateInfo {
+export function stepsToPlateInfo(lesson: stepPlate): PlateInfo {
   return {
     id: lesson.id,
     title: lesson.title,

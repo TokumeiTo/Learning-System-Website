@@ -2,12 +2,12 @@
 import React, { useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import LessonPlate from "./LessonPlate";
-import { generateSnakePath } from "../../utils/lessonPath";
-import type { PositionedLesson } from "../../utils/lessonLayout";
+import StepsPlate from "./StepPlate";
+import { generateSnakePath } from "../../utils/stepsPath";
+import type { Positionedsteps } from "../../utils/stepLayout";
 
 type Props = {
-  lessons: PositionedLesson[];
+  lessons: Positionedsteps[];
   activePlateId?: number | null;
   onPlateClick?: (lessonId: number) => void;
 };
@@ -80,7 +80,7 @@ export default function LessonMap({
             gap: 1,
           }}
         >
-          <LessonPlate
+          <StepsPlate
             completed={lesson.completed}
             locked={lesson.locked}
             active={lesson.id === activePlateId}

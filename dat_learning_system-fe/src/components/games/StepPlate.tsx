@@ -16,7 +16,7 @@ type Props = {
   onClick?: () => void;
 };
 
-export default function LessonPlate({
+export default function StepsPlate({
   completed,
   locked,
   active,
