@@ -27,6 +27,15 @@ public class CourseService : ICourseService
         _environment = environment;
     }
 
+    public async Task<CourseDetailDto?> GetCourseByIdAsync(Guid id)
+    {
+        // Use your repo method with .Include() logic
+        var course = await _courseRepo.GetFullClassroomDetailsAsync(id);
+
+        if (course == null) return null;
+
+        return _mapper.Map<CourseDetailDto>(course);
+    }
     public async Task<Course> CreateCourseAsync(CreateCourseDto dto, string creatorId)
     {
         // 1. Map basic fields
@@ -83,7 +92,7 @@ public class CourseService : ICourseService
 
         return course;
     }
-    
+
     public async Task<IEnumerable<Course>> GetAllCoursesAsync()
         => await _courseRepo.GetAllAsync();
 }

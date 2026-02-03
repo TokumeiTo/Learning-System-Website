@@ -115,7 +115,7 @@ namespace LMS.Backend.Migrations
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
                             CompanyCode = "00-0000",
-                            ConcurrencyStamp = "912ae83d-5ad7-4057-bf4e-25042a8b382a",
+                            ConcurrencyStamp = "5476df5a-992a-433b-b503-b923364960d6",
                             Email = "admin@lms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin",
@@ -124,10 +124,10 @@ namespace LMS.Backend.Migrations
                             NormalizedEmail = "ADMIN@LMS.COM",
                             NormalizedUserName = "00-0000",
                             OrgUnitId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAEH3vQy2GBWspXMCyqQylKVHmmx5hX46YP2rZ6jd2P6q33xbTBvrRlQOM4OoPsmitEQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEB4cYsUYeRDYm1g6OmiaT7IQhM4IyCEWINKNXRhJ/nU51W90oyoMkNMEx2fRHU7mpA==",
                             PhoneNumberConfirmed = false,
                             Position = 0,
-                            SecurityStamp = "b51a563c-982f-4f1a-9d67-266248d33f60",
+                            SecurityStamp = "2518a244-b692-4829-a8a5-cf625270cd59",
                             TwoFactorEnabled = false,
                             UserName = "00-0000"
                         });
@@ -257,6 +257,48 @@ namespace LMS.Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Enrollment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<double>("ProgressPercentage")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("UserId", "CourseId")
+                        .IsUnique();
+
+                    b.ToTable("Enrollments");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.Lesson", b =>
@@ -643,6 +685,25 @@ namespace LMS.Backend.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("AdminUser");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Enrollment", b =>
+                {
+                    b.HasOne("LMS.Backend.Data.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LMS.Backend.Data.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.Lesson", b =>

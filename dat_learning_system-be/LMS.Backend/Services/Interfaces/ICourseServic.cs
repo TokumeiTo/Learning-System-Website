@@ -7,4 +7,5 @@ public interface ICourseService
 {
     Task<Course> CreateCourseAsync(CreateCourseDto dto, string creatorId);
     Task<IEnumerable<Course>> GetAllCoursesAsync();
+    Task<CourseDetailDto?> GetCourseByIdAsync(Guid id);
 }

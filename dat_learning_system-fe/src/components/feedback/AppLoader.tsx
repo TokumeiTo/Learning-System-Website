@@ -40,7 +40,7 @@ export default function AppLoader({
   return (
     <Box
       sx={{
-        minHeight: fullscreen ? "100vh" : "auto",
+        minHeight: fullscreen ? "100vh" : "60vh",
         py: fullscreen ? 0 : 6,
         display: "flex",
         flexDirection: "column",

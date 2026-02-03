@@ -14,6 +14,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
 
 // Custom Components & Config
 import BasicSelect from "../common/Select";
@@ -60,6 +61,7 @@ const commonNavItems = [
   { label: "Home", path: "/home", icon: <HomeFilledIcon color="primary" /> },
   { label: "Progress", path: "/progress", icon: <AnalyticsIcon color="primary" /> },
   { label: "Support", path: "/help", icon: <SupportAgentIcon color="primary" /> },
+  { label: "Notifications", path: "/notifications", icon: <CircleNotificationsIcon color="primary" /> },
 ];
 
 /* ---------------- Sidebar Component ---------------- */
@@ -86,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   // 2. Auto-detect Mode from URL (Survives direct Navigation)
   React.useEffect(() => {
     // List your management routes here
-    const managementRoutes = ["/umanage", "/org_units", "/admin"];
+    const managementRoutes = ["/umanage", "/org_units", "/admin", "/enrollements", "/logs"];
     const isManagementPage = managementRoutes.some(path => location.pathname.startsWith(path));
 
     if (isManagementPage) {

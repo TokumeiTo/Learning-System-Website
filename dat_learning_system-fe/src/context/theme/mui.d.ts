@@ -9,6 +9,11 @@ declare module "@mui/material/styles" {
     interface TypeText {
         tertiary: string;
     }
+    // Allow palette to accept custom light/dark variations for semantic colors
+    interface Palette {
+        background: TypeBackground;
+        text: TypeText;
+    }
     interface PaletteOptions {
         background?: Partial<TypeBackground>;
         text?: Partial<TypeText>;

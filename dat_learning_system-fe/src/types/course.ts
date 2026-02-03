@@ -1,3 +1,4 @@
+import type { Lesson } from "./classroom";
 import type { Topic } from "./topic";
 
 export interface Course {
@@ -14,6 +15,7 @@ export interface Course {
     enrolledCount: number;
     status: 'Published' | 'Draft' | 'Closed' | string;
     topics?: Topic[];
+    lessons?: Lesson[];
 }
 
 // This helps React track the form before it's converted to FormData

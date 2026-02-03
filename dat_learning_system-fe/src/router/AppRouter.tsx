@@ -27,9 +27,12 @@ import ClassroomPage from "../pages/classroom/ClassroomPage";
 import SupportCenter from "../pages/feedbacks/FAQsPage";
 import MockTestPage from "../pages/mock_tests/MockTestPage";
 import CoursesPage from "../pages/courses/CoursePage";
-import UserManagementPage from "../pages/auth/UserManagementPage";
-import OrgPage from "../pages/orgUnits/OrgUnitPage";
-import AdminDashboard from "../pages/dashboard/AdminDashboardPage";
+import UserManagementPage from "../pages/admin/UserManagementPage";
+import OrgPage from "../pages/admin/OrgUnitPage";
+import AdminDashboard from "../pages/admin/AdminDashboardPage";
+import EnrollmentApprovalPage from "../pages/admin/EnrollManagementPage";
+import GlobalAuditLog from "../pages/admin/AuditLogsPage";
+import NotificationPage from "../pages/notification/NotiPageWithMocks";
 
 /* Guards */
 // import { ProtectedRoute } from "./ProtectedRoute";
@@ -58,6 +61,15 @@ export const AppRouter = () => {
           element={
             // <ProtectedRoute>
             <ProgressPage />
+            // </ProtectedRoute>
+          }
+        />
+
+         <Route
+          path="/notifications"
+          element={
+            // <ProtectedRoute>
+            <NotificationPage/>
             // </ProtectedRoute>
           }
         />
@@ -220,6 +232,24 @@ export const AppRouter = () => {
           element={
             // <ProtectedRoute>
             <OrgPage />
+            // </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin/enrollments"
+          element={
+            // <ProtectedRoute>
+            <EnrollmentApprovalPage />
+            // </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin/logs"
+          element={
+            // <ProtectedRoute>
+            <GlobalAuditLog />
             // </ProtectedRoute>
           }
         />

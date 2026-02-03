@@ -26,6 +26,7 @@
     "@tanstack/react-query-devtools": "^5.91.2",
     "axios": "^1.13.2",
     "classnames": "^2.5.1",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.19",
     "fg-loadcss": "^3.1.0",
     "framer-motion": "^12.23.26",

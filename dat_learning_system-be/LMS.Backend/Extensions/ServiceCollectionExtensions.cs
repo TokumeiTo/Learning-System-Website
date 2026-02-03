@@ -18,6 +18,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAssignmentRepository, AssignmentRepository>();
         services.AddScoped<ISubmissionRepository, SubmissionRepository>();
         services.AddScoped<ILessonRepository, LessonRepository>();
+        services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+        services.AddScoped<IAuditRepository, AuditRepository>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
@@ -25,6 +27,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<ILessonService, LessonService>();
+        services.AddScoped<IEnrollmentService, EnrollmentService>();
+        services.AddScoped<IAuditService, AuditService>();
 
         // Helpers
         services.AddSingleton<JwtHelper>();

@@ -6,6 +6,9 @@ using LMS.Backend.DTOs.OrgUnit;
 using LMS.Backend.DTOs.User;
 using LMS.Backend.DTOs.Classroom;
 using LMS.Backend.DTOs.Lesson;
+using LMS.Backend.DTOs.Enrollment;
+using LMS.Backend.DTOs.Topic;
+using LMS.Backend.DTOs.Audit;
 
 
 namespace LMS.Backend.Helpers;
@@ -43,6 +46,12 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.Ignore())
             .ForMember(dest => dest.Badge, opt => opt.Ignore())
             .ForMember(dest => dest.Thumbnail, opt => opt.Ignore());
+            CreateMap<Course, CourseDetailDto>()
+            .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src.Badge.ToString()))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+        CreateMap<Topic, TopicDto>();
+        CreateMap<Lesson, LessonDto>();
 
         // Classroom Profile
         CreateMap<LessonContent, ClassroomContentDto>();
@@ -63,5 +72,18 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.CourseId, opt => opt.Ignore())
             .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
             .ForMember(dest => dest.Contents, opt => opt.Ignore());
+
+        // Enrollments
+        CreateMap<Enrollment, EnrollmentRequestDto>()
+            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.User.FullName))
+            .ForMember(dest => dest.StudentEmail, opt => opt.MapFrom(src => src.User.Email))
+            .ForMember(dest => dest.CourseTitle, opt => opt.MapFrom(src => src.Course.Title));
+
+        // Audit
+        CreateMap<AuditLog, GlobalAuditLogDto>()
+            .ForMember(dest => dest.PerformedBy, 
+                    opt => opt.MapFrom(src => src.AdminUser != null 
+                                        ? $"{src.AdminUser.FullName}" 
+                                        : src.PerformedBy));
     }
 }

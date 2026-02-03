@@ -1,4 +1,3 @@
-// src/config/navigation.tsx
 import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
 import CastForEducationIcon from '@mui/icons-material/CastForEducation';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
@@ -11,6 +10,8 @@ import TranslateIcon from '@mui/icons-material/Translate';
 import PeopleIcon from '@mui/icons-material/People';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import AddCardIcon from '@mui/icons-material/AddCard';
+import DvrIcon from '@mui/icons-material/Dvr';
 
 export const LEARNING_NAV = [
     { label: "Learning path", path: "/dashboard/path", icon: <FollowTheSignsIcon color="primary" /> },
@@ -28,4 +29,6 @@ export const MANAGEMENT_NAV = [
     { label: "Admin Dashboard", path: "/admin/dashboard", icon: <DashboardIcon color="secondary" /> },
     { label: "User Management", path: "/admin/user_management", icon: <PeopleIcon color="secondary" /> },
     { label: "Org Structure", path: "/admin/org_units", icon: <AccountTreeIcon color="secondary" /> },
+    { label: "Enrollments", path: "/admin/enrollments", icon: <AddCardIcon color="secondary" /> },
+    { label: "Audits", path: "/admin/logs", icon: <DvrIcon color="secondary" /> },
 ];

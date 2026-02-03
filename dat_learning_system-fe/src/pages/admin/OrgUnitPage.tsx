@@ -7,7 +7,8 @@ import {
     Stack,
     TextField,
     InputAdornment,
-    Divider
+    Divider,
+    useTheme
 } from '@mui/material';
 import {
     MdAdd,
@@ -21,6 +22,7 @@ import PageLayout from '../../components/layout/PageLayout';
 
 const OrgPage: React.FC = () => {
     const queryClient = useQueryClient();
+    const theme = useTheme();
 
     const handleRefresh = () => {
         queryClient.invalidateQueries({ queryKey: ['org-hierarchy'] });
@@ -33,11 +35,12 @@ const OrgPage: React.FC = () => {
                 flexDirection: 'column',
                 gap: 3,
                 p: 4,
-                bgcolor: '#f4f6f8',
-                minHeight: '100vh'
+                bgcolor: 'background.default',
+                minHeight: '100vh',
+                transition: 'background-color 0.3s'
             }}>
 
-                {/* 1. Header Flex Row */}
+                {/* 1. Header Area */}
                 <Box sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -46,7 +49,7 @@ const OrgPage: React.FC = () => {
                     gap: 2
                 }}>
                     <Stack spacing={0.5}>
-                        <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: '-0.5px' }}>
+                        <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary' }}>
                             Organizational Structure
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -60,7 +63,7 @@ const OrgPage: React.FC = () => {
                             color="inherit"
                             startIcon={<MdRefresh />}
                             onClick={handleRefresh}
-                            sx={{ bgcolor: 'white' }}
+                            sx={{ bgcolor: 'background.paper', borderColor: 'divider' }}
                         >
                             Sync Data
                         </Button>
@@ -68,14 +71,14 @@ const OrgPage: React.FC = () => {
                             variant="contained"
                             startIcon={<MdAdd />}
                             disableElevation
-                            sx={{ borderRadius: 2, px: 3 }}
+                            sx={{ borderRadius: 2, px: 3, fontWeight: 700 }}
                         >
                             Add New Unit
                         </Button>
                     </Stack>
                 </Box>
 
-                {/* 2. Main Content Flex Container */}
+                {/* 2. Main Content Container */}
                 <Box sx={{
                     display: 'flex',
                     flexDirection: { xs: 'column', lg: 'row' },
@@ -83,17 +86,25 @@ const OrgPage: React.FC = () => {
                     alignItems: 'flex-start'
                 }}>
 
-                    {/* Left Side: Info & Stats (Flex-Basis: 300px) */}
+                    {/* Left Side: Info & Stats */}
                     <Stack sx={{
                         flex: '0 0 320px',
                         width: { xs: '100%', lg: '320px' },
                         gap: 2
                     }}>
-                        <Paper sx={{ p: 3, borderRadius: 3, boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+                        <Paper sx={{ 
+                            p: 3, 
+                            borderRadius: 4, 
+                            bgcolor: 'background.paper',
+                            border: `1px solid ${theme.palette.divider}`,
+                            backgroundImage: 'none'
+                        }}>
                             <Stack spacing={2}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <MdLayers color="#1976d2" size={24} />
-                                    <Typography variant="h6" sx={{ fontWeight: 700 }}>Quick Stats</Typography>
+                                    <MdLayers color={theme.palette.primary.main} size={24} />
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                        Quick Stats
+                                    </Typography>
                                 </Box>
                                 <Divider />
                                 <StatItem label="Total Units" value="84" />
@@ -102,28 +113,40 @@ const OrgPage: React.FC = () => {
                             </Stack>
                         </Paper>
 
-                        <Paper sx={{ p: 3, borderRadius: 3, bgcolor: 'primary.dark', color: 'white' }}>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                        <Paper sx={{ 
+                            p: 3, 
+                            borderRadius: 4, 
+                            bgcolor: theme.palette.mode === 'dark' ? 'primary.dark' : 'primary.main', 
+                            color: 'primary.contrastText',
+                            boxShadow: theme.shadows[4]
+                        }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1 }}>
                                 Hierarchy Tip
                             </Typography>
-                            <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                            <Typography variant="body2" sx={{ opacity: 0.9, lineHeight: 1.6 }}>
                                 Click on a parent unit to expand its sub-departments. The icons indicate the depth level automatically.
                             </Typography>
                         </Paper>
                     </Stack>
 
-                    {/* Right Side: Tree View (Flex-Grow: 1) */}
+                    {/* Right Side: Tree View */}
                     <Paper sx={{
                         flex: 1,
                         width: '100%',
-                        borderRadius: 3,
-                        boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                        borderRadius: 4,
+                        bgcolor: 'background.paper',
+                        border: `1px solid ${theme.palette.divider}`,
                         overflow: 'hidden',
                         display: 'flex',
-                        flexDirection: 'column'
+                        flexDirection: 'column',
+                        backgroundImage: 'none'
                     }}>
                         {/* Internal Search Bar */}
-                        <Box sx={{ p: 2, borderBottom: '1px solid #eee', bgcolor: '#fafafa' }}>
+                        <Box sx={{ 
+                            p: 2, 
+                            borderBottom: `1px solid ${theme.palette.divider}`, 
+                            bgcolor: theme.palette.background.gray // Using your custom gray token
+                        }}>
                             <TextField
                                 fullWidth
                                 size="small"
@@ -131,15 +154,15 @@ const OrgPage: React.FC = () => {
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <MdSearch size={20} />
+                                            <MdSearch size={20} color={theme.palette.text.secondary} />
                                         </InputAdornment>
                                     ),
-                                    sx: { borderRadius: 2, bgcolor: 'white' }
+                                    sx: { borderRadius: 2, bgcolor: 'background.paper' }
                                 }}
                             />
                         </Box>
 
-                        <Box sx={{ p: 1 }}>
+                        <Box sx={{ p: 2 }}>
                             <OrgUnitHierarchy />
                         </Box>
                     </Paper>
@@ -150,11 +173,10 @@ const OrgPage: React.FC = () => {
     );
 };
 
-// --- Small Helper for Stat Rows ---
 const StatItem = ({ label, value }: { label: string, value: string }) => (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="body2" color="text.secondary">{label}</Typography>
-        <Typography variant="body2" sx={{ fontWeight: 700 }}>{value}</Typography>
+        <Typography variant="body2" color="text.secondary" fontWeight={500}>{label}</Typography>
+        <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>{value}</Typography>
     </Box>
 );
 

@@ -1,5 +1,4 @@
-// src/theme/ThemeProvider.tsx
-import { createContext, useState, useMemo, type ReactNode } from "react";
+import { createContext, useState, useMemo, useEffect, type ReactNode } from "react";
 import { ThemeProvider as MuiThemeProvider, CssBaseline } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { getDesignTokens } from "./theme";
@@ -15,10 +14,19 @@ export const CustomThemeContext = createContext<ThemeContextType>({
 });
 
 export const CustomThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [mode, setMode] = useState<"light" | "dark">("light");
+  // 1. Initialize state by checking localStorage first
+  const [mode, setMode] = useState<"light" | "dark">(() => {
+    const savedMode = localStorage.getItem("app_theme_mode");
+    return (savedMode as "light" | "dark") || "light";
+  });
 
+  // 2. Wrap the toggle logic to save the new choice
   const toggleColorMode = () => {
-    setMode(prev => (prev === "light" ? "dark" : "light"));
+    setMode((prev) => {
+      const newMode = prev === "light" ? "dark" : "light";
+      localStorage.setItem("app_theme_mode", newMode);
+      return newMode;
+    });
   };
 
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);

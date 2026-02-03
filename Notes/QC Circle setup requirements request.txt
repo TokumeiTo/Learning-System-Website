@@ -51,6 +51,7 @@ npm install recharts
 npm install @hookform/resolvers yup
 npm install @tanstack/react-query-devtools
 npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
+npm install date-fns
 
 Chat gpt
 ⚠️ Intentionally NOT installed yet (good move):

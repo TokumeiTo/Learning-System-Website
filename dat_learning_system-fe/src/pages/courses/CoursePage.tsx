@@ -22,7 +22,6 @@ const CoursesPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Fetch courses from .NET Backend
     const fetchCourses = async () => {
         try {
             setLoading(true);
@@ -48,34 +47,27 @@ const CoursesPage: React.FC = () => {
     });
 
     const handleCreateNewCourse = async (newCourseFormData: FormData) => {
-        // --- DEBUGGING: Verify what's being sent ---
-        console.log("--- Sending to Backend ---");
-        newCourseFormData.forEach((value, key) => {
-            console.log(`${key}:`, value);
-        });
-
         try {
-            // This calls the service with the raw FormData
             const createdCourse = await createCourse(newCourseFormData);
-
-            // Update local state with the newly created course object returned by DB
             setCourses(prev => [createdCourse, ...prev]);
             setIsCreating(false);
         } catch (error: any) {
-            console.error("Error creating course:", error);
-            
-            // Check for the 415 error specifically to give a better hint
             if (error.response?.status === 415) {
                 alert("Server rejected the media type (415). Ensure the backend [FromForm] matches the request.");
             } else {
-                alert("Failed to create course. Please check the console and server logs.");
+                alert("Failed to create course. Please check the console.");
             }
         }
     };
 
     return (
         <PageLayout>
-            <Box sx={{ p: { xs: 2, md: 6 }, bgcolor: 'background.default', minHeight: '100vh' }}>
+            <Box sx={{ 
+                p: { xs: 2, md: 6 }, 
+                bgcolor: 'background.default', 
+                minHeight: '100vh',
+                transition: 'background-color 0.3s'
+            }}>
 
                 {/* Header Section */}
                 <Stack
@@ -86,10 +78,10 @@ const CoursesPage: React.FC = () => {
                     sx={{ mb: 4 }}
                 >
                     <Stack spacing={1}>
-                        <Typography variant="h3" fontWeight={900} sx={{ letterSpacing: '-1px' }}>
+                        <Typography variant="h3" fontWeight={900} sx={{ letterSpacing: '-1.5px', color: 'text.primary' }}>
                             Programs & Courses
                         </Typography>
-                        <Typography color="text.secondary">
+                        <Typography color="text.secondary" fontWeight={500}>
                             Manage your corporate learning catalog live from the database.
                         </Typography>
                     </Stack>
@@ -100,8 +92,12 @@ const CoursesPage: React.FC = () => {
                             startIcon={<Add />}
                             onClick={() => setIsCreating(true)}
                             sx={{
-                                borderRadius: 4, px: 3, py: 1.5, fontWeight: 800,
-                                textTransform: 'none', boxShadow: theme.shadows[4]
+                                borderRadius: 3, 
+                                px: 4, 
+                                py: 1.5, 
+                                fontWeight: 800,
+                                textTransform: 'none', 
+                                boxShadow: theme.palette.mode === 'dark' ? theme.shadows[8] : theme.shadows[4]
                             }}
                         >
                             Create New Course
@@ -122,8 +118,15 @@ const CoursesPage: React.FC = () => {
                         value={filter}
                         onChange={(_, val) => setFilter(val)}
                         sx={{
-                            '& .MuiTabs-indicator': { height: 3, borderRadius: 3 },
-                            '& .MuiTab-root': { fontWeight: 800, textTransform: 'none', minWidth: 100 }
+                            '& .MuiTabs-indicator': { height: 4, borderRadius: '4px 4px 0 0' },
+                            '& .MuiTab-root': { 
+                                fontWeight: 800, 
+                                textTransform: 'none', 
+                                minWidth: 80,
+                                fontSize: '1rem',
+                                color: 'text.secondary'
+                            },
+                            '& .Mui-selected': { color: 'primary.main' }
                         }}
                     >
                         {categories.map(cat => <Tab key={cat} label={cat} value={cat} />)}
@@ -141,39 +144,44 @@ const CoursesPage: React.FC = () => {
                                 </InputAdornment>
                             ),
                             sx: {
-                                borderRadius: 4, bgcolor: 'background.paper',
-                                width: { xs: '100%', md: 320 },
-                                boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+                                borderRadius: 3, 
+                                bgcolor: 'background.paper',
+                                width: { xs: '100%', md: 350 },
+                                border: `1px solid ${theme.palette.divider}`,
+                                '& fieldset': { border: 'none' },
+                                transition: '0.2s',
+                                '&:hover': { boxShadow: theme.shadows[2] }
                             }
                         }}
                     />
                 </Box>
 
-                {/* Loading State */}
+                {/* Main Content Area */}
                 {loading ? (
-                    <Stack alignItems="center" justifyContent="center" sx={{ minHeight: '30vh' }}>
-                        <CircularProgress thickness={5} size={50} />
-                        <Typography sx={{ mt: 2, fontWeight: 600, color: 'text.secondary' }}>
+                    <Stack alignItems="center" justifyContent="center" sx={{ minHeight: '40vh' }}>
+                        <CircularProgress thickness={5} size={60} sx={{ mb: 2 }} />
+                        <Typography sx={{ fontWeight: 700, color: 'text.secondary' }}>
                             Syncing with Database...
                         </Typography>
                     </Stack>
                 ) : (
                     <Box sx={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: 4,
-                        justifyContent: { xs: 'center', md: 'flex-start' }
+                        display: 'grid',
+                        gridTemplateColumns: {
+                            xs: '1fr',
+                            sm: 'repeat(auto-fill, minmax(340px, 1fr))'
+                        },
+                        gap: 4
                     }}>
                         <AnimatePresence mode="popLayout">
-                            {/* The Creator Card - Injected at the start of the list */}
                             {isCreating && (
                                 <Box
                                     key="creator"
                                     component={motion.div}
                                     layout
-                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
                                 >
                                     <CreateCourseCard
                                         onSave={handleCreateNewCourse}
@@ -182,7 +190,6 @@ const CoursesPage: React.FC = () => {
                                 </Box>
                             )}
 
-                            {/* Existing Course Cards */}
                             {filteredCourses.map((course) => (
                                 <Box
                                     key={course.id}
@@ -190,19 +197,18 @@ const CoursesPage: React.FC = () => {
                                     layout
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    sx={{ width: { xs: '100%', sm: 340 } }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    transition={{ duration: 0.2 }}
                                 >
                                     <CourseCard course={course} />
                                 </Box>
                             ))}
                         </AnimatePresence>
 
-                        {/* Empty State */}
                         {filteredCourses.length === 0 && !isCreating && (
-                            <Box sx={{ width: '100%', textAlign: 'center', py: 8 }}>
-                                <Typography variant="h6" color="text.secondary">
-                                    No courses match your criteria.
+                            <Box sx={{ gridColumn: '1 / -1', textAlign: 'center', py: 10 }}>
+                                <Typography variant="h6" color="text.disabled" fontWeight={700}>
+                                    No courses found matching "{searchTerm}"
                                 </Typography>
                             </Box>
                         )}

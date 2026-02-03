@@ -2,18 +2,16 @@ import React, { useEffect, useState, useMemo } from "react";
 import {
   Box, Button, TextField, MenuItem, Typography, Paper,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  IconButton, Chip, Stack, InputAdornment, Avatar, CircularProgress, Badge
+  IconButton, Chip, Stack, InputAdornment, Avatar, CircularProgress, Badge, useTheme
 } from "@mui/material";
-import {
-  PersonAdd, Search, Edit, Delete, FilterList
-} from "@mui/icons-material";
+import { PersonAdd, Search, Edit, Delete, FilterList } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 // APIs & Types
 import { register as registerApi } from '../../api/auth.api';
-import { getUsersList } from "../../api/user.api"; // Ensure this API exists
+import { getUsersList } from "../../api/user.api";
 import type { UserListItem } from "../../types/user";
 import { getDepartments, getDivisions, getSections, getTeams } from "../../api/org.api";
 import { POSITIONS } from "../../utils/positions";
@@ -33,12 +31,10 @@ const schema = yup.object({
 interface OrgUnitDto { id: number; name: string; }
 
 const UserManagementPage = () => {
-  // State for Users List
+  const theme = useTheme();
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  
-  // UI State
   const [showAddForm, setShowAddForm] = useState(false);
   const [orgUnits, setOrgUnits] = useState<OrgUnitDto[]>([]);
   const [popup, setPopup] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
@@ -52,7 +48,6 @@ const UserManagementPage = () => {
 
   const selectedPosition = watch("position");
 
-  // Load actual users from Backend
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -65,11 +60,8 @@ const UserManagementPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useEffect(() => { fetchUsers(); }, []);
 
-  // Org Unit Fetching Logic
   useEffect(() => {
     if (!selectedPosition) { setOrgUnits([]); return; }
     const fetchUnits = async () => {
@@ -82,7 +74,6 @@ const UserManagementPage = () => {
     fetchUnits();
   }, [selectedPosition]);
 
-  // Search/Filter Logic
   const filteredUsers = useMemo(() => {
     return users.filter(u => 
       u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -97,7 +88,7 @@ const UserManagementPage = () => {
         setPopup({ open: true, message: "User created successfully!", severity: "success" });
         reset();
         setShowAddForm(false);
-        fetchUsers(); // Refresh the list
+        fetchUsers();
       } else {
         setPopup({ open: true, message: res.message, severity: "error" });
       }
@@ -110,18 +101,19 @@ const UserManagementPage = () => {
 
   return (
     <PageLayout>
-      <Box sx={{ p: 4, bgcolor: "#f8fafc", minHeight: "100vh" }}>
+      <Box sx={{ p: 4, bgcolor: "background.default", minHeight: "100vh", transition: '0.3s' }}>
+        
         {/* Header Area */}
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
           <Box>
-            <Typography variant="h4" fontWeight={900} color="#1e293b">User Management</Typography>
+            <Typography variant="h4" fontWeight={900} color="text.primary">User Management</Typography>
             <Typography variant="body2" color="text.secondary">Manage system access and organization hierarchy</Typography>
           </Box>
           <Button
             variant="contained"
             startIcon={<PersonAdd />}
             onClick={() => { setShowAddForm(!showAddForm); if(showAddForm) reset(); }}
-            sx={{ borderRadius: 2, px: 3, bgcolor: "#6366f1", '&:hover': { bgcolor: '#4f46e5' } }}
+            sx={{ borderRadius: 2, px: 3, fontWeight: 700 }}
           >
             {showAddForm ? "View All Users" : "Add New User"}
           </Button>
@@ -129,10 +121,17 @@ const UserManagementPage = () => {
 
         {showAddForm ? (
           /* ADD USER FORM SECTION */
-          <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid #e2e8f0', maxWidth: 800, mx: 'auto' }}>
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 700 }}>Registration Details</Typography>
+          <Paper elevation={0} sx={{ 
+            p: 4, 
+            borderRadius: 4, 
+            bgcolor: 'background.paper',
+            border: `1px solid ${theme.palette.divider}`,
+            maxWidth: 800, 
+            mx: 'auto' 
+          }}>
+            <Typography variant="h6" sx={{ mb: 3, fontWeight: 700, color: 'text.primary' }}>Registration Details</Typography>
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
-              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
                 <Controller name="fullName" control={control} render={({ field, fieldState }) => (
                   <TextField {...field} label="Full Name" fullWidth error={!!fieldState.error} helperText={fieldState.error?.message} />
                 )} />
@@ -174,7 +173,7 @@ const UserManagementPage = () => {
                 )} />
               </Box>
               <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 4 }}>
-                <Button onClick={() => setShowAddForm(false)} sx={{ color: 'text.secondary' }}>Cancel</Button>
+                <Button onClick={() => setShowAddForm(false)} color="inherit">Cancel</Button>
                 <Button type="submit" variant="contained" sx={{ px: 4, borderRadius: 2 }}>Confirm Registration</Button>
               </Stack>
             </form>
@@ -182,7 +181,12 @@ const UserManagementPage = () => {
         ) : (
           /* USER LIST TABLE SECTION */
           <Box>
-            <Paper elevation={0} sx={{ p: 2, mb: 3, borderRadius: 3, border: '1px solid #e2e8f0', display: 'flex', gap: 2 }}>
+            <Paper elevation={0} sx={{ 
+              p: 2, mb: 3, borderRadius: 3, 
+              bgcolor: 'background.paper',
+              border: `1px solid ${theme.palette.divider}`, 
+              display: 'flex', gap: 2 
+            }}>
               <TextField
                 placeholder="Search by name or email..."
                 size="small"
@@ -191,53 +195,68 @@ const UserManagementPage = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }}
               />
-              <Button startIcon={<FilterList />} variant="outlined" color="inherit" sx={{ borderColor: '#e2e8f0' }}>Filters</Button>
+              <Button startIcon={<FilterList />} variant="outlined" color="inherit">Filters</Button>
             </Paper>
 
-            <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 4, border: '1px solid #e2e8f0' }}>
+            <TableContainer component={Paper} elevation={0} sx={{ 
+                borderRadius: 4, 
+                bgcolor: 'background.paper',
+                border: `1px solid ${theme.palette.divider}`,
+                backgroundImage: 'none'
+            }}>
               <Table>
-                <TableHead sx={{ bgcolor: "#f1f5f9" }}>
+                <TableHead sx={{ bgcolor: theme.palette.background.gray }}>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Full Name</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Contact</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Position</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Unit</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }} align="right">Actions</TableCell>
+                    <TableCell sx={{ fontWeight: 800 }}>Full Name</TableCell>
+                    <TableCell sx={{ fontWeight: 800 }}>Contact</TableCell>
+                    <TableCell sx={{ fontWeight: 800 }}>Position</TableCell>
+                    <TableCell sx={{ fontWeight: 800 }}>Unit</TableCell>
+                    <TableCell sx={{ fontWeight: 800 }} align="right">Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                        <CircularProgress size={24} sx={{ mr: 2 }} /> Loading users...
+                      <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                        <CircularProgress size={24} sx={{ mr: 2 }} />
+                        <Typography variant="body2" color="text.secondary" display="inline">Loading users...</Typography>
                       </TableCell>
                     </TableRow>
                   ) : filteredUsers.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                        No users found.
+                      <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                        <Typography color="text.disabled">No users found.</Typography>
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredUsers.map((user) => (
-                      <TableRow key={user.id} hover>
+                      <TableRow key={user.id} hover sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
                         <TableCell>
                           <Stack direction="row" spacing={2} alignItems="center">
                             <Badge overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant="dot" color="success">
-                              <Avatar sx={{ width: 40, height: 40, bgcolor: '#6366f1', fontSize: '0.85rem' }}>
+                              <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main', fontSize: '0.85rem', fontWeight: 700 }}>
                                 {getInitials(user.fullName)}
                               </Avatar>
                             </Badge>
-                            <Typography variant="subtitle2">{user.fullName}</Typography>
+                            <Typography variant="subtitle2" fontWeight={700} color="text.primary">{user.fullName}</Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell>{user.email}</TableCell>
+                        <TableCell color="text.secondary">{user.email}</TableCell>
                         <TableCell>
-                          <Chip label={user.position} size="small" sx={{ fontWeight: 600, bgcolor: '#dbeafe', color: '#1e40af' }} />
+                          <Chip 
+                            label={user.position} 
+                            size="small" 
+                            sx={{ 
+                                fontWeight: 800, 
+                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(61, 167, 253, 0.15)' : 'rgba(25, 118, 210, 0.1)', 
+                                color: 'primary.main',
+                                fontSize: '0.7rem'
+                            }} 
+                          />
                         </TableCell>
-                        <TableCell>{user.orgUnitName}</TableCell>
+                        <TableCell color="text.secondary">{user.orgUnitName}</TableCell>
                         <TableCell align="right">
-                          <IconButton size="small"><Edit fontSize="small" /></IconButton>
+                          <IconButton size="small" sx={{ color: 'text.secondary' }}><Edit fontSize="small" /></IconButton>
                           <IconButton size="small" color="error"><Delete fontSize="small" /></IconButton>
                         </TableCell>
                       </TableRow>

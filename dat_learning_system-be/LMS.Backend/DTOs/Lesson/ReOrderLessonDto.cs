@@ -1,3 +1,4 @@
+namespace LMS.Backend.DTOs.Lesson;
 public class ReorderLessonsDto
 {
     public Guid CourseId { get; set; }
