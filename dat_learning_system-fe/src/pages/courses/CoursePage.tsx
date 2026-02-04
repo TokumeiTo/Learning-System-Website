@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Box, Typography, Stack, TextField, InputAdornment,
-    Tab, Tabs, Button, useTheme, CircularProgress
+    Box, Typography, Stack,
+    Button, useTheme, CircularProgress,
+    Chip,
+    Paper,
+    InputBase
 } from '@mui/material';
-import { Search, Add } from '@mui/icons-material';
+import { Search, Add, Terminal, Translate, Language, Dashboard, AutoAwesome } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLayout from '../../components/layout/PageLayout';
 import type { Course } from '../../types/course';
@@ -62,9 +65,9 @@ const CoursesPage: React.FC = () => {
 
     return (
         <PageLayout>
-            <Box sx={{ 
-                p: { xs: 2, md: 6 }, 
-                bgcolor: 'background.default', 
+            <Box sx={{
+                p: { xs: 2, md: 6 },
+                bgcolor: 'background.default',
                 minHeight: '100vh',
                 transition: 'background-color 0.3s'
             }}>
@@ -92,11 +95,11 @@ const CoursesPage: React.FC = () => {
                             startIcon={<Add />}
                             onClick={() => setIsCreating(true)}
                             sx={{
-                                borderRadius: 3, 
-                                px: 4, 
-                                py: 1.5, 
+                                borderRadius: 3,
+                                px: 4,
+                                py: 1.5,
                                 fontWeight: 800,
-                                textTransform: 'none', 
+                                textTransform: 'none',
                                 boxShadow: theme.palette.mode === 'dark' ? theme.shadows[8] : theme.shadows[4]
                             }}
                         >
@@ -105,56 +108,82 @@ const CoursesPage: React.FC = () => {
                     )}
                 </Stack>
 
-                {/* Filter & Search Bar */}
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: { xs: 'column', md: 'row' },
-                    justifyContent: 'space-between',
-                    alignItems: { md: 'center' },
-                    gap: 3,
-                    mb: 6
-                }}>
-                    <Tabs
-                        value={filter}
-                        onChange={(_, val) => setFilter(val)}
+                {/* Filter & Search Bar Area */}
+                <Stack
+                    direction={{ xs: 'column', lg: 'row' }}
+                    spacing={3}
+                    justifyContent="space-between"
+                    alignItems={{ xs: 'start', lg: 'center' }}
+                    sx={{ mb: 6 }}
+                >
+                    {/* Category Pills (Replaces Tabs) */}
+                    <Stack
+                        direction="row"
+                        spacing={1}
                         sx={{
-                            '& .MuiTabs-indicator': { height: 4, borderRadius: '4px 4px 0 0' },
-                            '& .MuiTab-root': { 
-                                fontWeight: 800, 
-                                textTransform: 'none', 
-                                minWidth: 80,
-                                fontSize: '1rem',
-                                color: 'text.secondary'
-                            },
-                            '& .Mui-selected': { color: 'primary.main' }
+                            overflowX: 'auto',
+                            width: '100%',
+                            pb: { xs: 1, lg: 0 },
+                            '&::-webkit-scrollbar': { display: 'none' } // Hides scrollbar for a cleaner look
                         }}
                     >
-                        {categories.map(cat => <Tab key={cat} label={cat} value={cat} />)}
-                    </Tabs>
+                        {categories.map((cat) => (
+                            <Chip
+                                key={cat}
+                                label={cat}
+                                onClick={() => setFilter(cat)}
+                                color={filter === cat ? "primary" : "default"}
+                                variant={filter === cat ? "filled" : "outlined"}
+                                icon={
+                                    cat === 'IT' ? <Terminal fontSize="small" /> :
+                                        cat === 'Japanese' ? <Translate fontSize="small" /> :
+                                            cat === 'English' ? <Language fontSize="small" /> :
+                                                cat === 'Custom' ? <AutoAwesome fontSize="small" /> :
+                                                    cat === 'All' ? <Dashboard fontSize="small" /> : undefined
+                                }
+                                sx={{
+                                    px: 2,
+                                    py: 2.5,
+                                    borderRadius: 3,
+                                    fontWeight: 700,
+                                    transition: '0.3s',
+                                    border: filter === cat ? 'none' : '1px solid #e2e8f0',
+                                    '&:hover': {
+                                        bgcolor: filter === cat ? 'primary.main' : 'rgba(0,0,0,0.04)'
+                                    }
+                                }}
+                            />
+                        ))}
+                    </Stack>
 
-                    <TextField
-                        placeholder="Search courses..."
-                        size="small"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <Search sx={{ color: 'primary.main' }} />
-                                </InputAdornment>
-                            ),
-                            sx: {
-                                borderRadius: 3, 
-                                bgcolor: 'background.paper',
-                                width: { xs: '100%', md: 350 },
-                                border: `1px solid ${theme.palette.divider}`,
-                                '& fieldset': { border: 'none' },
-                                transition: '0.2s',
-                                '&:hover': { boxShadow: theme.shadows[2] }
+                    {/* Search Bar (Replaces TextField) */}
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            px: 2,
+                            py: 0.8,
+                            borderRadius: 3,
+                            bgcolor: 'background.paper',
+                            border: `1px solid ${theme.palette.divider}`,
+                            width: { xs: '100%', lg: 350 },
+                            transition: '0.2s',
+                            '&:focus-within': {
+                                borderColor: 'primary.main',
+                                boxShadow: '0 0 0 3px rgba(25, 118, 210, 0.1)'
                             }
                         }}
-                    />
-                </Box>
+                    >
+                        <Search sx={{ color: 'text.disabled', fontSize: 20 }} />
+                        <InputBase
+                            sx={{ ml: 1, flex: 1, fontSize: 14, fontWeight: 500 }}
+                            placeholder="Search courses..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </Paper>
+                </Stack>
 
                 {/* Main Content Area */}
                 {loading ? (

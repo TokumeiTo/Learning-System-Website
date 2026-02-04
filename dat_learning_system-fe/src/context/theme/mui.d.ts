@@ -5,6 +5,7 @@ declare module "@mui/material/styles" {
         blur: string;
         toolbar?: string;
         gray?: string;
+        gradient?: string;
     }
     interface TypeText {
         tertiary: string;

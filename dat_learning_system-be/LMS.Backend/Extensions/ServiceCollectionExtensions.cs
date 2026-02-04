@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILessonService, LessonService>();
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<ITranslationService, TranslationService>();
 
         // Helpers
         services.AddSingleton<JwtHelper>();

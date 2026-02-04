@@ -107,6 +107,91 @@
           }
         }
       },
+      "Kawazu/1.1.4": {
+        "type": "package",
+        "dependencies": {
+          "LibNMeCab": "0.10.1",
+          "LibNMeCab.IpaDicBin": "0.10.0"
+        },
+        "compile": {
+          "lib/net5.0/Kawazu.dll": {}
+        },
+        "runtime": {
+          "lib/net5.0/Kawazu.dll": {}
+        },
+        "contentFiles": {
+          "contentFiles/any/net5.0/AUTHORS": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/net5.0/COPYING": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/net5.0/char.bin": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/net5.0/matrix.bin": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/net5.0/sys.dic": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          },
+          "contentFiles/any/net5.0/unk.dic": {
+            "buildAction": "Content",
+            "codeLanguage": "any",
+            "copyToOutput": false
+          }
+        }
+      },
+      "LanguageDetection/1.2.0": {
+        "type": "package",
+        "compile": {
+          "lib/net45/LanguageDetection.dll": {}
+        },
+        "runtime": {
+          "lib/net45/LanguageDetection.dll": {}
+        }
+      },
+      "LibNMeCab/0.10.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/LibNMeCab.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/LibNMeCab.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "LibNMeCab.IpaDicBin/0.10.0": {
+        "type": "package",
+        "dependencies": {
+          "LibNMeCab": "[0.10.0, 0.11.0)"
+        },
+        "compile": {
+          "lib/netstandard2.0/LibNMeCab.IpaDicBin.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/LibNMeCab.IpaDicBin.dll": {}
+        },
+        "build": {
+          "build/_._": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/_._": {}
+        }
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.0": {
         "type": "package",
         "dependencies": {
@@ -1700,6 +1785,94 @@
         "lib/netstandard2.0/Humanizer.dll",
         "lib/netstandard2.0/Humanizer.xml",
         "logo.png"
+      ]
+    },
+    "Kawazu/1.1.4": {
+      "sha512": "ZXSCv+STeJomB+sjHBk74b30rAI/JTPAzanC7YhsP+6qy7HzZV5QYHhtpXd21jdCUjvSasAhbIZzpa+BFZoOfA==",
+      "type": "package",
+      "path": "kawazu/1.1.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Kawazu_icon.png",
+        "content/AUTHORS",
+        "content/COPYING",
+        "content/char.bin",
+        "content/matrix.bin",
+        "content/sys.dic",
+        "content/unk.dic",
+        "contentFiles/any/net5.0/AUTHORS",
+        "contentFiles/any/net5.0/COPYING",
+        "contentFiles/any/net5.0/char.bin",
+        "contentFiles/any/net5.0/matrix.bin",
+        "contentFiles/any/net5.0/sys.dic",
+        "contentFiles/any/net5.0/unk.dic",
+        "contentFiles/any/netcoreapp3.1/AUTHORS",
+        "contentFiles/any/netcoreapp3.1/COPYING",
+        "contentFiles/any/netcoreapp3.1/char.bin",
+        "contentFiles/any/netcoreapp3.1/matrix.bin",
+        "contentFiles/any/netcoreapp3.1/sys.dic",
+        "contentFiles/any/netcoreapp3.1/unk.dic",
+        "contentFiles/any/netstandard2.0/AUTHORS",
+        "contentFiles/any/netstandard2.0/COPYING",
+        "contentFiles/any/netstandard2.0/char.bin",
+        "contentFiles/any/netstandard2.0/matrix.bin",
+        "contentFiles/any/netstandard2.0/sys.dic",
+        "contentFiles/any/netstandard2.0/unk.dic",
+        "kawazu.1.1.4.nupkg.sha512",
+        "kawazu.nuspec",
+        "lib/net5.0/Kawazu.dll",
+        "lib/netcoreapp3.1/Kawazu.dll",
+        "lib/netstandard2.0/Kawazu.dll"
+      ]
+    },
+    "LanguageDetection/1.2.0": {
+      "sha512": "kjRoYZNahh3Ot/HZO8Yh8lRjYagsnCOt82qnzKSOuVx51aWvguQ/p31+8ye9kR9nfWwyh3i8Xjq/16WPzcQpsg==",
+      "type": "package",
+      "path": "languagedetection/1.2.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "languagedetection.1.2.0.nupkg.sha512",
+        "languagedetection.nuspec",
+        "lib/net45/LanguageDetection.dll"
+      ]
+    },
+    "LibNMeCab/0.10.1": {
+      "sha512": "GXP1Lu5YJQM1kE0KYMMDoYVwdZdLja66yaiQK/tR3XWNGalCC+gwDS6Dm4WWuB8xgFq9VB0c71WfTNEhXyR7ww==",
+      "type": "package",
+      "path": "libnmecab/0.10.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "NMeCab-icon-512.png",
+        "lib/netstandard2.0/LibNMeCab.dll",
+        "lib/netstandard2.0/LibNMeCab.xml",
+        "libnmecab.0.10.1.nupkg.sha512",
+        "libnmecab.nuspec"
+      ]
+    },
+    "LibNMeCab.IpaDicBin/0.10.0": {
+      "sha512": "Ky8tAvVnsRyAcRi70RvA/y7+Vr/n77kqdGI+JFoH2nbMIf2ZQr8iWNDcIy8Quh/kugjYVrA2yles32xcx75nYg==",
+      "type": "package",
+      "path": "libnmecab.ipadicbin/0.10.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "NMeCab-icon-512.png",
+        "build/LibNMeCab.IpaDicBin.props",
+        "build/LibNMeCab.IpaDicBin.targets",
+        "buildMultiTargeting/LibNMeCab.IpaDicBin.props",
+        "buildMultiTargeting/LibNMeCab.IpaDicBin.targets",
+        "content/IpaDic/AUTHORS",
+        "content/IpaDic/COPYING",
+        "content/IpaDic/char.bin",
+        "content/IpaDic/matrix.bin",
+        "content/IpaDic/sys.dic",
+        "content/IpaDic/unk.dic",
+        "lib/netstandard2.0/LibNMeCab.IpaDicBin.dll",
+        "libnmecab.ipadicbin.0.10.0.nupkg.sha512",
+        "libnmecab.ipadicbin.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.0": {
@@ -4147,6 +4320,8 @@
       "AutoMapper.Extensions.Microsoft.DependencyInjection >= 12.0.1",
       "BCrypt.Net-Next >= 4.0.3",
       "FluentValidation.AspNetCore >= 11.3.1",
+      "Kawazu >= 1.1.4",
+      "LanguageDetection >= 1.2.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 8.0.0",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 8.0.0",
       "Microsoft.AspNetCore.OpenApi >= 8.0.22",
@@ -4163,11 +4338,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
+      "projectUniqueName": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
       "projectName": "LMS.Backend",
-      "projectPath": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
+      "projectPath": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
       "packagesPath": "C:\\Users\\25-00372\\.nuget\\packages\\",
-      "outputPath": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\obj\\",
+      "outputPath": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\25-00372\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -4210,6 +4385,14 @@
           "FluentValidation.AspNetCore": {
             "target": "Package",
             "version": "[11.3.1, )"
+          },
+          "Kawazu": {
+            "target": "Package",
+            "version": "[1.1.4, )"
+          },
+          "LanguageDetection": {
+            "target": "Package",
+            "version": "[1.2.0, )"
           },
           "Microsoft.AspNetCore.Authentication.JwtBearer": {
             "target": "Package",
@@ -4268,5 +4451,17 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'LanguageDetection 1.2.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.",
+      "libraryId": "LanguageDetection",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

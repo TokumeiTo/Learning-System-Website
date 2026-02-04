@@ -6,39 +6,32 @@ export const getDesignTokens = (mode: "light" | "dark") => ({
         ...(mode === "light"
             ? {
                 primary: { main: "#1976d2" },
-                secondary: { main: "#ff9800" },
-                // Semantic colors for Audit/Logs
-                success: { main: "#10b981", light: "#dcfce7" },
-                warning: { main: "#f59e0b", light: "#fef3c7" },
-                error: { main: "#ef4444", light: "#fee2e2" },
                 background: {
                     default: "#f5f5f5",
                     paper: "#f8fafc",
                     toolbar: '#0080ffff',
                     blur: 'rgba(200, 213, 255, 0.43)',
                     gray: '#dcdcdcff',
+                    gradient: `radial-gradient(at 0% 0%, rgba(25, 118, 210, 0.15) 0%, transparent 50%), 
+                        linear-gradient(135deg, #e2e8f0 0%, #ffffff 50%, #cbd5e1 100%)`,
                 },
                 text: { primary: "#333", secondary: "#666", tertiary: '#6200ffff' },
             }
             : {
                 primary: { main: "#3da7fd" },
-                secondary: { main: "#fbc02d" },
-                // Semantic colors for Audit/Logs (Vibrant for Dark Mode)
-                success: { main: "#34d399", light: "rgba(52, 211, 153, 0.15)" },
-                warning: { main: "#fbbf24", light: "rgba(251, 191, 36, 0.15)" },
-                error: { main: "#f87171", light: "rgba(248, 113, 113, 0.15)" },
                 background: {
                     default: "#0b1220",
                     paper: "#111827",
                     toolbar: '#000d26',
                     blur: '#000d2641',
-                    gray: '#000000ff'
+                    gray: '#000000ff',
+                    gradient: 'radial-gradient(circle at 2% 10%, #000d2641 0%, transparent 40%)', // Dark glow
                 },
-                text: { 
-                    primary: "#fff", 
-                    secondary: "#9e9e9eff", 
-                    tertiary: '#00e7ff', 
-                    disabled: '#585858ff' 
+                text: {
+                    primary: "#fff",
+                    secondary: "#9e9e9eff",
+                    tertiary: '#00e7ff',
+                    disabled: '#585858ff'
                 },
             }),
     },

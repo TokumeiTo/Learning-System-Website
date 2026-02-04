@@ -31,6 +31,8 @@ BackEnd installation
 dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
 dotnet add package Microsoft.EntityFrameworkCore.Design
 dotnet tool install dotnet-ef --version 8.* --add-source https://api.nuget.org/v3/index.json
+dotnet add package Kawazu
+dotnet add package LanguageDetection
 
 dotnet ef database update
 

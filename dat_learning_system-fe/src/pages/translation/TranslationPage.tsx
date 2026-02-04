@@ -1,70 +1,106 @@
 import React, { useState } from 'react';
 import {
     Box, Typography, Stack, Paper, TextField, IconButton,
-    Button, MenuItem, Select, CircularProgress, Divider,
-    Tooltip, Alert, Snackbar
+    Button, MenuItem, Select, Divider, Alert, Snackbar,
+    CircularProgress
 } from '@mui/material';
 import {
-    CompareArrows, ContentCopy, VolumeUp, Translate,
-    History, Settings, AutoFixHigh, Gavel
+    CompareArrows, Translate, History, AutoFixHigh, Gavel
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import axios from 'axios';
-import PageLayout from '../../components/layout/PageLayout';
 
-// --- Note ---
-// If you are self-hosting, replace this URL with your local instance
-// Default local address is usually http://localhost:5000/translate
-const LIBRE_API_URL = "https://libretranslate.de/translate";
+// Layout & API
+import PageLayout from '../../components/layout/PageLayout';
+import { translateText } from '../../api/translation.api';
+import type { TranslationHistoryItem, TranslationRequest } from '../../types/translation';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+
+// Your New Separated Components
+import TranslationResult from '../../components/translation/TranslationResult';
+import HistoryDrawer from '../../components/translation/HistoryDrawer';
 
 const TranslationPage: React.FC = () => {
+    // State
     const [sourceText, setSourceText] = useState('');
     const [translatedText, setTranslatedText] = useState('');
+    const [romajiText, setRomajiText] = useState('');
     const [loading, setLoading] = useState(false);
-    const [sourceLang, setSourceLang] = useState('ja');
+    const [sourceLang, setSourceLang] = useState('auto');
     const [targetLang, setTargetLang] = useState('en');
     const [error, setError] = useState<string | null>(null);
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const [history, setHistory] = useState<TranslationHistoryItem[]>(
+        JSON.parse(localStorage.getItem('trans_history') || '[]')
+    );
 
-    const handleTranslate = async () => {
+    const handleTranslate = async (isItContext: boolean = false) => {
         if (!sourceText.trim()) return;
 
         setLoading(true);
         setError(null);
 
-        try {
-            const res = await axios.post(LIBRE_API_URL, {
-                q: sourceText,
-                source: sourceLang,
-                target: targetLang,
-                format: "text",
-                api_key: "" // Leave empty if your local instance doesn't require one
-            });
+        const request: TranslationRequest = {
+            text: sourceText,
+            sourceLanguage: sourceLang,
+            targetLanguage: targetLang,
+            isItContext: isItContext
+        };
 
-            setTranslatedText(res.data.translatedText);
-        } catch (err) {
-            setError("Unable to connect to LibreTranslate. Ensure your server is running.");
-            console.error(err);
+        try {
+            const data = await translateText(request);
+            
+            // 1. Clean the IT tag from the display result
+            const finalResult = data.translatedText.replace(/\[Technical IT Context\]:\s*/gi, "");
+            
+            setTranslatedText(finalResult);
+            setRomajiText(data.romaji || ''); 
+
+            // 2. Save to History (Using cleaned text)
+            const newEntry: TranslationHistoryItem = {
+                id: Date.now(),
+                source: sourceText,
+                translated: finalResult,
+                romaji: data.romaji,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            const updatedHistory = [newEntry, ...history].slice(0, 10);
+            setHistory(updatedHistory);
+            localStorage.setItem('trans_history', JSON.stringify(updatedHistory));
+        } catch (err: any) {
+            const msg = err.response?.data?.message || "Translation service is currently unavailable.";
+            setError(msg);
         } finally {
             setLoading(false);
         }
     };
 
+    const loadFromHistory = (item: TranslationHistoryItem) => {
+        setSourceText(item.source);
+        setTranslatedText(item.translated);
+        setRomajiText(item.romaji || '');
+    };
+
     const swapLanguages = () => {
+        if (sourceLang === 'auto') return;
         setSourceLang(targetLang);
         setTargetLang(sourceLang);
         setSourceText(translatedText);
         setTranslatedText(sourceText);
     };
 
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(translatedText);
+    const speakText = (text: string, lang: string) => {
+        if (!text) return;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang === 'ja' ? 'ja-JP' : 'en-US';
+        window.speechSynthesis.speak(utterance);
     };
 
     return (
         <PageLayout>
-            <Box sx={{ minHeight: 'calc(100vh - 65px)', bgcolor: '#background.default', p: { xs: 2, md: 6 } }}>
+            <Box sx={{ minHeight: 'calc(100vh - 65px)', bgcolor: 'background.default', p: { xs: 2, md: 6 } }}>
 
-                {/* 1. Header Area */}
+                {/* Header */}
                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
                     <Box>
                         <Typography variant="h4" fontWeight={900} color="text.primary">
@@ -73,163 +109,110 @@ const TranslationPage: React.FC = () => {
                         <Stack direction="row" spacing={1} alignItems="center">
                             <Gavel sx={{ fontSize: 14, color: 'text.secondary' }} />
                             <Typography variant="caption" color="text.secondary">
-                                Powered by LibreTranslate • Private & Secure Internal Instance
+                                Secure Internal Gateway • Audit Log Enabled
                             </Typography>
                         </Stack>
                     </Box>
                     <Stack direction="row" spacing={1}>
-                        <Button startIcon={<History />} color="inherit" sx={{ fontWeight: 600 }}>History</Button>
-                        <IconButton><Settings /></IconButton>
+                        <Button 
+                            startIcon={<History />} 
+                            onClick={() => setIsHistoryOpen(true)}
+                            color="inherit" 
+                            sx={{ fontWeight: 600, textTransform: 'none' }}
+                        >
+                            History
+                        </Button>
                     </Stack>
                 </Stack>
 
-                {/* 2. Translation Workspace */}
-                <Box component={motion.div} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            borderRadius: 6,
-                            border: '1px solid #e2e8f0',
-                            overflow: 'hidden',
-                            boxShadow: '0 10px 40px rgba(0,0,0,0.04)'
-                        }}
-                    >
-                        {/* Language Selector Bar */}
-                        <Stack
-                            direction="row"
-                            alignItems="center"
-                            justifyContent="space-between"
-                            sx={{ px: 3, py: 2, bgcolor: '#background.paper', borderBottom: '1px solid #e2e8f0' }}
-                        >
-                            <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: 1 }}>
-                                <Select
-                                    value={sourceLang}
-                                    onChange={(e) => setSourceLang(e.target.value)}
-                                    size="small"
-                                    sx={{ minWidth: 150, borderRadius: 3, bgcolor: 'background.paper', fontWeight: 600 }}
-                                >
-                                    <MenuItem value="ja">Japanese</MenuItem>
-                                    <MenuItem value="en">English</MenuItem>
-                                    <MenuItem value="auto">Detect Language</MenuItem>
-                                </Select>
-                            </Stack>
+                {/* Main Workspace */}
+                <Box component={motion.div} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
+                    <Paper elevation={0} sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
+                        
+                        {/* Toolbar */}
+                        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ px: 3, py: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                            <Select value={sourceLang} onChange={(e) => setSourceLang(e.target.value)} size="small" sx={{ minWidth: 160, borderRadius: 2 }}>
+                                <MenuItem value="auto"><AutoAwesomeIcon fontSize='small' sx={{color:'orange'}}/> Detect Language</MenuItem>
+                                <MenuItem value="ja">Japanese</MenuItem>
+                                <MenuItem value="en">English</MenuItem>
+                                <MenuItem value="my">Myanmar</MenuItem>
+                            </Select>
 
-                            <IconButton onClick={swapLanguages} sx={{ mx: 3, bgcolor: 'background.paper', border: '1px solid #e2e8f0' }}>
-                                <CompareArrows color="primary" />
+                            <IconButton onClick={swapLanguages} disabled={sourceLang === 'auto'} sx={{ border: '1px solid', borderColor: 'divider' }}>
+                                <CompareArrows color={sourceLang === 'auto' ? "disabled" : "primary"} />
                             </IconButton>
 
-                            <Stack direction="row" spacing={2} alignItems="center" justifyContent="flex-end" sx={{ flex: 1 }}>
-                                <Select
-                                    value={targetLang}
-                                    onChange={(e) => setTargetLang(e.target.value)}
-                                    size="small"
-                                    sx={{ minWidth: 150, borderRadius: 3, bgcolor: 'background.paper', fontWeight: 600 }}
-                                >
-                                    <MenuItem value="en">English</MenuItem>
-                                    <MenuItem value="ja">Japanese</MenuItem>
-                                </Select>
-                            </Stack>
+                            <Select value={targetLang} onChange={(e) => setTargetLang(e.target.value)} size="small" sx={{ minWidth: 140, borderRadius: 2 }}>
+                                <MenuItem value="en">English</MenuItem>
+                                <MenuItem value="ja">Japanese</MenuItem>
+                                <MenuItem value="my">Myanmar</MenuItem>
+                            </Select>
                         </Stack>
 
-                        {/* Text Input/Output Area (Flex Container) */}
+                        {/* Input/Output Area */}
                         <Stack direction={{ xs: 'column', md: 'row' }} divider={<Divider orientation="vertical" flexItem />}>
-
-                            {/* Input Box */}
-                            <Box sx={{ flex: 1, p: 4 }}>
+                            {/* Source Side */}
+                            <Box sx={{ flex: 1, p: 3 }}>
                                 <TextField
-                                    fullWidth
-                                    multiline
-                                    rows={10}
-                                    placeholder="Type or paste text here (IT reports, emails, etc.)..."
-                                    variant="standard"
-                                    InputProps={{
-                                        disableUnderline: true,
-                                        style: { fontSize: '1.25rem', lineHeight: 1.6, fontWeight: 400 }
-                                    }}
+                                    fullWidth multiline rows={10} variant="standard"
+                                    placeholder="Paste technical logs or emails..."
                                     value={sourceText}
                                     onChange={(e) => setSourceText(e.target.value)}
+                                    InputProps={{ disableUnderline: true, style: { fontSize: '1.15rem' }}}
                                 />
                                 <Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }}>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {sourceText.length} / 5000 characters
+                                    <Typography variant="caption" color="text.disabled">
+                                        {sourceText.length.toLocaleString()} characters
                                     </Typography>
-                                    <Button
-                                        startIcon={<AutoFixHigh />}
-                                        size="small"
-                                        sx={{ color: 'text.secondary', textTransform: 'none' }}
+                                    <Button 
+                                        startIcon={<AutoFixHigh />} variant="outlined" size="small"
+                                        onClick={() => handleTranslate(true)} disabled={loading || !sourceText}
                                     >
                                         Improve for IT Context
                                     </Button>
                                 </Stack>
                             </Box>
 
-                            {/* Output Box */}
-                            <Box sx={{ flex: 1, p: 4, bgcolor: '#background.paper' }}>
-                                {loading ? (
-                                    <Stack alignItems="center" justifyContent="center" sx={{ height: '100%' }}>
-                                        <CircularProgress size={30} thickness={5} />
-                                        <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>Translating...</Typography>
-                                    </Stack>
-                                ) : (
-                                    <>
-                                        <Typography
-                                            variant="body1"
-                                            sx={{
-                                                fontSize: '1.25rem',
-                                                lineHeight: 1.6,
-                                                minHeight: 250,
-                                                color: translatedText ? 'inherit' : '#94a3b8'
-                                            }}
-                                        >
-                                            {translatedText || "The translation will appear here automatically..."}
-                                        </Typography>
-                                        <Stack direction="row" spacing={1} sx={{ mt: 2, pt: 2, borderTop: '1px solid #f1f5f9' }}>
-                                            <Tooltip title="Copy to Clipboard">
-                                                <IconButton onClick={copyToClipboard} size="small"><ContentCopy fontSize="small" /></IconButton>
-                                            </Tooltip>
-                                            <IconButton size="small"><VolumeUp fontSize="small" /></IconButton>
-                                        </Stack>
-                                    </>
-                                )}
-                            </Box>
+                            {/* Result Side Component */}
+                            <TranslationResult 
+                                loading={loading}
+                                translatedText={translatedText}
+                                romajiText={romajiText}
+                                sourceText={sourceText}
+                                targetLang={targetLang}
+                                onCopy={() => navigator.clipboard.writeText(translatedText)}
+                                onSpeak={speakText}
+                            />
                         </Stack>
                     </Paper>
 
+                    {/* Submit */}
                     <Stack direction="row" justifyContent="flex-end" sx={{ mt: 3 }}>
                         <Button
-                            variant="contained"
-                            onClick={handleTranslate}
-                            disabled={loading}
-                            size="large"
-                            startIcon={<Translate />}
-                            sx={{
-                                borderRadius: 4,
-                                px: 6,
-                                py: 1.8,
-                                fontWeight: 800,
-                                fontSize: '1rem',
-                                boxShadow: '0 10px 20px rgba(99, 102, 241, 0.2)'
-                            }}
+                            variant="contained" size="large" onClick={() => handleTranslate(false)}
+                            disabled={loading || !sourceText}
+                            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Translate />}
+                            sx={{ borderRadius: 3, px: 5, fontWeight: 800 }}
                         >
-                            Translate
+                            {loading ? "Translating..." : "Translate"}
                         </Button>
                     </Stack>
                 </Box>
 
-                {/* 3. Footer Context Tip */}
-                <Alert
-                    severity="info"
-                    icon={<Translate fontSize="inherit" />}
-                    sx={{ mt: 6, borderRadius: 4, bgcolor: '#e0e7ff', color: '#3730a3', border: 'none' }}
-                >
-                    <b>Corporate Guideline:</b> Use this tool for internal documentation only. For official customer-facing contracts, please refer to the <b>Official Glossary</b> in the Dictionary page.
-                </Alert>
+                {/* History Drawer Component */}
+                <HistoryDrawer 
+                    open={isHistoryOpen} 
+                    onClose={() => setIsHistoryOpen(false)} 
+                    history={history}
+                    onSelect={loadFromHistory}
+                    onClear={() => { setHistory([]); localStorage.removeItem('trans_history'); }}
+                />
 
-                {error && (
-                    <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError(null)}>
-                        <Alert severity="error" variant="filled">{error}</Alert>
-                    </Snackbar>
-                )}
+                {/* Alerts/Snackbars */}
+                <Snackbar open={!!error} autoHideDuration={5000} onClose={() => setError(null)}>
+                    <Alert severity="error" variant="filled">{error}</Alert>
+                </Snackbar>
+
             </Box>
         </PageLayout>
     );

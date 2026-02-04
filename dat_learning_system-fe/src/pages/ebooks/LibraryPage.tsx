@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import {
-    Box, Typography, Stack, Paper, InputBase, 
+    Box, Typography, Stack, Paper, InputBase,
     Chip, Button, Card, CardContent, LinearProgress,
     Select, MenuItem, FormControl
 } from '@mui/material';
 import {
     Search, Download,
     Translate, Terminal, Language, Star,
-    LightbulbCircle, Sort
+    LightbulbCircle, Sort,
+    Dashboard
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLayout from '../../components/layout/PageLayout';
@@ -88,11 +89,12 @@ const EBooksPage: React.FC = () => {
                                 color={activeCategory === cat ? "primary" : "default"}
                                 variant={activeCategory === cat ? "filled" : "outlined"}
                                 icon={
+                                    cat === 'All' ? <Dashboard fontSize="small" /> :
                                     cat === 'IT' ? <Terminal fontSize="small" /> :
-                                        cat === 'Japanese' ? <Translate fontSize="small" /> :
-                                            cat === 'English' ? <Language fontSize="small" /> : undefined
+                                    cat === 'Japanese' ? <Translate fontSize="small" /> :
+                                    cat === 'English' ? <Language fontSize="small" /> : undefined
                                 }
-                                sx={{ px: 2, py: 2.5, borderRadius: 3, fontWeight: 700, border: '1px solid #e2e8f0' }}
+                        sx={{ px: 2, py: 2.5, borderRadius: 3, fontWeight: 700, border: '1px solid #e2e8f0' }}
                             />
                         ))}
                     </Stack>

@@ -55,6 +55,14 @@
               "target": "Package",
               "version": "[11.3.1, )"
             },
+            "Kawazu": {
+              "target": "Package",
+              "version": "[1.1.4, )"
+            },
+            "LanguageDetection": {
+              "target": "Package",
+              "version": "[1.2.0, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[8.0.0, )"

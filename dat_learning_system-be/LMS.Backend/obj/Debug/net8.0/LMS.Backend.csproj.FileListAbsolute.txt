@@ -145,3 +145,13 @@ C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\obj\Debug\net8.0\LMS.Backend
 C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\obj\Debug\net8.0\LMS.Backend.genruntimeconfig.cache
 C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\obj\Debug\net8.0\ref\LMS.Backend.dll
 c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\LMS.Backend.staticwebassets.runtime.json
+c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\Kawazu.dll
+c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\LibNMeCab.dll
+c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\LibNMeCab.IpaDicBin.dll
+c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\IpaDic\AUTHORS
+c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\IpaDic\char.bin
+c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\IpaDic\COPYING
+c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\IpaDic\matrix.bin
+c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\IpaDic\sys.dic
+c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\IpaDic\unk.dic
+c:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\LanguageDetection.dll

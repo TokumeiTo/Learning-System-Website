@@ -1,6 +1,7 @@
 // Builder and Configuration
 using System.Text;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using LMS.Backend.Data.Dbcontext;
 using LMS.Backend.Data.Entities;
 using LMS.Backend.Data.Interceptors;
@@ -18,6 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 /////////////////////Builder Created/////////////////////////////////
 
+builder.Services.AddHttpClient();
 /* Controllers */
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -28,6 +30,7 @@ builder.Services.AddControllers()
         // PREVENTS INFINITE LOOP CRASH:
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
@@ -70,8 +73,16 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<AppDbContext>((sp, options) =>
 {
     var auditInterceptor = sp.GetRequiredService<AuditInterceptor>();
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-            .AddInterceptors(auditInterceptor);
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        npgsqlOptions =>
+        {
+            // This handles the "transient failure" by retrying the connection
+            npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorCodesToAdd: null);
+        })
+    .AddInterceptors(auditInterceptor);
 });
 
 // Hash Password
