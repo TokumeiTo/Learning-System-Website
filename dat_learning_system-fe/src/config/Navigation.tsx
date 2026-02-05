@@ -14,15 +14,15 @@ import AddCardIcon from '@mui/icons-material/AddCard';
 import DvrIcon from '@mui/icons-material/Dvr';
 
 export const LEARNING_NAV = [
-    { label: "Learning path", path: "/dashboard/path", icon: <FollowTheSignsIcon color="primary" /> },
+    { label: "Learning path", path: "/path", icon: <FollowTheSignsIcon color="primary" /> },
     { label: "Courses", path: "/courses", icon: <CastForEducationIcon color="primary" /> },
     { label: "Schedule", path: "/schedule", icon: <EditCalendarIcon color="primary" /> },
-    { label: "Flashcards", path: "/dashboard/flashcards", icon: <StyleIcon color="primary" /> },
+    { label: "Flashcards", path: "/flashcards", icon: <StyleIcon color="primary" /> },
     { label: "Quizs & Practice", path: "/quiz", icon: <QuizIcon color="primary" /> },
     { label: "Mock test", path: "/mock_test", icon: <HistoryEduIcon color="primary" />, },
     { label: "Library", path: "/ebooks", icon: <LocalLibraryIcon color="primary" /> },
     { label: "Dictionary", path: "/dictionary", icon: <BookIcon color="primary" /> },
-    { label: "Translation tool", path: "/dashboard/translate", icon: <TranslateIcon color="primary" /> },
+    { label: "Translation tool", path: "/translate", icon: <TranslateIcon color="primary" /> },
 ];
 
 export const MANAGEMENT_NAV = [

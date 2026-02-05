@@ -10,7 +10,7 @@ import {
     Badge,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import StyledBadge from "./common/Badge";
+import StyledBadge from "../common/Badge";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';

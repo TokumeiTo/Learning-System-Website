@@ -59,7 +59,7 @@ const BugReportForm: React.FC = () => {
                 <Stack spacing={1} sx={{ mb: 4 }}>
                     <Stack direction="row" spacing={2} alignItems="center">
                         <BugReport color="primary" sx={{ fontSize: 32 }} />
-                        <Typography variant="h4" fontWeight={900} color="#1e293b">
+                        <Typography variant="h4" fontWeight={900} color="text.default">
                             Bug Report & Feedback
                         </Typography>
                     </Stack>
@@ -103,7 +103,7 @@ const BugReportForm: React.FC = () => {
                                         name="type"
                                         control={control}
                                         render={({ field }) => (
-                                            <Select {...field} sx={{ borderRadius: 3, bgcolor: '#fcfcfc' }}>
+                                            <Select {...field} sx={{ borderRadius: 3, bgcolor: 'background.paper' }}>
                                                 <MenuItem value="Technical Bug">Technical Bug (Website Issue)</MenuItem>
                                                 <MenuItem value="Content Error">Course Content Error (Japanese/English typo)</MenuItem>
                                                 <MenuItem value="Feature Request">Feature Request</MenuItem>
@@ -127,7 +127,7 @@ const BugReportForm: React.FC = () => {
                                                 placeholder="e.g., Jisho Dictionary not loading"
                                                 error={!!errors.subject}
                                                 helperText={errors.subject?.message}
-                                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: '#fcfcfc' } }}
+                                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
                                             />
                                         )}
                                     />
@@ -147,7 +147,7 @@ const BugReportForm: React.FC = () => {
                                                 placeholder="Paste the link where the error happened"
                                                 error={!!errors.pageUrl}
                                                 helperText={errors.pageUrl?.message}
-                                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: '#fcfcfc' } }}
+                                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
                                             />
                                         )}
                                     />
@@ -168,7 +168,7 @@ const BugReportForm: React.FC = () => {
                                                 placeholder="Steps to reproduce the bug or details of the typo..."
                                                 error={!!errors.description}
                                                 helperText={errors.description?.message}
-                                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: '#fcfcfc' } }}
+                                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'background.paper' } }}
                                             />
                                         )}
                                     />
@@ -214,9 +214,9 @@ const BugReportForm: React.FC = () => {
                 )}
 
                 {/* Knowledge Base Tip */}
-                <Paper sx={{ mt: 4, p: 3, borderRadius: 4, display: 'flex', alignItems: 'center', gap: 2, bgcolor: '#eff6ff', border: 'none' }}>
+                <Paper sx={{ mt: 4, p: 3, borderRadius: 4, display: 'flex', alignItems: 'center', gap: 2, bgcolor: 'background.tertiary', border: 'none' }}>
                     <Psychology color="primary" />
-                    <Typography variant="body2" fontWeight={600} color="#3730a3">
+                    <Typography variant="body2" fontWeight={600} color="text.tertiary">
                         Wait! Have you checked the <b>FAQ section</b>? Most common IT and course access issues are resolved there.
                     </Typography>
                 </Paper>

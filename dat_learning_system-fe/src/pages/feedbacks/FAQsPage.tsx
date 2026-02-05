@@ -34,19 +34,23 @@ const SupportCenter: React.FC = () => {
                 </Stack>
 
                 {/* Modern Tab Navigation */}
-                <Tabs
-                    value={activeTab}
-                    onChange={(_, val) => setActiveTab(val)}
-                    sx={{
-                        mb: 4,
-                        position: 'sticky',
-                        top: '70px',
-                        '& .MuiTabs-indicator': { height: 3, borderRadius: '3px 3px 0 0' }
-                    }}
-                >
-                    <Tab icon={<Quiz sx={{ mr: 1 }} />} iconPosition="start" label="FAQs" sx={{ fontWeight: 700 }} />
-                    <Tab icon={<BugIcon sx={{ mr: 1 }} />} iconPosition="start" label="Report an Issue" sx={{ fontWeight: 700 }} />
-                </Tabs>
+                <Box sx={{
+                    bgcolor: 'background.default',
+                    mb: 4,
+                    position: 'sticky',
+                    top: '70px',
+                }}>
+                    <Tabs
+                        value={activeTab}
+                        onChange={(_, val) => setActiveTab(val)}
+                        sx={{
+                            '& .MuiTabs-indicator': { height: 3, borderRadius: '3px 3px 0 0', bgcolor: 'background.tertiary' }
+                        }}
+                    >
+                        <Tab icon={<Quiz sx={{ mr: 1 }} />} iconPosition="start" label="FAQs" sx={{ fontWeight: 700 }} />
+                        <Tab icon={<BugIcon sx={{ mr: 1 }} />} iconPosition="start" label="Report an Issue" sx={{ fontWeight: 700 }} />
+                    </Tabs>
+                </Box>
 
                 {activeTab === 0 ? (
                     <Box>

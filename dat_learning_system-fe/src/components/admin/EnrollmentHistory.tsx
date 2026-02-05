@@ -91,7 +91,7 @@ const EnrollmentHistory: React.FC = () => {
                                             icon={isApproved ? <CheckCircle /> : <Cancel />}
                                             sx={{ 
                                                 bgcolor: isApproved ? 'success.light' : 'error.light',
-                                                color: isApproved ? 'success.main' : 'error.main',
+                                                color: 'text.default',
                                                 fontWeight: 800
                                             }}
                                         />

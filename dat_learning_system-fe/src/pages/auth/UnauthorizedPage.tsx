@@ -39,9 +39,9 @@ export default function UnauthorizedPage({
             <Button
               variant="contained"
               startIcon={<LoginIcon />}
-              onClick={() => navigate("/signIn")}
+              onClick={() => navigate("/home")}
             >
-              Login
+              Go to Home
             </Button>
 
             <Button

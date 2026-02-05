@@ -35,7 +35,7 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
             Delete(lesson);
             await SaveChangesAsync();
 
-            // OPTIONAL: Re-gap the SortOrders so there are no holes (e.g., 1, 2, 4 becomes 1, 2, 3)
+            // Re-gap the SortOrders so there are no holes (e.g., 1, 2, 4 becomes 1, 2, 3)
             var remainingLessons = await _context.Lessons
                 .Where(l => l.CourseId == lesson.CourseId)
                 .OrderBy(l => l.SortOrder)

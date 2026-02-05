@@ -18,7 +18,7 @@ import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
 
 // Custom Components & Config
 import BasicSelect from "../common/Select";
-import UserProfileMenu from "../UserProfileMenu";
+import UserProfileMenu from "../user/UserProfileMenu";
 import { useAuth } from "../../hooks/useAuth";
 import { LEARNING_NAV, MANAGEMENT_NAV } from "../../config/Navigation";
 

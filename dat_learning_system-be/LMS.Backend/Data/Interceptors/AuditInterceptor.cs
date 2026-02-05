@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Text.Json;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using LMS.Backend.Data.Entities;
 using LMS.Backend.Data.Models;
 
@@ -19,8 +18,8 @@ public class AuditInterceptor : SaveChangesInterceptor
     }
 
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
-        DbContextEventData eventData, 
-        InterceptionResult<int> result, 
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
         if (eventData.Context == null) return base.SavingChangesAsync(eventData, result, cancellationToken);
@@ -34,7 +33,7 @@ public class AuditInterceptor : SaveChangesInterceptor
         var reason = _httpContextAccessor.HttpContext?.Items[AuditReasonKey]?.ToString() ?? "None";
 
         var auditEntries = OnBeforeSaveChanges(eventData.Context);
-        
+
         foreach (var entry in auditEntries)
         {
             eventData.Context.Set<AuditLog>().Add(new AuditLog
@@ -61,6 +60,7 @@ public class AuditInterceptor : SaveChangesInterceptor
 
         foreach (var entry in context.ChangeTracker.Entries())
         {
+            // Ignore the audit table itself and unchanged entries
             if (entry.Entity is AuditLog || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
                 continue;
 
@@ -69,24 +69,40 @@ public class AuditInterceptor : SaveChangesInterceptor
                 EntityName = entry.Entity.GetType().Name,
                 Action = entry.State.ToString(),
                 Timestamp = DateTime.UtcNow,
+                // Capture ID - works for Update/Delete. For Add, it might be 0 until Saved.
                 EntityId = entry.Properties.FirstOrDefault(p => p.Metadata.IsPrimaryKey())?.CurrentValue?.ToString() ?? "New"
             };
 
-            // Improved: Capture data for Added and Deleted states as well
-            if (entry.State == EntityState.Modified)
+            var changes = new Dictionary<string, object?>();
+            var originals = new Dictionary<string, object?>();
+
+            foreach (var property in entry.Properties)
             {
-                auditEntry.OldData = JsonSerializer.Serialize(entry.OriginalValues.ToObject());
-                auditEntry.NewData = JsonSerializer.Serialize(entry.CurrentValues.ToObject());
+                string propertyName = property.Metadata.Name;
+
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        changes[propertyName] = property.CurrentValue;
+                        break;
+
+                    case EntityState.Deleted:
+                        originals[propertyName] = property.OriginalValue;
+                        break;
+
+                    case EntityState.Modified:
+                        if (property.IsModified)
+                        {
+                            originals[propertyName] = property.OriginalValue;
+                            changes[propertyName] = property.CurrentValue;
+                        }
+                        break;
+                }
             }
-            else if (entry.State == EntityState.Added)
-            {
-                auditEntry.NewData = JsonSerializer.Serialize(entry.CurrentValues.ToObject());
-            }
-            else if (entry.State == EntityState.Deleted)
-            {
-                auditEntry.OldData = JsonSerializer.Serialize(entry.OriginalValues.ToObject());
-            }
-            
+
+            auditEntry.OldData = originals.Count > 0 ? JsonSerializer.Serialize(originals) : null;
+            auditEntry.NewData = changes.Count > 0 ? JsonSerializer.Serialize(changes) : null;
+
             auditEntries.Add(auditEntry);
         }
         return auditEntries;

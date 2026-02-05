@@ -33,9 +33,8 @@ import AdminDashboard from "../pages/admin/AdminDashboardPage";
 import EnrollmentApprovalPage from "../pages/admin/EnrollManagementPage";
 import GlobalAuditLog from "../pages/admin/AuditLogsPage";
 import NotificationPage from "../pages/notification/NotiPageWithMocks";
-
-/* Guards */
-// import { ProtectedRoute } from "./ProtectedRoute";
+import { ProtectedRoute } from "./ProtectedRoute";
+import EnrollmentGuard from "../components/auth/EnrollmentGuard";
 
 export const AppRouter = () => {
   const { user } = useAuth();
@@ -50,149 +49,159 @@ export const AppRouter = () => {
         <Route
           path="/home"
           element={
-            // <ProtectedRoute>
-            <Home />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/progress"
           element={
-            // <ProtectedRoute>
-            <ProgressPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <ProgressPage />
+            </ProtectedRoute>
           }
         />
 
-         <Route
+        <Route
           path="/notifications"
           element={
-            // <ProtectedRoute>
-            <NotificationPage/>
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <NotificationPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
-          path="/dashboard/flashcards"
+          path="/flashcards"
           element={
-            // <ProtectedRoute>
-            <FlashcardsPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <FlashcardsPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
-          path="/dashboard/translate"
+          path="/translate"
           element={
-            // <ProtectedRoute>
-            <TranslationPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <TranslationPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/schedule"
           element={
-            // <ProtectedRoute>
-            <SchedulePage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <SchedulePage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/lessons"
           element={
-            // <ProtectedRoute>
-            <LessonPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <LessonPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/classroom/:id"
           element={
-            // <ProtectedRoute>
-            <ClassroomPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <EnrollmentGuard>
+                <ClassroomPage />
+              </EnrollmentGuard>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/courses"
           element={
-            // <ProtectedRoute>
-            <CoursesPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <CoursesPage />
+            </ProtectedRoute>
           }
         />
-        
+
 
         {/* ---------- Quiz (semi-public) ---------- */}
-        <Route path="/quiz" element={<QuizSetupPage />} />
-        <Route path="/quiz/list" element={<QuizListPage />} />
+        <Route path="/quiz" element={
+          <ProtectedRoute>
+            <QuizSetupPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/quiz/list" element={
+          <ProtectedRoute>
+            <QuizListPage />
+          </ProtectedRoute>
+        } />
 
         <Route
           path="/quiz/start"
           element={
-            // <ProtectedRoute>
-            <QuizPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <QuizPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/quiz/result"
           element={
-            // <ProtectedRoute>
-            <QuizResultPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <QuizResultPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/quiz/review"
           element={
-            // <ProtectedRoute>
-            <QuizReviewPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <QuizReviewPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/ebooks"
           element={
-            // <ProtectedRoute>
-            <EBooksPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <EBooksPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/mock_test"
           element={
-            // <ProtectedRoute>
-            <MockTestPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <MockTestPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/dictionary"
           element={
-            // <ProtectedRoute>
-            <DictionaryPage />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <DictionaryPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/help"
           element={
-            // <ProtectedRoute>
-            <SupportCenter />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <SupportCenter />
+            </ProtectedRoute>
           }
         />
 
@@ -212,45 +221,45 @@ export const AppRouter = () => {
         <Route
           path="admin/dashboard"
           element={
-            // <ProtectedRoute>
-            <AdminDashboard />
-            // </ProtectedRoute>
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="admin/user_management"
           element={
-            // <ProtectedRoute>
-            <UserManagementPage />
-            // </ProtectedRoute>
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+              <UserManagementPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="admin/org_units"
           element={
-            // <ProtectedRoute>
-            <OrgPage />
-            // </ProtectedRoute>
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+              <OrgPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="admin/enrollments"
           element={
-            // <ProtectedRoute>
-            <EnrollmentApprovalPage />
-            // </ProtectedRoute>
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+              <EnrollmentApprovalPage />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="admin/logs"
           element={
-            // <ProtectedRoute>
-            <GlobalAuditLog />
-            // </ProtectedRoute>
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+              <GlobalAuditLog />
+            </ProtectedRoute>
           }
         />
       </Routes>

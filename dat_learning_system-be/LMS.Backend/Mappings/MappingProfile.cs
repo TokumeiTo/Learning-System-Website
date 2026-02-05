@@ -9,6 +9,7 @@ using LMS.Backend.DTOs.Lesson;
 using LMS.Backend.DTOs.Enrollment;
 using LMS.Backend.DTOs.Topic;
 using LMS.Backend.DTOs.Audit;
+using LMS.Backend.Common;
 
 
 namespace LMS.Backend.Helpers;
@@ -17,12 +18,22 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        // Existing User mapping
         CreateMap<ApplicationUser, UserResponseDto>()
-            // Map the Enum to String automatically
-            .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position.ToString()))
-            // Map the Navigation Property Name
-            .ForMember(dest => dest.OrgUnitName, opt => opt.MapFrom(src => src.OrgUnit != null ? src.OrgUnit.Name : null));
+            // Map Entity.Position (Enum) -> DTO.PositionName (String)
+            .ForMember(dest => dest.PositionName, opt => opt.MapFrom(src => src.Position.ToString()))
+            // Map Entity.Position (Enum) -> DTO.Position (Integer)
+            .ForMember(dest => dest.Position, opt => opt.MapFrom(src => (int)src.Position))
+            // Explicitly map CompanyCode
+            .ForMember(dest => dest.CompanyCode, opt => opt.MapFrom(src => src.CompanyCode))
+            // Handle OrgUnit with null-safety
+            .ForMember(dest => dest.OrgUnitName, opt => opt.MapFrom(src =>
+                src.OrgUnit != null ? src.OrgUnit.Name : "N/A"))
+            .ForMember(dest => dest.OrgUnitId, opt => opt.MapFrom(src => src.OrgUnitId));
+            
+        // Mapping Request DTO -> Entity (Used in UpdateUserAsync)
+        CreateMap<UserUpdateRequestDto, ApplicationUser>()
+            .ForMember(dest => dest.Position, opt => opt.Ignore()) // Handled manually in service
+            .ForMember(dest => dest.OrgUnitId, opt => opt.MapFrom(src => src.OrgUnitId));
 
         // Registration mapping
         CreateMap<RegisterRequestDto, ApplicationUser>()
@@ -46,9 +57,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.Ignore())
             .ForMember(dest => dest.Badge, opt => opt.Ignore())
             .ForMember(dest => dest.Thumbnail, opt => opt.Ignore());
-            CreateMap<Course, CourseDetailDto>()
-            .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src.Badge.ToString()))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+        CreateMap<Course, CourseDetailDto>()
+        .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src.Badge.ToString()))
+        .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
         CreateMap<Topic, TopicDto>();
         CreateMap<Lesson, LessonDto>();
@@ -81,9 +92,8 @@ public class MappingProfile : Profile
 
         // Audit
         CreateMap<AuditLog, GlobalAuditLogDto>()
-            .ForMember(dest => dest.PerformedBy, 
-                    opt => opt.MapFrom(src => src.AdminUser != null 
-                                        ? $"{src.AdminUser.FullName}" 
-                                        : src.PerformedBy));
+            .ForMember(dest => dest.PerformedBy, opt => opt.MapFrom(src => src.AdminUser != null
+                    ? $"{src.AdminUser.Email}"
+                    : src.PerformedBy));
     }
 }

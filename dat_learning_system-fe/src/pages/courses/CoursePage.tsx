@@ -16,6 +16,7 @@ import { getCourses, createCourse } from '../../api/course.api';
 
 import CreateCourseCard from '../../components/course/CreateCourseCard';
 import CourseCard from '../../components/course/CourseCard';
+import { useAuth } from '../../hooks/useAuth';
 
 const CoursesPage: React.FC = () => {
     const theme = useTheme();
@@ -24,6 +25,9 @@ const CoursesPage: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const { user } = useAuth();
+    // Check against DB IDs for maximum accuracy
+    const canManageCourses = user?.position === "Admin" || user?.position === "SuperAdmin";
 
     const fetchCourses = async () => {
         try {
@@ -89,7 +93,7 @@ const CoursesPage: React.FC = () => {
                         </Typography>
                     </Stack>
 
-                    {!isCreating && (
+                    {canManageCourses && !isCreating && (
                         <Button
                             variant="contained"
                             startIcon={<Add />}

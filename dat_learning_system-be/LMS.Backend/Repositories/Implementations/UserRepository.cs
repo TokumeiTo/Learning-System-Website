@@ -12,7 +12,14 @@ public class UserRepository : IUserRepository
     {
         _context = context;
     }
-    
+
+    public async Task<ApplicationUser?> GetByIdAsync(string id)
+    {
+        return await _context.Users
+            .Include(u => u.OrgUnit)
+            .FirstOrDefaultAsync(u => u.Id == id);
+    }
+
     public async Task<ApplicationUser?> GetByCompanyCodeAsync(string companyCode)
     {
         return await _context.Users
@@ -23,6 +30,11 @@ public class UserRepository : IUserRepository
     public async Task<bool> UpdateAsync(ApplicationUser user)
     {
         _context.Users.Update(user);
-        return await _context.SaveChangesAsync() >0;
+        return await _context.SaveChangesAsync() > 0;
+    }
+    public async Task<bool> DeleteAsync(ApplicationUser user)
+    {
+        _context.Users.Remove(user);
+        return await _context.SaveChangesAsync() > 0;
     }
 }

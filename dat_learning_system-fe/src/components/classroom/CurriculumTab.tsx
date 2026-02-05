@@ -79,7 +79,7 @@ const CurriculumTab = ({ data, setData, currentLesson, setCurrentLesson, isEditM
                 courseId: data.courseId,
                 title,
                 sortOrder: nextOrder,
-                time: time.trim() || "5:00"
+                time: time.trim() || "-:--"
             });
 
             setData({ ...data, lessons: [...data.lessons, newLesson] });
