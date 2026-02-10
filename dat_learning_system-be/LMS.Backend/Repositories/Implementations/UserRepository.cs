@@ -19,6 +19,15 @@ public class UserRepository : IUserRepository
             .Include(u => u.OrgUnit)
             .FirstOrDefaultAsync(u => u.Id == id);
     }
+    public async Task<List<string>> GetAdminUserIdsAsync()
+    {
+        // Assuming Position is your Enum and 1=Admin, 2=SuperAdmin 
+        // Adjust based on your actual Enum names
+        return await _context.Users
+            .Where(u => u.Position == Common.Position.Admin || u.Position == Common.Position.SuperAdmin)
+            .Select(u => u.Id)
+            .ToListAsync();
+    }
 
     public async Task<ApplicationUser?> GetByCompanyCodeAsync(string companyCode)
     {

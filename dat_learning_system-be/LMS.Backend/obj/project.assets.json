@@ -4338,11 +4338,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
+      "projectUniqueName": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
       "projectName": "LMS.Backend",
-      "projectPath": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
+      "projectPath": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
       "packagesPath": "C:\\Users\\25-00372\\.nuget\\packages\\",
-      "outputPath": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\obj\\",
+      "outputPath": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\25-00372\\AppData\\Roaming\\NuGet\\NuGet.Config"

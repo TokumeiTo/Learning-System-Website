@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "uDx1BNwsoUk=",
+  "dgSpecHash": "GLXkugiVvSA=",
   "success": true,
-  "projectFilePath": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
+  "projectFilePath": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\25-00372\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\25-00372\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
