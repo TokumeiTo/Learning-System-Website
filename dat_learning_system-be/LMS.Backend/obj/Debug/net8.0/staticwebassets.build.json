@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "4Pyuh5bsUd9weVJ4+d786Tg9H0E7J3GkESJ9062Z3Xc=",
+  "Hash": "UG9Ea1aBDUX0fuvOtSdDozZtg/ZJe21qiChjmXh4SoU=",
   "Source": "LMS.Backend",
   "BasePath": "_content/LMS.Backend",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "LMS.Backend\\wwwroot",
       "Source": "LMS.Backend",
-      "ContentRoot": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
+      "ContentRoot": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
       "BasePath": "_content/LMS.Backend",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\2aa0a8f7-f8f0-4889-a0c6-655d5f4531eb.png",
+      "Identity": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\2aa0a8f7-f8f0-4889-a0c6-655d5f4531eb.png",
       "SourceId": "LMS.Backend",
       "SourceType": "Discovered",
-      "ContentRoot": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
+      "ContentRoot": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
       "BasePath": "_content/LMS.Backend",
       "RelativePath": "uploads/2aa0a8f7-f8f0-4889-a0c6-655d5f4531eb.png",
       "AssetKind": "All",
@@ -36,10 +36,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\2aa0a8f7-f8f0-4889-a0c6-655d5f4531eb.png"
     },
     {
-      "Identity": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\3c6e27be-f835-4e20-8b6d-96349dfb23d7.png",
+      "Identity": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\3c6e27be-f835-4e20-8b6d-96349dfb23d7.png",
       "SourceId": "LMS.Backend",
       "SourceType": "Discovered",
-      "ContentRoot": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
+      "ContentRoot": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
       "BasePath": "_content/LMS.Backend",
       "RelativePath": "uploads/3c6e27be-f835-4e20-8b6d-96349dfb23d7.png",
       "AssetKind": "All",
@@ -55,10 +55,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\3c6e27be-f835-4e20-8b6d-96349dfb23d7.png"
     },
     {
-      "Identity": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\57e4d0c6-8c8c-4182-bdbd-5dc217b86022.png",
+      "Identity": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\57e4d0c6-8c8c-4182-bdbd-5dc217b86022.png",
       "SourceId": "LMS.Backend",
       "SourceType": "Discovered",
-      "ContentRoot": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
+      "ContentRoot": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
       "BasePath": "_content/LMS.Backend",
       "RelativePath": "uploads/57e4d0c6-8c8c-4182-bdbd-5dc217b86022.png",
       "AssetKind": "All",

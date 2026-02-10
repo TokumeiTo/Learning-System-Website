@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILessonRepository, LessonRepository>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<IAuditRepository, AuditRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
@@ -30,6 +31,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<ITranslationService, TranslationService>();
+        services.AddScoped<INotificationService, NotificationService>();
 
         // Helpers
         services.AddSingleton<JwtHelper>();

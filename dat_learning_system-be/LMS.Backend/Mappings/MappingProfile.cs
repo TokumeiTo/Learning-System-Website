@@ -9,7 +9,7 @@ using LMS.Backend.DTOs.Lesson;
 using LMS.Backend.DTOs.Enrollment;
 using LMS.Backend.DTOs.Topic;
 using LMS.Backend.DTOs.Audit;
-using LMS.Backend.Common;
+using LMS.Backend.DTOs.Notification;
 
 
 namespace LMS.Backend.Helpers;
@@ -29,7 +29,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.OrgUnitName, opt => opt.MapFrom(src =>
                 src.OrgUnit != null ? src.OrgUnit.Name : "N/A"))
             .ForMember(dest => dest.OrgUnitId, opt => opt.MapFrom(src => src.OrgUnitId));
-            
+
         // Mapping Request DTO -> Entity (Used in UpdateUserAsync)
         CreateMap<UserUpdateRequestDto, ApplicationUser>()
             .ForMember(dest => dest.Position, opt => opt.Ignore()) // Handled manually in service
@@ -93,7 +93,16 @@ public class MappingProfile : Profile
         // Audit
         CreateMap<AuditLog, GlobalAuditLogDto>()
             .ForMember(dest => dest.PerformedBy, opt => opt.MapFrom(src => src.AdminUser != null
-                    ? $"{src.AdminUser.Email}"
-                    : src.PerformedBy));
+                ? $"{src.AdminUser.Email}"
+                : src.PerformedBy));
+
+        // Notification
+        CreateMap<Notification, NotificationResponseDto>()
+            .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src =>
+                src.Sender != null ? src.Sender.FullName : "System"));
+        CreateMap<CreateNotificationDto, Notification>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
+            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+            .ForMember(dest => dest.IsRead, opt => opt.MapFrom(_ => false));
     }
 }
