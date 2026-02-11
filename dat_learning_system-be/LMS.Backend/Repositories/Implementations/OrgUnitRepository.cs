@@ -26,19 +26,19 @@ public class OrgUnitRepository : IOrgUnitRepository
 
     public async Task<IEnumerable<OrgUnit>> GetAllTeams()
     {
-        return await _context.OrgUnits.Where(u=>u.Level == OrgLevel.Team).ToListAsync();
+        return await _context.OrgUnits.Where(u => u.Level == OrgLevel.Team).ToListAsync();
     }
     public async Task<IEnumerable<OrgUnit>> GetAllDivisions()
     {
-        return await _context.OrgUnits.Where(u=>u.Level == OrgLevel.Division).ToListAsync();
+        return await _context.OrgUnits.Where(u => u.Level == OrgLevel.Division).ToListAsync();
     }
     public async Task<IEnumerable<OrgUnit>> GetAllDepartments()
     {
-        return await _context.OrgUnits.Where(u=>u.Level == OrgLevel.Department).ToListAsync();
+        return await _context.OrgUnits.Where(u => u.Level == OrgLevel.Department).ToListAsync();
     }
     public async Task<IEnumerable<OrgUnit>> GetAllSections()
     {
-        return await _context.OrgUnits.Where(u=>u.Level == OrgLevel.Section).ToListAsync();
+        return await _context.OrgUnits.Where(u => u.Level == OrgLevel.Section).ToListAsync();
     }
 
     public async Task<OrgUnit?> GetByIdAsync(int id)
@@ -51,5 +51,29 @@ public class OrgUnitRepository : IOrgUnitRepository
         return await _context.OrgUnits
             .Where(u => u.ParentId == parentId)
             .Select(u => u.Id).ToListAsync();
+    }
+
+    public async Task<List<int>> GetAllRecursiveChildIds(int parentId)
+    {
+        // 1. Get all Units (minimal data) to build the tree in memory
+        var allUnits = await _context.OrgUnits
+            .Select(u => new { u.Id, u.ParentId })
+            .ToListAsync();
+
+        var resultIds = new List<int> { parentId };
+
+        // 2. Recursive local function
+        void Traverse(int pid)
+        {
+            var children = allUnits.Where(u => u.ParentId == pid).Select(u => u.Id).ToList();
+            foreach (var id in children)
+            {
+                resultIds.Add(id);
+                Traverse(id); // Go deeper
+            }
+        }
+
+        Traverse(parentId);
+        return resultIds;
     }
 }

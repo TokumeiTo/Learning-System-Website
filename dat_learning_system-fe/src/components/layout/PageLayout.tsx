@@ -37,7 +37,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
         display: "flex",
         flexDirection: 'row',
         minHeight: "100vh",
-        bgcolor: "background.default",
+        bgcolor: "background.gradient",
       }}
     >
       {/* Sidebar */}
@@ -52,7 +52,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
           component="main"
           sx={{
             flexGrow: 1,
-            bgcolor: "background.paper",
+            bgcolor: "background.gradient",
             paddingTop: '65px',
             position: "relative",
             display: "flex",

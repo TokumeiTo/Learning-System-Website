@@ -12,4 +12,5 @@ public interface IOrgUnitRepository
     Task<OrgUnit?> GetByIdAsync(int id);
     Task<bool> AddAsync(OrgUnit unit);
     Task<List<int>> GetChildUnitIdsAsync(int parentId);
+    Task<List<int>> GetAllRecursiveChildIds(int parentId);
 }

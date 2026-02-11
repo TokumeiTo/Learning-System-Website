@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-    Box, Button, TextField, MenuItem, Paper, Typography, Stack, CircularProgress
+    Box, Button, TextField, MenuItem, Paper, Typography, Stack, CircularProgress,
+    Alert, AlertTitle, Checkbox, FormControlLabel, Divider,
+    useTheme
 } from "@mui/material";
+import { InfoOutlined, WarningAmberRounded } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
+import { ButtonClickLoader } from "../feedback/ButtonClickLoader";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { POSITIONS } from "../../utils/positions";
@@ -29,8 +33,10 @@ interface UserAddFormProps {
 const UserAddForm: React.FC<UserAddFormProps> = ({ onSuccess, onCancel, loading }) => {
     const [orgUnits, setOrgUnits] = useState<{ id: number; name: string }[]>([]);
     const [fetchingUnits, setFetchingUnits] = useState(false);
+    const [isConfirmed, setIsConfirmed] = useState(false);
 
-    const { control, handleSubmit, watch, formState: { errors } } = useForm<RegisterRequest>({
+    const theme = useTheme();
+    const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<RegisterRequest>({
         resolver: yupResolver(schema),
         defaultValues: {
             fullName: "",
@@ -55,69 +61,100 @@ const UserAddForm: React.FC<UserAddFormProps> = ({ onSuccess, onCancel, loading 
         const fetchUnits = async () => {
             setFetchingUnits(true);
             try {
+                const posId = Number(selectedPosition);
                 let data = [];
-                if (selectedPosition === 1) data = await getDivisions();
-                else if (selectedPosition === 2) data = await getDepartments();
-                else if (selectedPosition === 3) data = await getSections();
-                else data = await getTeams();
 
-                setOrgUnits(normalizeOrgData(data));
+                if (posId === 6) {
+                    // 1. Fetch specifically for Management
+                    const divisions = await getDivisions();
+                    const normalized = normalizeOrgData(divisions);
+                    setOrgUnits(normalized);
+
+                    // 2. Auto-find and Force Value
+                    const mgmtDiv = normalized.find(d =>
+                        d.name.match(/management/i) // Flexible search for "Management"
+                    );
+                    if (mgmtDiv) {
+                        setValue("orgUnitId", mgmtDiv.id);
+                    }
+                } else {
+                    // 3. Normal Manual Fetching
+                    if (posId === 1) data = await getDivisions();
+                    else if (posId === 2) data = await getDepartments();
+                    else if (posId === 3) data = await getSections();
+                    else data = await getTeams();
+
+                    setOrgUnits(normalizeOrgData(data));
+
+                    // 4. Clear value when switching FROM position 6 back to manual
+                    // This ensures the user must pick a new valid unit.
+                    setValue("orgUnitId", "" as any);
+                }
             } finally {
                 setFetchingUnits(false);
             }
         };
         fetchUnits();
-    }, [selectedPosition]);
+    }, [selectedPosition, setValue]);
 
     return (
-        <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid', borderColor: 'divider', maxWidth: 800, mx: 'auto' }}>
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 700 }}>Registration Details</Typography>
+        <Paper
+            elevation={0}
+            sx={{
+                p: { xs: 3, md: 5 },
+                borderRadius: 8,
+                border: '1px solid rgba(0, 231, 255, 0.2)',
+                maxWidth: 850,
+                mx: 'auto',
+                position: 'relative',
+                overflow: 'hidden',
+                background: theme.palette.background.gradient,
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.05)'
+            }}
+        >
+            {loading && <ButtonClickLoader kanji="登" message="登録中..." />}
+
+            <Box sx={{ mb: 4 }}>
+                <Typography variant="h5" sx={{
+                    fontWeight: 900,
+                    color: 'text.primary',
+                }}>
+                    Account Registration
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    Register a new member to the learning management system.
+                </Typography>
+            </Box>
 
             <form onSubmit={handleSubmit(onSuccess)} noValidate>
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
-
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
                     <Controller name="fullName" control={control} render={({ field }) => (
-                        <TextField {...field} label="Full Name" fullWidth error={!!errors.fullName} helperText={errors.fullName?.message} />
+                        <TextField {...field} label="Full Name" fullWidth error={!!errors.fullName} helperText={errors.fullName?.message} sx={{ bgcolor: 'background.paper', borderRadius: 5 }} />
                     )} />
 
                     <Controller name="email" control={control} render={({ field }) => (
-                        <TextField {...field} label="Email Address" fullWidth error={!!errors.email} helperText={errors.email?.message} />
-                    )} />
-
-                    <Controller name="password" control={control} render={({ field }) => (
-                        <TextField {...field} label="Temporary Password" type="password" fullWidth error={!!errors.password} helperText={errors.password?.message} />
+                        <TextField {...field} label="Email Address" fullWidth error={!!errors.email} helperText={errors.email?.message} sx={{ bgcolor: 'background.paper', borderRadius: 5 }} />
                     )} />
 
                     <Controller name="companyCode" control={control} render={({ field }) => (
-                        <TextField {...field} label="Company Code" fullWidth error={!!errors.companyCode} helperText={errors.companyCode?.message} />
+                        <TextField {...field} label="Company Code" fullWidth error={!!errors.companyCode} helperText={errors.companyCode?.message} sx={{ bgcolor: 'background.paper', borderRadius: 5 }} />
                     )} />
 
-                    {/* Position / Role Selection */}
-                    <Controller
-                        name="position"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                select
-                                label="Role / Position"
-                                fullWidth
-                                // If field.value is undefined/null, use "" to satisfy MUI
-                                value={field.value ?? ""}
-                                error={!!errors.position}
-                                helperText={errors.position?.message}
-                                onChange={(e) => field.onChange(Number(e.target.value))}
-                            >
-                                {POSITIONS.map((p) => (
-                                    <MenuItem key={p.value} value={p.value}>
-                                        {p.label}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        )}
-                    />
+                    <Controller name="password" control={control} render={({ field }) => (
+                        <TextField {...field} label="Temporary Password" type="password" fullWidth error={!!errors.password} helperText={errors.password?.message} sx={{ bgcolor: 'background.paper', borderRadius: 5 }} />
+                    )} />
 
-                    {/* Organization Unit Selection */}
+                    <Controller name="position" control={control} render={({ field }) => (
+                        <TextField
+                            {...field} select label="Role / Position" fullWidth
+                            value={field.value ?? ""}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            sx={{ bgcolor: 'background.paper', borderRadius: 5 }}
+                        >
+                            {POSITIONS.map((p) => <MenuItem key={p.value} value={p.value}>{p.label}</MenuItem>)}
+                        </TextField>
+                    )} />
+
                     <Controller
                         name="orgUnitId"
                         control={control}
@@ -125,17 +162,16 @@ const UserAddForm: React.FC<UserAddFormProps> = ({ onSuccess, onCancel, loading 
                             <TextField
                                 {...field}
                                 select
-                                label="Assign to Unit"
+                                label={selectedPosition === 6 ? "Assigned Unit (Fixed)" : "Assign to Unit"}
                                 fullWidth
-                                // If field.value is undefined/null, use "" to satisfy MUI
+                                // Lock only for position 6
+                                disabled={!selectedPosition || fetchingUnits || selectedPosition === 6}
                                 value={field.value ?? ""}
-                                disabled={!selectedPosition || fetchingUnits}
-                                error={!!errors.orgUnitId}
-                                helperText={errors.orgUnitId?.message || (!selectedPosition && "Select position first")}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                sx={{ bgcolor: 'background.paper', borderRadius: 5 }}
                                 InputProps={{
                                     endAdornment: fetchingUnits ? <CircularProgress size={20} sx={{ mr: 3 }} /> : null
                                 }}
-                                onChange={(e) => field.onChange(Number(e.target.value))}
                             >
                                 {orgUnits.length > 0 ? (
                                     orgUnits.map((unit) => (
@@ -145,7 +181,7 @@ const UserAddForm: React.FC<UserAddFormProps> = ({ onSuccess, onCancel, loading 
                                     ))
                                 ) : (
                                     <MenuItem disabled value="">
-                                        {fetchingUnits ? "Loading..." : "No units available"}
+                                        {fetchingUnits ? "Loading..." : "No units found"}
                                     </MenuItem>
                                 )}
                             </TextField>
@@ -153,10 +189,45 @@ const UserAddForm: React.FC<UserAddFormProps> = ({ onSuccess, onCancel, loading 
                     />
                 </Box>
 
+                <Alert
+                    severity="warning"
+                    icon={<WarningAmberRounded />}
+                    sx={{
+                        mt: 4, borderRadius: 3, border: '1px solid #ffe16a',
+                        background: 'background.paper',
+                        backdropFilter: 'blur(4px)'
+                    }}
+                >
+                    <AlertTitle sx={{ fontWeight: 800 }}>Important Audit Notice</AlertTitle>
+                    <Typography variant="caption" display="block">
+                        • Full Name and Position can be adjusted in the Admin panel later.
+                    </Typography>
+                    <Typography variant="body2" color="error.main" sx={{ fontWeight: 800, mt: 1 }}>
+                        • Company Code is permanent and cannot be modified after registration.
+                    </Typography>
+                </Alert>
+
+                <Box sx={{ mt: 3, p: 2, bgcolor: 'background.default', borderRadius: 3, border: `1px dashed ${theme.palette.text.tertiary}` }}>
+                    <FormControlLabel
+                        control={<Checkbox checked={isConfirmed} onChange={(e) => setIsConfirmed(e.target.checked)} sx={{ color: theme.palette.text.tertiary }} />}
+                        label={<Typography variant="body2" sx={{ fontWeight: 500 }}>I confirm all data (especially Company Code) is correct.</Typography>}
+                    />
+                </Box>
+
                 <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 4 }}>
-                    <Button onClick={onCancel} color="inherit" disabled={loading}>Cancel</Button>
-                    <Button type="submit" variant="contained" disabled={loading} sx={{ px: 4, borderRadius: 2 }}>
-                        {loading ? "Registering..." : "Confirm Registration"}
+                    <Button onClick={onCancel} color="inherit" disabled={loading} sx={{ fontWeight: 600 }}>Cancel</Button>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={loading || !isConfirmed}
+                        sx={{
+                            px: 5, py: 1.5, borderRadius: 10, fontWeight: 800,
+                            background: isConfirmed ? 'linear-gradient(90deg, #00b4cc, #00e7ff)' : '#ccc',
+                            boxShadow: isConfirmed ? '0 10px 20px rgba(0, 231, 255, 0.3)' : 'none',
+                            '&:hover': { background: 'linear-gradient(90deg, #008ba3, #00d4eb)' }
+                        }}
+                    >
+                        Confirm Registration
                     </Button>
                 </Stack>
             </form>

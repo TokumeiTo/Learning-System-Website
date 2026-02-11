@@ -71,9 +71,7 @@ const CoursesPage: React.FC = () => {
         <PageLayout>
             <Box sx={{
                 p: { xs: 2, md: 6 },
-                bgcolor: 'background.default',
                 minHeight: '100vh',
-                transition: 'background-color 0.3s'
             }}>
 
                 {/* Header Section */}

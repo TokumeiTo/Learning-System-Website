@@ -230,7 +230,7 @@ export const AppRouter = () => {
         <Route
           path="admin/user_management"
           element={
-            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin", "ProjectManager"]}>
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin", "ProjectManager", "DivHead"]}>
               <UserManagementPage />
             </ProtectedRoute>
           }

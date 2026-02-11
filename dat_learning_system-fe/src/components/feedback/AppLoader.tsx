@@ -40,8 +40,8 @@ export default function AppLoader({
   return (
     <Box
       sx={{
-        minHeight: fullscreen ? "100vh" : "60vh",
-        py: fullscreen ? 0 : 6,
+        minHeight: "calc(100vh - 165px)",
+        mt: '-100px',
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

@@ -38,7 +38,7 @@ export default function ProfessionalLMSSchedule() {
 
     return (
         <PageLayout>
-            <Box sx={{ bgcolor: '#F8FAFC', minHeight: '100vh', p: { xs: 2, md: 6 } }}>
+            <Box sx={{ minHeight: '100vh', p: { xs: 2, md: 6 } }}>
                 <Box sx={{ maxWidth: '1200px', margin: '0 auto' }}>
 
                     {/* --- Header: Simple & Bold --- */}
@@ -47,7 +47,7 @@ export default function ProfessionalLMSSchedule() {
                             <Typography variant="overline" sx={{ letterSpacing: 2, fontWeight: 700, color: 'text.disabled' }}>
                                 STUDENT PORTAL
                             </Typography>
-                            <Typography variant="h3" sx={{ fontWeight: 800, color: '#1e293b', mt: 1 }}>
+                            <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', mt: 1 }}>
                                 My Schedule
                             </Typography>
                         </Box>
@@ -55,7 +55,7 @@ export default function ProfessionalLMSSchedule() {
                             variant="contained"
                             disableElevation
                             startIcon={<CalendarMonth />}
-                            sx={{ borderRadius: 2, px: 3, py: 1, bgcolor: '#1e293b', '&:hover': { bgcolor: '#334155' } }}
+                            sx={{ borderRadius: 2, px: 3, py: 1, bgcolor: 'background.primary', '&:hover': { bgcolor: 'text.tertiary' } }}
                         >
                             Sync to Calendar
                         </Button>
