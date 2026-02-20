@@ -25,11 +25,11 @@ interface EBook {
 }
 
 const EBOOKS_DATA: EBook[] = [
-    { id: 1, title: 'Clean Code: A Handbook of Agile Software', author: 'Robert C. Martin', category: 'IT', progress: 45, rating: 4.9, image: 'https://m.media-amazon.com/images/I/41xShlnTZTL._SX376_BO1,204,203,200_.jpg' },
-    { id: 2, title: 'Minna no Nihongo - Elementary I', author: '3A Network', category: 'Japanese', progress: 80, rating: 4.8, image: 'https://m.media-amazon.com/images/I/51p0vU9E2SL._SX352_BO1,204,203,200_.jpg' },
-    { id: 3, title: 'Advanced English Grammar in Use', author: 'Raymond Murphy', category: 'English', progress: 10, rating: 4.7, image: 'https://m.media-amazon.com/images/I/51Z9y6L-NfL._SX384_BO1,204,203,200_.jpg' },
-    { id: 4, title: 'Designing Data-Intensive Applications', author: 'Martin Kleppmann', category: 'IT', progress: 0, rating: 5.0, image: 'https://m.media-amazon.com/images/I/51OO7ar8m6L._SX379_BO1,204,203,200_.jpg' },
-    { id: 5, title: 'Business Etiquette in Japan', author: 'S.R. Walker', category: 'Japanese', progress: 0, rating: 4.5, image: 'https://m.media-amazon.com/images/I/41O2XU-M-OL._SX322_BO1,204,203,200_.jpg' },
+    { id: 1, title: 'Clean Code: A Handbook of Agile Software', author: 'Robert C. Martin', category: 'IT', progress: 45, rating: 4.9, image: '#' },
+    { id: 2, title: 'Minna no Nihongo - Elementary I', author: '3A Network', category: 'Japanese', progress: 80, rating: 4.8, image: '#' },
+    { id: 3, title: 'Advanced English Grammar in Use', author: 'Raymond Murphy', category: 'English', progress: 10, rating: 4.7, image: '#' },
+    { id: 4, title: 'Designing Data-Intensive Applications', author: 'Martin Kleppmann', category: 'IT', progress: 0, rating: 5.0, image: '#' },
+    { id: 5, title: 'Business Etiquette in Japan', author: 'S.R. Walker', category: 'Japanese', progress: 0, rating: 4.5, image: '#' },
 ];
 
 const EBooksPage: React.FC = () => {
