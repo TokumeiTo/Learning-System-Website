@@ -17,30 +17,35 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-/////////////////////Builder Created/////////////////////////////////
+///////////////////// 1. SERVICES REGISTRATION /////////////////////////////////
 
 builder.Services.AddHttpClient();
-/* Controllers */
+builder.Services.AddHttpContextAccessor(); // Required for AuditInterceptor to see the User
+
+/* Application services (Helpers, Interceptors, etc.) */
+// Grouping registrations so "Tools" are defined first
+builder.Services.AddSingleton<JwtHelper>();
+builder.Services.AddSingleton<AuditInterceptor>(); 
+builder.Services.AddApplicationServices();
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
+/* Controllers & Validation */
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        // FIXES THE "0" ISSUE:
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-
-        // PREVENTS INFINITE LOOP CRASH:
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
+
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
-// Swagger and Open Api
+/* Swagger and Open Api */
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "LMS API", Version = "v1" });
-
-    // 1. Define the Security Scheme
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -48,35 +53,29 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below."
+        Description = "JWT Authorization header using the Bearer scheme."
     });
-
-    // 2. Make Swagger use that scheme
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference // Fixed name here
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
             new string[] {}
         }
     });
 });
 
-/* Application services (Helpers, Services, etc.) */
-// EFCore Postgre SQL
+///////////////////// 2. DATABASE & IDENTITY /////////////////////////////////
+
+// EFCore Postgre SQL - Activated after Interceptor is registered
 builder.Services.AddDbContext<AppDbContext>((sp, options) =>
 {
     var auditInterceptor = sp.GetRequiredService<AuditInterceptor>();
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
         npgsqlOptions =>
         {
-            // This handles the "transient failure" by retrying the connection
             npgsqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 5,
                 maxRetryDelay: TimeSpan.FromSeconds(30),
@@ -85,38 +84,34 @@ builder.Services.AddDbContext<AppDbContext>((sp, options) =>
     .AddInterceptors(auditInterceptor);
 });
 
-// Hash Password
+// Identity Configuration
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    options.Password.RequireDigit = false; // Set to true for production
+    options.Password.RequireDigit = false;
     options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
-
-    // Since we login with CompanyCode, we ensure the UserName is the unique key
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-";
+    
+    // Explicit Lockout Settings
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    options.Lockout.MaxFailedAccessAttempts = 5;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-// Singletons
-builder.Services.AddSingleton<JwtHelper>();
-builder.Services.AddSingleton<AuditInterceptor>();
-// Helper Services
-builder.Services.AddApplicationServices();
-builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
-// CORS
+///////////////////// 3. SECURITY & CORS /////////////////////////////////
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp",
-    policy =>
+    options.AddPolicy("AllowReactApp", policy =>
     {
         policy.WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
 });
-// Auth/JWT Bearer
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -137,41 +132,23 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-////////////////////Controller and Services added//////////////////////////////////
+///////////////////// 4. MIDDLEWARE PIPELINE /////////////////////////////////
 
-// Build Application
 var app = builder.Build();
 
-/////////////////////Built Application/////////////////////////////////
-
-/* Middleware Pipeline */
-
-// Exception Middleware
 app.UseMiddleware<ExceptionMiddleware>();
-
 app.UseStaticFiles();
-
 app.UseRouting();
 
-// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Security and HTTP
-// app.UseHttpsRedirection();
 app.UseCors("AllowReactApp");
-
-// Auth
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Map endpoints
 app.MapControllers();
 
-//////////////////Middleware done////////////////////////////////////
-
-/* Run App */
 app.Run();
