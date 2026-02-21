@@ -47,4 +47,10 @@ public class EnrollmentRepository : BaseRepository<Enrollment>, IEnrollmentRepos
             .AsNoTracking()
             .ToListAsync();
     }
+    public async Task<Enrollment?> GetWithCourseAsync(Guid id)
+    {
+        return await _dbSet
+            .Include(e => e.Course)
+            .FirstOrDefaultAsync(e => e.Id == id);
+    }
 }

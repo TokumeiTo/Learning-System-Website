@@ -1,16 +1,24 @@
 {
   "Files": [
     {
-      "Id": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\2aa0a8f7-f8f0-4889-a0c6-655d5f4531eb.png",
-      "PackagePath": "staticwebassets\\uploads\\2aa0a8f7-f8f0-4889-a0c6-655d5f4531eb.png"
-    },
-    {
       "Id": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\3c6e27be-f835-4e20-8b6d-96349dfb23d7.png",
       "PackagePath": "staticwebassets\\uploads\\3c6e27be-f835-4e20-8b6d-96349dfb23d7.png"
     },
     {
+      "Id": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\4775f214-b355-4160-bc77-f2c4e005ac1c.jfif",
+      "PackagePath": "staticwebassets\\uploads\\4775f214-b355-4160-bc77-f2c4e005ac1c.jfif"
+    },
+    {
       "Id": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\57e4d0c6-8c8c-4182-bdbd-5dc217b86022.png",
       "PackagePath": "staticwebassets\\uploads\\57e4d0c6-8c8c-4182-bdbd-5dc217b86022.png"
+    },
+    {
+      "Id": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\77ce37df-5c4b-47c9-ab1b-db5849c6daf4.jfif",
+      "PackagePath": "staticwebassets\\uploads\\77ce37df-5c4b-47c9-ab1b-db5849c6daf4.jfif"
+    },
+    {
+      "Id": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\No_Thumbnail.svg",
+      "PackagePath": "staticwebassets\\uploads\\No_Thumbnail.svg"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.LMS.Backend.Microsoft.AspNetCore.StaticWebAssets.props",

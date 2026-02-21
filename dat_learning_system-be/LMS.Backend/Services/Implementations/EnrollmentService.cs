@@ -71,27 +71,45 @@ public class EnrollmentService : IEnrollmentService
     // For Admin: Approve or Reject a specific enrollment
     public async Task<bool> RespondToRequestAsync(Guid enrollmentId, bool approve, string? reason = null)
     {
-        var enrollment = await _repo.GetByIdAsync(enrollmentId);
-        if (enrollment == null) return false;
+        // 1. Get Enrollment WITH the Course navigation property loaded
+        var enrollment = await _repo.GetWithCourseAsync(enrollmentId);
 
-        // REMOVED: if (enrollment.Status != "Pending") return false; 
-        // This allows transitioning between Approved <-> Rejected
+        // Safety check for both the enrollment and the related course
+        if (enrollment == null || enrollment.Course == null) return false;
 
+        string oldStatus = enrollment.Status;
+        string newStatus = approve ? "Approved" : "Rejected";
+
+        // 2. Only update the count if the status is actually transitioning in/out of 'Approved'
+        if (oldStatus != newStatus)
+        {
+            if (newStatus == "Approved")
+            {
+                enrollment.Course.EnrolledCount++;
+            }
+            else if (oldStatus == "Approved" && newStatus == "Rejected")
+            {
+                // Ensure we never drift into negative numbers
+                if (enrollment.Course.EnrolledCount > 0)
+                    enrollment.Course.EnrolledCount--;
+            }
+        }
+
+        // 3. Audit Logic - Pass the reason to the HttpContext for the SaveChanges Interceptor
         if (_httpContextAccessor.HttpContext != null)
         {
             _httpContextAccessor.HttpContext.Items["AuditReason"] = reason ?? "None";
         }
 
-        enrollment.Status = approve ? "Approved" : "Rejected";
-
-        // Manage timestamps: Only set date if moving to Approved. 
-        // If moving from Approved -> Rejected, we nullify it.
+        // 4. Update the enrollment details
+        enrollment.Status = newStatus;
         enrollment.ApprovedAt = approve ? DateTime.UtcNow : null;
 
-        _repo.Update(enrollment);
+        // 5. Save everything. 
+        // Because EF Core is tracking the 'enrollment' object AND its child 'Course' object,
+        // SaveChangesAsync will update both tables (Enrollments and Courses) in one transaction.
         return await _repo.SaveChangesAsync();
     }
-
     public async Task<IEnumerable<EnrollmentRequestDto>> GetHistoryAsync()
     {
         // Fetch all records where Status is 'Approved' or 'Rejected'

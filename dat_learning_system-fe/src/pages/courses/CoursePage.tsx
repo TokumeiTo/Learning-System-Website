@@ -116,7 +116,7 @@ const CoursesPage: React.FC = () => {
                     spacing={3}
                     justifyContent="space-between"
                     alignItems={{ xs: 'start', lg: 'center' }}
-                    sx={{ mb: 6 }}
+                    sx={{ mb: 6, position: 'sticky', top: '75px', zIndex: '300' }}
                 >
                     {/* Category Pills (Replaces Tabs) */}
                     <Stack
@@ -202,7 +202,7 @@ const CoursesPage: React.FC = () => {
                             xs: '1fr',
                             sm: 'repeat(auto-fill, minmax(340px, 1fr))'
                         },
-                        gap: 4
+                        gap: 7
                     }}>
                         <AnimatePresence mode="popLayout">
                             {isCreating && (
@@ -210,9 +210,11 @@ const CoursesPage: React.FC = () => {
                                     key="creator"
                                     component={motion.div}
                                     layout
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    transition={{ duration: 0.2 }}
+                                    sx={{ display: 'flex', alignItems: 'center' }}
                                 >
                                     <CreateCourseCard
                                         onSave={handleCreateNewCourse}
@@ -231,7 +233,10 @@ const CoursesPage: React.FC = () => {
                                     exit={{ opacity: 0, scale: 0.95 }}
                                     transition={{ duration: 0.2 }}
                                 >
-                                    <CourseCard course={course} />
+                                    <CourseCard
+                                        course={course}
+                                        onRefresh={fetchCourses}
+                                    />
                                 </Box>
                             ))}
                         </AnimatePresence>
@@ -239,7 +244,7 @@ const CoursesPage: React.FC = () => {
                         {filteredCourses.length === 0 && !isCreating && (
                             <Box sx={{ gridColumn: '1 / -1', textAlign: 'center', py: 10 }}>
                                 <Typography variant="h6" color="text.disabled" fontWeight={700}>
-                                    No courses found matching "{searchTerm}"
+                                    {searchTerm ? `No courses found matching ' ${searchTerm} '` : "No courses provided"}
                                 </Typography>
                             </Box>
                         )}

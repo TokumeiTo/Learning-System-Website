@@ -11,17 +11,19 @@ import { useNavigate } from 'react-router-dom';
 import { getEnrollmentStatus, requestEnrollment } from '../../api/enrollment.api';
 import type { Course } from '../../types/course';
 import type { EnrollmentStatusResponse } from '../../types/enrollment';
+import CourseRatingAction from './CourseRatingAction';
 
 interface CourseDetailModalProps {
     course: Course;
     open: boolean;
     onClose: () => void;
+    onRefresh?: () => void;
 }
 
-const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onClose }) => {
+const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onClose, onRefresh }) => {
     const theme = useTheme();
     const navigate = useNavigate();
-    
+
     // Logic States
     const [status, setStatus] = useState<EnrollmentStatusResponse | null>(null);
     const [loading, setLoading] = useState(false);
@@ -55,7 +57,7 @@ const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onC
         setSubmitting(true);
         try {
             await requestEnrollment({ courseId: course.id });
-            await checkStatus(); 
+            await checkStatus();
         } finally {
             setSubmitting(false);
         }
@@ -78,7 +80,7 @@ const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onC
                     onClick={onClose}
                     sx={{
                         position: 'absolute', right: 16, top: 16,
-                        bgcolor: alpha(theme.palette.common.black, 0.4), 
+                        bgcolor: alpha(theme.palette.common.black, 0.4),
                         color: 'white',
                         backdropFilter: 'blur(8px)',
                         zIndex: 10,
@@ -95,9 +97,9 @@ const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onC
                         src={imageUrl}
                         alt={course.title}
                         onError={(e: any) => {
-                            e.target.src = 'https://placehold.co/600x400?text=No+Thumbnail';
+                            e.target.src = '/No_Thumbnail.svg';
                         }}
-                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     />
                     <Stack direction="row" spacing={1} sx={{ position: 'absolute', bottom: 20, left: 20 }}>
                         <Chip
@@ -143,7 +145,19 @@ const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onC
                         {course.description}
                     </Typography>
 
-                    <Divider />
+                    {/* --- ONLY SHOW RATING IF STUDENT IS ACCEPTED --- */}
+                    {status?.status === 'Approved' && (
+                        <>
+                            <Divider sx={{ my: 3 }} />
+                            <CourseRatingAction
+                                courseId={course.id}
+                                onSuccess={() => {
+                                    if (onRefresh) onRefresh();
+                                }}
+                            />
+                            <Divider sx={{ my: 3 }} />
+                        </>
+                    )}
 
                     {/* Meta Stats Row */}
                     <Stack direction="row" flexWrap="wrap" gap={3}>
@@ -153,11 +167,11 @@ const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onC
                     </Stack>
 
                     {/* 3. Enrollment Action Area */}
-                    <Box sx={{ 
-                        bgcolor: alpha(theme.palette.primary.main, 0.04), 
-                        p: 3, 
-                        borderRadius: 4, 
-                        border: `1px solid ${theme.palette.divider}` 
+                    <Box sx={{
+                        bgcolor: alpha(theme.palette.primary.main, 0.04),
+                        p: 3,
+                        borderRadius: 4,
+                        border: `1px solid ${theme.palette.divider}`
                     }}>
                         {loading ? (
                             <Stack alignItems="center" py={1}><CircularProgress size={28} /></Stack>
@@ -166,14 +180,14 @@ const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onC
                                 <Box>
                                     <Typography variant="subtitle2" fontWeight={900} color="text.primary">Enrollment Status</Typography>
                                     <Typography variant="caption" color="text.secondary" fontWeight={600}>
-                                        {status?.status === 'None' ? 'Open for new requests' : `Current Status: ${status?.status}`}
+                                        {status?.status === 'None' ? 'Open for new requests' : `Current Status: ${status?.status || 'Unenrolled'}`}
                                     </Typography>
                                 </Box>
 
                                 {status?.isEnrolled ? (
-                                    <Button 
-                                        variant="contained" 
-                                        color="success" 
+                                    <Button
+                                        variant="contained"
+                                        color="success"
                                         fullWidth={false}
                                         startIcon={<PlayCircleOutline />}
                                         onClick={() => navigate(`/classroom/${course.id}`)}
@@ -185,17 +199,27 @@ const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onC
                                     <Button disabled variant="outlined" sx={{ borderRadius: 3, px: 4, py: 1.5, fontWeight: 800 }}>
                                         Waiting for Approval
                                     </Button>
+                                ) : status?.status === 'Rejected' ? (
+                                    /* --- NEW REJECTED STATE --- */
+                                    <Button
+                                        disabled
+                                        variant="contained"
+                                        sx={{ borderRadius: 3, px: 4, py: 1.5, fontWeight: 800, opacity: 0.6 }}
+                                    >
+                                        Access Denied
+                                    </Button>
                                 ) : (
-                                    <Button 
-                                        variant="contained" 
+                                    /* --- ONLY SHOW REQUEST ACCESS IF STATUS IS NULL OR NOT REJECTED/PENDING --- */
+                                    <Button
+                                        variant="contained"
                                         onClick={handleEnrollRequest}
                                         disabled={submitting}
                                         startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : <Lock />}
-                                        sx={{ 
-                                            borderRadius: 3, 
-                                            px: 4, 
-                                            py: 1.5, 
-                                            fontWeight: 800, 
+                                        sx={{
+                                            borderRadius: 3,
+                                            px: 4,
+                                            py: 1.5,
+                                            fontWeight: 800,
                                             textTransform: 'none',
                                             bgcolor: 'text.primary',
                                             color: 'background.paper',
@@ -218,9 +242,9 @@ const DetailItem = ({ icon, label, value }: { icon: React.ReactNode, label: stri
     const theme = useTheme();
     return (
         <Stack direction="row" spacing={1.5} alignItems="center">
-            <Box sx={{ 
-                color: 'primary.main', 
-                display: 'flex', 
+            <Box sx={{
+                color: 'primary.main',
+                display: 'flex',
                 bgcolor: alpha(theme.palette.primary.main, 0.1),
                 p: 1,
                 borderRadius: 2

@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IOrgUnitRepository, OrgUnitRepository>();
         services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();
         services.AddScoped<ITopicRepository, TopicRepository>();
         services.AddScoped<IAssignmentRepository, AssignmentRepository>();
         services.AddScoped<ISubmissionRepository, SubmissionRepository>();
@@ -27,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IOrgUnitService, OrgUnitService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICourseService, CourseService>();
+        services.AddScoped<ICourseRatingService, CourseRatingService>();
         services.AddScoped<ILessonService, LessonService>();
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddScoped<IAuditService, AuditService>();

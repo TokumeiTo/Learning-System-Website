@@ -60,9 +60,25 @@ public class AuditInterceptor : SaveChangesInterceptor
 
         foreach (var entry in context.ChangeTracker.Entries())
         {
-            // Ignore the audit table itself and unchanged entries
-            if (entry.Entity is AuditLog || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
+            // 1. IGNORE LOGIC: Skip AuditLogs and the new CourseRating table entirely
+            if (entry.Entity is AuditLog ||
+             entry.Entity is CourseRating ||
+             entry.State == EntityState.Detached ||
+             entry.State == EntityState.Unchanged)
+            {
                 continue;
+            }
+
+            if (entry.Entity is Course && entry.State == EntityState.Modified)
+            {
+                var modifiedProps = entry.Properties.Where(p => p.IsModified).Select(p => p.Metadata.Name).ToList();
+
+                // If the only properties changed are Rating and/or ReviewCount, skip auditing this update
+                if (modifiedProps.All(name => name == nameof(Course.Rating) || name == nameof(Course.ReviewCount)))
+                {
+                    continue;
+                }
+            }
 
             var auditEntry = new AuditEntry
             {

@@ -45,8 +45,10 @@ public class CourseService : ICourseService
         course.Status = Enum.TryParse<CourseStatus>(dto.Status, true, out var status)
                         ? status : CourseStatus.Draft;
 
-        course.Badge = Enum.TryParse<CourseBadge>(dto.Badge, true, out var badge)
-                       ? badge : CourseBadge.Beginner;
+        // Replace the old Badge parsing logic with this:
+        course.Badge = string.IsNullOrWhiteSpace(dto.Badge)
+               ? "GENERAL"
+               : dto.Badge.Trim().ToUpper();
 
         // 3. File Upload Logic
         if (dto.ThumbnailFile != null && dto.ThumbnailFile.Length > 0)
@@ -68,7 +70,7 @@ public class CourseService : ICourseService
         }
         else
         {
-            course.Thumbnail = "/uploads/default-course.png";
+            course.Thumbnail = "/uploads/No_Thumbnial.svg";
         }
 
         // 4. Add Course to Repo

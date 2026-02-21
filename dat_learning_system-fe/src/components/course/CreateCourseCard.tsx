@@ -107,7 +107,7 @@ const CreateCourseCard: React.FC<CreateCourseCardProps> = ({ onSave, onCancel })
         <Box
             component={motion.div}
             initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 1, scale: 1, margin: 'auto' }}
             sx={{ width: { xs: '100%', sm: 340 } }}
         >
             <Card sx={{
@@ -142,7 +142,7 @@ const CreateCourseCard: React.FC<CreateCourseCardProps> = ({ onSave, onCancel })
                     <AnimatePresence mode="wait">
                         {preview ? (
                             <Box key="preview" sx={{ width: '100%', height: '100%', position: 'relative' }}>
-                                <Box component="img" src={preview} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <Box component="img" src={preview} sx={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                 <IconButton
                                     size="small"
                                     onClick={(e) => {
@@ -157,7 +157,13 @@ const CreateCourseCard: React.FC<CreateCourseCardProps> = ({ onSave, onCancel })
                             </Box>
                         ) : (
                             <Stack key="placeholder" spacing={1} alignItems="center">
-                                <CloudUpload color={dragging ? "primary" : "disabled"} sx={{ fontSize: 32 }} />
+                                <CloudUpload
+                                    sx={{
+                                        fontSize: 32,
+                                        color: dragging ? "primary.main" : "text.disabled",
+                                        transition: "color 0.3s ease"
+                                    }}
+                                />
                                 <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>
                                     {dragging ? "DROP TO UPLOAD" : "THUMBNAIL"}
                                 </Typography>
@@ -175,6 +181,11 @@ const CreateCourseCard: React.FC<CreateCourseCardProps> = ({ onSave, onCancel })
                             size="small"
                             options={['Beginner', 'Intermediate', 'Advanced', 'N1', 'N2', 'N3']}
                             value={form.badge}
+                            slotProps={{
+                                clearIndicator: {
+                                    sx: { visibility: 'visible' } // Forces it to stay visible
+                                }
+                            }}
                             onInputChange={(_, newValue) => setForm({ ...form, badge: newValue })}
                             renderInput={(params) => (
                                 <TextField
@@ -183,8 +194,8 @@ const CreateCourseCard: React.FC<CreateCourseCardProps> = ({ onSave, onCancel })
                                     variant="standard"
                                     InputProps={{ ...params.InputProps, disableUnderline: true }}
                                     sx={{
-                                        bgcolor: 'white', px: 1.5, borderRadius: 2,
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: 120,
+                                        bgcolor: 'background.default', px: 1, py: 0.3, borderRadius: 2,
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: 200,
                                         '& .MuiInputBase-input': {
                                             fontSize: '0.65rem', fontWeight: 800, height: 20,
                                             color: 'primary.main', textTransform: 'uppercase'
@@ -243,7 +254,7 @@ const CreateCourseCard: React.FC<CreateCourseCardProps> = ({ onSave, onCancel })
 
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Stack direction="row" spacing={0.5} alignItems="center">
-                            <Timer sx={{ fontSize: 16, color: 'text.disabled' }} />
+                            <Timer sx={{ fontSize: 16, color: 'text.secondary' }} />
                             <TextField
                                 variant="standard"
                                 type="number"
@@ -252,7 +263,7 @@ const CreateCourseCard: React.FC<CreateCourseCardProps> = ({ onSave, onCancel })
                                 onChange={(e) => setForm({ ...form, totalHours: Number(e.target.value) })}
                                 InputProps={{ disableUnderline: true, style: { fontSize: '0.8rem', fontWeight: 800 } }}
                             />
-                            <Typography variant="caption" fontWeight={700} color="text.disabled">hrs</Typography>
+                            <Typography variant="caption" fontWeight={700} color="text.secondary">hrs</Typography>
                         </Stack>
 
                         <ToggleButtonGroup
@@ -279,16 +290,16 @@ const CreateCourseCard: React.FC<CreateCourseCardProps> = ({ onSave, onCancel })
                             disabled={isSubmitting} // Disable while loading
                             sx={{
                                 borderRadius: 2.5, fontWeight: 800, textTransform: 'none',
-                                bgcolor: form.status === 'Published' ? '#10b981' : '#1e293b',
-                                '&:hover': { bgcolor: form.status === 'Published' ? '#059669' : '#0f172a' }
+                                bgcolor: form.status === 'Published' ? '#10b981' : 'text.primary',
+                                '&:hover': { bgcolor: form.status === 'Published' ? '#059669' : 'gray' }
                             }}
                         >
                             {isSubmitting
                                 ? (form.status === 'Published' ? 'Publishing...' : 'Saving Draft...')
-                                : (form.status === 'Published' ? 'Create & Publish' : 'Save Draft')
+                                : (form.status === 'Published' ? 'Create & Publish' : 'Save as Draft')
                             }
                         </Button>
-                        <IconButton onClick={onCancel} disabled={isSubmitting} sx={{ bgcolor: 'grey.100', borderRadius: 2.5 }}>
+                        <IconButton onClick={onCancel} disabled={isSubmitting} sx={{ bgcolor: 'red', borderRadius: 2.5 }}>
                             <Close fontSize="small" />
                         </IconButton>
                     </Stack>

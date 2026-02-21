@@ -12,7 +12,9 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.HasKey(c => c.Id);
 
         // Enums to String conversion
-        builder.Property(c => c.Badge).HasConversion<string>().HasMaxLength(20);
+        builder.Property(c => c.Badge)
+            .HasMaxLength(50) // Increased to 50 for custom labels
+            .IsRequired(false);
         builder.Property(c => c.Status).HasConversion<string>().HasMaxLength(20);
 
         // Category is a flexible string for "Custom" input

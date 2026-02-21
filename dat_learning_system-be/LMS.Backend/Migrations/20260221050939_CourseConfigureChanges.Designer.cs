@@ -3,6 +3,7 @@ using System;
 using LMS.Backend.Data.Dbcontext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LMS.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260221050939_CourseConfigureChanges")]
+    partial class CourseConfigureChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,7 +118,7 @@ namespace LMS.Backend.Migrations
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
                             CompanyCode = "00-0000",
-                            ConcurrencyStamp = "941d4cbf-0a5c-437a-94ac-4fc0e29861f7",
+                            ConcurrencyStamp = "f351c076-fe53-4989-86a0-4f750a504f0b",
                             Email = "admin@lms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin",
@@ -124,10 +127,10 @@ namespace LMS.Backend.Migrations
                             NormalizedEmail = "ADMIN@LMS.COM",
                             NormalizedUserName = "00-0000",
                             OrgUnitId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAELszWCgrpDh2nn9Lyb80JvT0lBj9Nmw5sqdGHf+HLxx7UgWwok+vmVDNmImTkkHxPA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAaZcGa4C3qVLy7v8NDvY/mE7rJkFOCTKDmcwHeuf4zM4oEEM6SYYzYHi2lMrnSb2A==",
                             PhoneNumberConfirmed = false,
                             Position = 0,
-                            SecurityStamp = "d76b7143-58cb-42ed-ac17-ce25b2fda8db",
+                            SecurityStamp = "dc69833b-a96e-4432-a80c-8a2c925961eb",
                             TwoFactorEnabled = false,
                             UserName = "00-0000"
                         });
@@ -236,9 +239,6 @@ namespace LMS.Backend.Migrations
                     b.Property<double>("Rating")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("ReviewCount")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -259,39 +259,6 @@ namespace LMS.Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Courses");
-                });
-
-            modelBuilder.Entity("LMS.Backend.Data.Entities.CourseRating", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("UserId", "CourseId")
-                        .IsUnique();
-
-                    b.ToTable("CourseRatings");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.Enrollment", b =>
@@ -1136,25 +1103,6 @@ namespace LMS.Backend.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("AdminUser");
-                });
-
-            modelBuilder.Entity("LMS.Backend.Data.Entities.CourseRating", b =>
-                {
-                    b.HasOne("LMS.Backend.Data.Entities.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LMS.Backend.Data.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.Enrollment", b =>

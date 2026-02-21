@@ -17,35 +17,31 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-///////////////////// 1. SERVICES REGISTRATION /////////////////////////////////
+/////////////////////Builder Created/////////////////////////////////
 
 builder.Services.AddHttpClient();
-builder.Services.AddHttpContextAccessor(); // Required for AuditInterceptor to see the User
-
-/* Application services (Helpers, Interceptors, etc.) */
-// Grouping registrations so "Tools" are defined first
-builder.Services.AddSingleton<JwtHelper>();
-builder.Services.AddSingleton<AuditInterceptor>(); 
-builder.Services.AddApplicationServices();
-builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
-
-/* Controllers & Validation */
+/* Controllers & Validators */
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
+        // FIXES THE "0" ISSUE:
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+
+        // PREVENTS INFINITE LOOP CRASH:
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
-
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
-/* Swagger and Open Api */
+/* Swagger */
+#region Swagger section
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "LMS API", Version = "v1" });
+
+    // 1. Define the Security Scheme
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -53,29 +49,37 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "JWT Authorization header using the Bearer scheme."
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below."
     });
+
+    // 2. Make Swagger use that scheme
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                Reference = new OpenApiReference // Fixed name here
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
             },
             new string[] {}
         }
     });
 });
+#endregion
 
-///////////////////// 2. DATABASE & IDENTITY /////////////////////////////////
-
-// EFCore Postgre SQL - Activated after Interceptor is registered
+/* Application services (Helpers, Services, etc.) */
+#region EFCore Activation & Password Definition
+// EFCore Postgre SQL and Interceptors Activation
 builder.Services.AddDbContext<AppDbContext>((sp, options) =>
 {
     var auditInterceptor = sp.GetRequiredService<AuditInterceptor>();
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
         npgsqlOptions =>
         {
+            // This handles the "transient failure" by retrying the connection
             npgsqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 5,
                 maxRetryDelay: TimeSpan.FromSeconds(30),
@@ -84,34 +88,43 @@ builder.Services.AddDbContext<AppDbContext>((sp, options) =>
     .AddInterceptors(auditInterceptor);
 });
 
-// Identity Configuration
+// Hash Password Helper
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    options.Password.RequireDigit = false;
+    options.Password.RequireDigit = false; // Set to true for production
     options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
+
+    // Since we login with CompanyCode, we ensure the UserName is the unique key
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-";
-    
-    // Explicit Lockout Settings
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
-    options.Lockout.MaxFailedAccessAttempts = 5;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
+#endregion
 
-///////////////////// 3. SECURITY & CORS /////////////////////////////////
+#region Helper Registration/Dependency Injections
+// Singletons
+builder.Services.AddSingleton<JwtHelper>();
+builder.Services.AddSingleton<AuditInterceptor>();
+// Helper Services
+builder.Services.AddApplicationServices();
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+#endregion
 
+#region SECURITY & CORS
+// CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
+    options.AddPolicy("AllowReactApp",
+    policy =>
     {
         policy.WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
 });
-
+// Auth/JWT Bearer
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -131,24 +144,42 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "default_secret_key_32_characters_long"))
     };
 });
+#endregion
+////////////////////Controller and Services added//////////////////////////////////
 
-///////////////////// 4. MIDDLEWARE PIPELINE /////////////////////////////////
-
+// Build Application
 var app = builder.Build();
 
+/////////////////////Built Application/////////////////////////////////
+
+/* Middleware Pipeline */
+
+// Exception Middleware
 app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseStaticFiles();
+
 app.UseRouting();
 
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// Security and HTTP
+// app.UseHttpsRedirection();
 app.UseCors("AllowReactApp");
+
+// Auth
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Map endpoints
 app.MapControllers();
 
+//////////////////Middleware done////////////////////////////////////
+
+/* Run App */
 app.Run();

@@ -9,9 +9,10 @@ import CourseDetailModal from './CourseDetailModal';
 
 interface CourseCardProps {
     course: Course;
+    onRefresh?: () => void;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, onRefresh}) => {
     const theme = useTheme();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -51,13 +52,14 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
                         image={course.thumbnail.startsWith('http') ? course.thumbnail : `${import.meta.env.VITE_API_URL}${course.thumbnail}`}
                         alt={course.title}
                         onError={(e: any) => {
-                            e.target.src = 'https://placehold.co/400x250?text=No+Thumbnail';
+                            e.target.src = '/No_Thumbnail.svg';
                         }}
                         sx={{
                             filter: course.status === 'Draft' ? 'grayscale(0.6)' : 'none',
-                            objectFit: 'cover',
+                            objectFit: 'contain',
+                            bgcolor: 'white',
                             transition: 'transform 0.5s ease',
-                            '&:hover': { transform: 'scale(1.05)' }
+                            '&:hover': { transform: 'scale(1.05)' },
                         }}
                     />
 
@@ -195,6 +197,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
                     course={course}
                     open={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
+                    onRefresh={onRefresh}
                 />
             )}
         </>

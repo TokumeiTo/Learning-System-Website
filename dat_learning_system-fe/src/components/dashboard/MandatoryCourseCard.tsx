@@ -30,8 +30,8 @@ const MandatoryCourseCard: React.FC<Props> = ({ course, onView }) => {
                     <img
                         src={imageUrl}
                         alt={course.title}
-                        onError={(e: any) => { e.target.src = 'https://placehold.co/400x250?text=No+Thumbnail'; }}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e: any) => { e.target.src = '/No_Thumbnail.svg'; }}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', backgroundColor:'lightgray' }}
                     />
                 </Box>
 

@@ -20,4 +20,3 @@ public enum OrgLevel
     Team
 }
 public enum CourseStatus { Published, Draft, Closed }
-public enum CourseBadge { Beginner, Intermediate, Advanced }

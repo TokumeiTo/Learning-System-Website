@@ -11,7 +11,7 @@ public class CourseDetailDto
     public string Thumbnail { get; set; } = string.Empty;
     public double TotalHours { get; set; }
     public double Rating { get; set; }
-    public string Badge { get; set; } = string.Empty;
+    public string? Badge { get; set; } = string.Empty;
     public int EnrolledCount { get; set; }
     public string Status { get; set; } = string.Empty;
 

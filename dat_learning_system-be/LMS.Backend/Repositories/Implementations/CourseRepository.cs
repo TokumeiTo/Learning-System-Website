@@ -18,4 +18,16 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
                 .ThenInclude(t => t.Assignments) // The "Google Classroom" part
             .FirstOrDefaultAsync(c => c.Id == courseId);
     }
+    public async Task UpdateRatingCacheAsync(Guid courseId, double newAverage, int newCount)
+    {
+        var course = await _dbSet.FindAsync(courseId);
+        if (course != null)
+        {
+            course.Rating = newAverage;
+            course.ReviewCount = newCount;
+            // No need to call _dbSet.Update(course) because FindAsync 
+            // attaches it to the tracker automatically. 
+            // It will be saved when SaveChangesAsync is called in the service.
+        }
+    }
 }
