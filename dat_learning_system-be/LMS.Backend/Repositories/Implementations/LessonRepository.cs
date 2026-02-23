@@ -19,10 +19,14 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
     // NEW: Specialized Update for Lesson Metadata
     public async Task UpdateLessonAsync(Lesson lesson)
     {
-        // Because we inherit from BaseRepository, we use the protected _context or Update()
-        _context.Entry(lesson).State = EntityState.Modified;
-        
-        // Ensure we don't accidentally overwrite the CourseId or other sensitive fields if needed
+        var existing = await _context.Lessons.FindAsync(lesson.Id);
+        if (existing == null) return;
+
+        // Update only the fields that are allowed to change
+        existing.Title = lesson.Title;
+        existing.Time = lesson.Time;
+        // We usually don't want to change CourseId here via a simple update
+
         await SaveChangesAsync();
     }
 
@@ -45,7 +49,7 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
             {
                 remainingLessons[i].SortOrder = i + 1;
             }
-            
+
             await SaveChangesAsync();
         }
     }
@@ -83,20 +87,42 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
 
     public async Task SaveLessonContentsAsync(Guid lessonId, IEnumerable<LessonContent> contents)
     {
-        var existing = await _context.LessonContents
-            .Where(c => c.LessonId == lessonId)
-            .ToListAsync();
+        // 1. Get the strategy
+        var strategy = _context.Database.CreateExecutionStrategy();
 
-        _context.LessonContents.RemoveRange(existing);
-
-        int order = 1;
-        foreach (var item in contents)
+        // 2. Wrap everything in the strategy execution
+        await strategy.ExecuteAsync(async () =>
         {
-            item.LessonId = lessonId;
-            item.SortOrder = order++;
-            await _context.LessonContents.AddAsync(item);
-        }
+            // 3. Start the transaction INSIDE the strategy
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Remove existing
+                var existing = await _context.LessonContents
+                    .Where(c => c.LessonId == lessonId)
+                    .ToListAsync();
 
-        await SaveChangesAsync();
+                _context.LessonContents.RemoveRange(existing);
+                await SaveChangesAsync();
+
+                // Add new
+                int order = 1;
+                foreach (var item in contents)
+                {
+                    item.Id = Guid.NewGuid();
+                    item.LessonId = lessonId;
+                    item.SortOrder = order++;
+                    await _context.LessonContents.AddAsync(item);
+                }
+
+                await SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw; // Re-throw so the strategy knows it might need to retry
+            }
+        });
     }
 }

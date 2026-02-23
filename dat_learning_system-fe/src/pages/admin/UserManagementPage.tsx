@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import {
-  Box, Button, TextField, Typography, Paper, IconButton, Chip, Stack, 
-  InputAdornment, Avatar, Badge, useTheme, Table, TableBody, TableCell, 
+  Box, Button, TextField, Typography, Paper, IconButton, Chip, Stack,
+  InputAdornment, Avatar, Badge, useTheme, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, CircularProgress
 } from "@mui/material";
 import { PersonAdd, Search, Edit, Delete, FilterList } from "@mui/icons-material";
@@ -21,18 +21,18 @@ import type { RegisterRequest } from "../../types/auth";
 
 const UserManagementPage = () => {
   const theme = useTheme();
-  
+
   // State Management
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-  
+
   // Targets for Modals
   const [editTarget, setEditTarget] = useState<UserListItem | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserListItem | null>(null);
-  
+
   const [popup, setPopup] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
     open: false, message: "", severity: "success",
   });
@@ -54,8 +54,8 @@ const UserManagementPage = () => {
 
   // 2. Filter Logic
   const filteredUsers = useMemo(() => {
-    return users.filter(u => 
-      u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    return users.filter(u =>
+      u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [users, searchTerm]);
@@ -64,56 +64,80 @@ const UserManagementPage = () => {
   const handleAddUser = async (data: RegisterRequest) => {
     try {
       setProcessing(true);
+
+      // 1. Call the API (now using your 'api' instance with interceptors)
       const res = await registerApi(data);
+
+      // 2. Check the result from your C# RegisterResponse
       if (res.isSuccess) {
-        setPopup({ open: true, message: "User created successfully!", severity: "success" });
+        // Use the message from the backend: e.g., "User registered successfully!"
+        setPopup({ open: true, message: res.message, severity: "success" });
         setShowAddForm(false);
         fetchUsers();
       } else {
-        setPopup({ open: true, message: res.message, severity: "error" });
+        // Handle cases where isSuccess is false (custom logic from your service)
+        setPopup({ open: true, message: res.message || "Registration failed", severity: "error" });
       }
-    } catch (err) {
-      setPopup({ open: true, message: "Server error during registration", severity: "error" });
-    } finally { setProcessing(false); }
+    } catch (err: any) {
+      // 3. Handle actual HTTP errors (400 BadRequest, 401 Unauthorized, etc.)
+      // We pull the error message sent by .NET (like ModelState validation errors)
+      const errorMsg = err.response?.data?.message || "Server error during registration";
+      setPopup({ open: true, message: errorMsg, severity: "error" });
+
+      console.error("Registration Error:", err);
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const handleUpdateUser = async (id: string, data: UserUpdateFields) => {
     try {
       setProcessing(true);
-      await updateUser(id, data);
-      setPopup({ open: true, message: "User updated successfully", severity: "success" });
+      // Call API and capture the result (Ok(new { message = "..." }))
+      const res = await updateUser(id, data);
+
+      setPopup({ open: true, message: res.message, severity: "success" });
       setEditTarget(null);
       fetchUsers();
-    } catch (err) {
-      setPopup({ open: true, message: "Update failed", severity: "error" });
-    } finally { setProcessing(false); }
+    } catch (err: any) {
+      // Pull the specific error message from the backend if it exists
+      const errorMsg = err.response?.data?.message || "Update failed";
+      setPopup({ open: true, message: errorMsg, severity: "error" });
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const handleDeleteUser = async (id: string, data: UserDeleteFields) => {
     try {
       setProcessing(true);
-      await deleteUser(id, data);
-      setPopup({ open: true, message: "User removed from system", severity: "success" });
+      // Same pattern: Capture the backend response message
+      const res = await deleteUser(id, data);
+
+      setPopup({ open: true, message: res.message, severity: "success" });
       setDeleteTarget(null);
       fetchUsers();
-    } catch (err) {
-      setPopup({ open: true, message: "Delete failed", severity: "error" });
-    } finally { setProcessing(false); }
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message || "Delete failed";
+      setPopup({ open: true, message: errorMsg, severity: "error" });
+    } finally {
+      setProcessing(false);
+    }
   };
 
-  const getInitials = (name: string) => 
+  const getInitials = (name: string) =>
     name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
 
   return (
     <PageLayout>
-      <Box sx={{ 
-        p: 4, 
-        bgcolor: "background.default", 
+      <Box sx={{
+        p: 4,
+        bgcolor: "background.default",
         minHeight: "calc(100vh - 65px)",
         display: 'flex',
         flexDirection: 'column'
       }}>
-        
+
         {/* Header Section */}
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
           <Box>
@@ -131,19 +155,19 @@ const UserManagementPage = () => {
         </Stack>
 
         {showAddForm ? (
-          <UserAddForm 
-            onSuccess={handleAddUser} 
-            onCancel={() => setShowAddForm(false)} 
+          <UserAddForm
+            onSuccess={handleAddUser}
+            onCancel={() => setShowAddForm(false)}
             loading={processing}
           />
         ) : (
           <Box sx={{ flexGrow: 1 }}>
             {/* Search and Filters */}
-            <Paper elevation={0} sx={{ 
-              p: 2, mb: 3, borderRadius: 3, 
+            <Paper elevation={0} sx={{
+              p: 2, mb: 3, borderRadius: 3,
               bgcolor: 'background.paper',
-              border: `1px solid ${theme.palette.divider}`, 
-              display: 'flex', gap: 2 
+              border: `1px solid ${theme.palette.divider}`,
+              display: 'flex', gap: 2
             }}>
               <TextField
                 placeholder="Search by name or email..."
@@ -151,18 +175,18 @@ const UserManagementPage = () => {
                 sx={{ flex: 1 }}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{ 
-                    startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> 
+                InputProps={{
+                  startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment>
                 }}
               />
               <Button startIcon={<FilterList />} variant="outlined" color="inherit">Filters</Button>
             </Paper>
 
             {/* Main Table */}
-            <TableContainer component={Paper} elevation={0} sx={{ 
-                borderRadius: 4, 
-                border: `1px solid ${theme.palette.divider}`,
-                maxHeight: 'calc(100vh - 300px)' // Sticky header support
+            <TableContainer component={Paper} elevation={0} sx={{
+              borderRadius: 4,
+              border: `1px solid ${theme.palette.divider}`,
+              maxHeight: 'calc(100vh - 300px)' // Sticky header support
             }}>
               <Table stickyHeader>
                 <TableHead>
@@ -184,9 +208,9 @@ const UserManagementPage = () => {
                     </TableRow>
                   ) : filteredUsers.length === 0 ? (
                     <TableRow>
-                        <TableCell colSpan={5} align="center" sx={{ py: 10 }}>
-                            <Typography variant="body1" color="text.secondary">No users found matching your criteria.</Typography>
-                        </TableCell>
+                      <TableCell colSpan={5} align="center" sx={{ py: 10 }}>
+                        <Typography variant="body1" color="text.secondary">No users found matching your criteria.</Typography>
+                      </TableCell>
                     </TableRow>
                   ) : filteredUsers.map((user) => (
                     <TableRow key={user.id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
@@ -198,8 +222,8 @@ const UserManagementPage = () => {
                             </Avatar>
                           </Badge>
                           <Box>
-                              <Typography variant="subtitle2" fontWeight={700} sx={{ lineHeight: 1.2 }}>{user.fullName}</Typography>
-                              <Typography variant="caption" color="text.secondary">{user.companyCode}</Typography>
+                            <Typography variant="subtitle2" fontWeight={700} sx={{ lineHeight: 1.2 }}>{user.fullName}</Typography>
+                            <Typography variant="caption" color="text.secondary">{user.companyCode}</Typography>
                           </Box>
                         </Stack>
                       </TableCell>
@@ -207,15 +231,15 @@ const UserManagementPage = () => {
                         <Typography variant="body2" color="text.primary">{user.email}</Typography>
                       </TableCell>
                       <TableCell>
-                        <Chip 
-                            label={user.positionName} 
-                            size="small" 
-                            sx={{ 
-                                fontWeight: 700, 
-                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.1)' : 'rgba(25, 118, 210, 0.05)', 
-                                color: 'primary.main',
-                                border: '1px solid rgba(25, 118, 210, 0.1)'
-                            }} 
+                        <Chip
+                          label={user.positionName}
+                          size="small"
+                          sx={{
+                            fontWeight: 700,
+                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.1)' : 'rgba(25, 118, 210, 0.05)',
+                            color: 'primary.main',
+                            border: '1px solid rgba(25, 118, 210, 0.1)'
+                          }}
                         />
                       </TableCell>
                       <TableCell>
@@ -223,21 +247,21 @@ const UserManagementPage = () => {
                       </TableCell>
                       <TableCell align="right">
                         <Stack direction="row" spacing={1} justifyContent="flex-end">
-                            <IconButton 
-                                size="small" 
-                                onClick={() => setEditTarget(user)}
-                                sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'rgba(25, 118, 210, 0.05)' } }}
-                            >
+                          <IconButton
+                            size="small"
+                            onClick={() => setEditTarget(user)}
+                            sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'rgba(25, 118, 210, 0.05)' } }}
+                          >
                             <Edit fontSize="small" />
-                            </IconButton>
-                            <IconButton 
-                                size="small" 
-                                color="error" 
-                                onClick={() => setDeleteTarget(user)}
-                                sx={{ '&:hover': { bgcolor: 'rgba(211, 47, 47, 0.05)' } }}
-                            >
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => setDeleteTarget(user)}
+                            sx={{ '&:hover': { bgcolor: 'rgba(211, 47, 47, 0.05)' } }}
+                          >
                             <Delete fontSize="small" />
-                            </IconButton>
+                          </IconButton>
                         </Stack>
                       </TableCell>
                     </TableRow>
@@ -249,19 +273,19 @@ const UserManagementPage = () => {
         )}
 
         {/* Action Dialogs */}
-        <UserEditDialog 
-          open={!!editTarget} 
-          user={editTarget} 
-          onClose={() => setEditTarget(null)} 
-          onConfirm={handleUpdateUser} 
+        <UserEditDialog
+          open={!!editTarget}
+          user={editTarget}
+          onClose={() => setEditTarget(null)}
+          onConfirm={handleUpdateUser}
           loading={processing}
         />
 
-        <UserDeleteDialog 
-          open={!!deleteTarget} 
-          user={deleteTarget} 
-          onClose={() => setDeleteTarget(null)} 
-          onConfirm={handleDeleteUser} 
+        <UserDeleteDialog
+          open={!!deleteTarget}
+          user={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleDeleteUser}
           loading={processing}
         />
 

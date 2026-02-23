@@ -1,21 +1,22 @@
-// api/auth.api.ts
-import axios from "axios";
+import api from "../hooks/useApi";
 import type { RegisterRequest, RegisterResponse, LoginRequest, LoginResponse } from "../types/auth";
-import { getToken } from "../utils/token";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-// Existing login
+/**
+ * Public endpoint: Log in to get a JWT token.
+ * Note: Interceptor will try to add a token, but since this is usually the 
+ * first call, it won't find one, which is fine for public endpoints!
+ */
 export const login = async (payload: LoginRequest): Promise<LoginResponse> => {
-  const res = await axios.post(`${API_URL}/api/Auth/login`, payload);
+  const res = await api.post('/api/Auth/login', payload);
   return res.data;
 };
 
-// New register
+/**
+ * Protected endpoint: Register a new user.
+ * The interceptor automatically attaches the Bearer token from getToken()
+ * so we don't have to pass headers manually here.
+ */
 export const register = async (payload: RegisterRequest): Promise<RegisterResponse> => {
-  const token = getToken(); // optional: if you want only admin to register
-  const res = await axios.post(`${API_URL}/api/Auth/register`, payload, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined
-  });
+  const res = await api.post('/api/Auth/register', payload);
   return res.data;
 };

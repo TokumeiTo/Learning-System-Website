@@ -2,9 +2,12 @@ using LMS.Backend.DTOs.Classroom;
 using LMS.Backend.DTOs.Lesson;
 using LMS.Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace LMS.Backend.Controllers;
 
+[Authorize] // Ensure the user is logged in to access the classroom
 [ApiController]
 [Route("api/[controller]")]
 public class ClassroomController(ILessonService lessonService) : ControllerBase
@@ -12,7 +15,14 @@ public class ClassroomController(ILessonService lessonService) : ControllerBase
     [HttpGet("{courseId}")]
     public async Task<ActionResult<ClassroomViewDto>> GetClassroom(Guid courseId)
     {
-        var result = await lessonService.GetClassroomViewAsync(courseId);
+        // Extract the UserId from the claims (Sub or NameIdentifier)
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        // Now passing both the courseId AND the userId to calculate progress
+        var result = await lessonService.GetClassroomViewAsync(courseId, userId);
+        
         if (result == null) return NotFound();
         return Ok(result);
     }
@@ -23,7 +33,8 @@ public class ClassroomController(ILessonService lessonService) : ControllerBase
         try
         {
             var result = await lessonService.CreateLessonAsync(dto);
-            return CreatedAtAction(nameof(CreateLesson), new { id = result.Id }, result);
+            // Updated to be more RESTful with the actual ID
+            return CreatedAtAction(nameof(GetClassroom), new { courseId = dto.CourseId }, result);
         }
         catch (Exception ex)
         {

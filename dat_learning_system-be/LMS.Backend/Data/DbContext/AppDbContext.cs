@@ -22,7 +22,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Enrollment> Enrollments { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<CourseRating> CourseRatings { get; set; }
-
+    public DbSet<UserLessonProgress> UserLessonProgresses { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder builder)
     {
         // Must call base for Identity tables to be created

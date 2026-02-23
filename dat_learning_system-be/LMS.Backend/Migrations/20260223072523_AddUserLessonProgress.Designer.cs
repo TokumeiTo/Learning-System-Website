@@ -3,6 +3,7 @@ using System;
 using LMS.Backend.Data.Dbcontext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LMS.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260223072523_AddUserLessonProgress")]
+    partial class AddUserLessonProgress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,7 +118,7 @@ namespace LMS.Backend.Migrations
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
                             CompanyCode = "00-0000",
-                            ConcurrencyStamp = "fef4fe09-64af-47fc-b796-6679e874c898",
+                            ConcurrencyStamp = "e88f8c02-25db-45ab-a1b6-9a62c8fdb838",
                             Email = "admin@lms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin",
@@ -124,10 +127,10 @@ namespace LMS.Backend.Migrations
                             NormalizedEmail = "ADMIN@LMS.COM",
                             NormalizedUserName = "00-0000",
                             OrgUnitId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAEJNOtvxUEatgJsh5xWpr01cBsg5edRhjJV79wGGQyVz68LTl8IOXMkujtI9krUiyBQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGrTbrrsdFkUrLf9VxjK/m5nUb0Gr79opRayqqNedrLAFuHLXTBcQMKqKCMXzHzvNA==",
                             PhoneNumberConfirmed = false,
                             Position = 0,
-                            SecurityStamp = "fc04339e-7940-4a40-8897-8b8e89c9de6d",
+                            SecurityStamp = "4be002e2-3778-45e1-bf1e-41f6d6eccbc5",
                             TwoFactorEnabled = false,
                             UserName = "00-0000"
                         });
@@ -345,13 +348,18 @@ namespace LMS.Backend.Migrations
                     b.Property<Guid>("CourseId")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("IsDone")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer");
 
                     b.Property<string>("Time")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -360,7 +368,9 @@ namespace LMS.Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId", "SortOrder");
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("SortOrder");
 
                     b.ToTable("Lessons");
                 });

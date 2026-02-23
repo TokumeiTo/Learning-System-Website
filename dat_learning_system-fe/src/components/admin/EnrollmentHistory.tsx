@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { 
-    Box, Table, TableBody, TableCell, TableContainer, 
-    TableHead, TableRow, Paper, Chip, Typography, CircularProgress, 
+import {
+    Box, Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, Paper, Chip, Typography, CircularProgress,
     useTheme, IconButton, Tooltip,
     Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField
 } from '@mui/material';
@@ -9,12 +9,17 @@ import { CheckCircle, Cancel, Person, Autorenew } from '@mui/icons-material';
 import { getEnrollmentHistory, respondToEnrollment } from '../../api/enrollment.api';
 import type { EnrollmentRequest } from '../../types/enrollment';
 import { format } from 'date-fns';
+import MessagePopup from '../feedback/MessagePopup';
 
 const EnrollmentHistory: React.FC = () => {
     const [history, setHistory] = useState<EnrollmentRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedReq, setSelectedReq] = useState<EnrollmentRequest | null>(null);
+    const [popup, setPopup] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
+        open: false, message: "", severity: "success",
+    });
+
     const theme = useTheme();
 
     const loadHistory = async () => {
@@ -42,11 +47,21 @@ const EnrollmentHistory: React.FC = () => {
 
     const executeUpdate = async (id: string, approve: boolean, reason: string) => {
         try {
-            await respondToEnrollment(id, approve, reason);
+            // Change respondToEnrollment to return the result in your api.ts
+            const result = await respondToEnrollment(id, approve, reason);
+
+            // Show success toast with backend message
+            setPopup({
+                open: true,
+                message: result?.message || `Enrollment ${approve ? 'Approved' : 'Rejected'}`,
+                severity: "success"
+            });
+
             setModalOpen(false);
-            loadHistory(); // Refresh the list to show new status
-        } catch (error) {
-            console.error("Update failed", error);
+            loadHistory();
+        } catch (error: any) {
+            const errorMsg = error.response?.data?.message || "Failed to update status";
+            setPopup({ open: true, message: errorMsg, severity: "error" });
         }
     };
 
@@ -85,11 +100,11 @@ const EnrollmentHistory: React.FC = () => {
                                     </TableCell>
                                     <TableCell sx={{ fontWeight: 500 }}>{req.courseTitle}</TableCell>
                                     <TableCell>
-                                        <Chip 
-                                            label={req.status} 
+                                        <Chip
+                                            label={req.status}
                                             size="small"
                                             icon={isApproved ? <CheckCircle /> : <Cancel />}
-                                            sx={{ 
+                                            sx={{
                                                 bgcolor: isApproved ? 'success.light' : 'error.light',
                                                 color: 'text.default',
                                                 fontWeight: 800
@@ -120,21 +135,28 @@ const EnrollmentHistory: React.FC = () => {
                     <Typography variant="body2" sx={{ mb: 2 }}>
                         Why are you revoking <strong>{selectedReq?.studentName}</strong>'s access?
                     </Typography>
-                    <TextField 
-                        autoFocus fullWidth multiline rows={3} label="Reason" 
-                        variant="outlined" onChange={(e) => setSelectedReq(prev => prev ? {...prev, reason: e.target.value} : null)}
+                    <TextField
+                        autoFocus fullWidth multiline rows={3} label="Reason"
+                        variant="outlined" onChange={(e) => setSelectedReq(prev => prev ? { ...prev, reason: e.target.value } : null)}
                     />
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setModalOpen(false)}>Cancel</Button>
-                    <Button 
-                        variant="contained" color="error" 
+                    <Button
+                        variant="contained" color="error"
                         onClick={() => selectedReq && executeUpdate(selectedReq.id, false, (selectedReq as any).reason || "None")}
                     >
                         Confirm Revoke
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <MessagePopup
+                open={popup.open}
+                message={popup.message}
+                severity={popup.severity}
+                onClose={() => setPopup({ ...popup, open: false })}
+            />
         </Box>
     );
 };

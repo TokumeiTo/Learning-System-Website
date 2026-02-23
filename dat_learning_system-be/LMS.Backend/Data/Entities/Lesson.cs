@@ -9,8 +9,6 @@ public class Lesson
     public string Title { get; set; } = "Untitled";
     public string Time { get; set; } = "-:--";
     public int SortOrder { get; set; }
-    public bool IsLocked { get; set; }
-    public bool IsDone { get; set; }
 
     public List<LessonContent> Contents { get; set; } = new();
 }

@@ -1,4 +1,5 @@
 import api from '../hooks/useApi';
+import type { ApiResponse } from '../types/api';
 import type {
     EnrollmentRequest,
     SubmitEnrollment,
@@ -24,16 +25,9 @@ export const getPendingRequests = async (): Promise<EnrollmentRequest[]> => {
 };
 
 // Admin: Approve or Reject a request with an optional reason
-export const respondToEnrollment = async (
-    id: string,
-    approve: boolean,
-    reason: string = "None" // Default to "None" if no reason is provided
-): Promise<void> => {
-    // We send 'approve' and 'reason' in the body for a cleaner API
-    await api.patch(`/api/enrollment/respond/${id}`, {
-        approve,
-        reason
-    });
+export const respondToEnrollment = async (id: string, approve: boolean, reason: string = "None"): Promise<ApiResponse> => {
+    const response = await api.patch(`/api/enrollment/respond/${id}`, { approve, reason });
+    return response.data; // This returns the { message: "..." } from .NET
 };
 
 export const getEnrollmentHistory = async (): Promise<EnrollmentRequest[]> => {

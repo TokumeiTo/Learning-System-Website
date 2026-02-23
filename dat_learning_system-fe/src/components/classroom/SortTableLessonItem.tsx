@@ -5,7 +5,8 @@ import {
 } from '@mui/material';
 import {
     CheckCircle, PlayCircle, DragIndicator as DragIcon,
-    Edit as EditIcon, DeleteOutline as DeleteIcon
+    Edit as EditIcon, DeleteOutline as DeleteIcon,
+    Lock as LockIcon
 } from '@mui/icons-material';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -20,13 +21,13 @@ type SortableItemProps = {
     onDelete: (id: string) => void;
 };
 
-const SortableLessonItem = ({ 
-    item, 
-    isEditMode, 
-    currentLessonId, 
-    onSelect, 
-    onUpdate, 
-    onDelete 
+const SortableLessonItem = ({
+    item,
+    isEditMode,
+    currentLessonId,
+    onSelect,
+    onUpdate,
+    onDelete
 }: SortableItemProps) => {
     // Local state for inline editing
     const [isEditing, setIsEditing] = useState(false);
@@ -35,8 +36,8 @@ const SortableLessonItem = ({
 
     const {
         attributes, listeners, setNodeRef, transform, transition, isDragging
-    } = useSortable({ 
-        id: item.id, 
+    } = useSortable({
+        id: item.id,
         disabled: !isEditMode || isEditing // Disable drag while typing
     });
 
@@ -60,10 +61,10 @@ const SortableLessonItem = ({
             ref={setNodeRef}
             style={style}
             disablePadding
-            sx={{ 
+            sx={{
                 mb: 0.5,
                 // Show action buttons only on hover when in edit mode
-                '&:hover .item-actions': { opacity: 1 } 
+                '&:hover .item-actions': { opacity: 1 }
             }}
         >
             <ListItemButton
@@ -74,7 +75,11 @@ const SortableLessonItem = ({
                     borderRadius: 2,
                     px: 1,
                     transition: '0.2s',
-                    '&.Mui-selected': { 
+                    '&.Mui-disabled': {
+                        opacity: 0.5,
+                        cursor: 'not-allowed'
+                    },
+                    '&.Mui-selected': {
                         bgcolor: 'rgba(99, 102, 241, 0.15)',
                         borderRight: '3px solid #6366f1'
                     },
@@ -82,8 +87,8 @@ const SortableLessonItem = ({
             >
                 {/* 1. Drag Handle (Left) */}
                 {isEditMode && !isEditing && (
-                    <ListItemIcon 
-                        {...attributes} {...listeners} 
+                    <ListItemIcon
+                        {...attributes} {...listeners}
                         sx={{ minWidth: 28, color: 'rgba(255,255,255,0.2)', cursor: 'grab' }}
                     >
                         <DragIcon fontSize="small" />
@@ -91,15 +96,26 @@ const SortableLessonItem = ({
                 )}
 
                 {/* 2. Status Icon */}
-                <ListItemIcon sx={{ minWidth: 32, color: item.isDone ? '#10b981' : 'rgba(255,255,255,0.3)' }}>
-                    {item.isDone ? <CheckCircle fontSize="small" /> : <PlayCircle fontSize="small" />}
+                <ListItemIcon sx={{
+                    minWidth: 32,
+                    color: item.isLocked && !isEditMode
+                        ? 'rgba(255,255,255,0.2)'
+                        : item.isDone ? '#10b981' : '#6366f1'
+                }}>
+                    {item.isLocked && !isEditMode ? (
+                        <LockIcon sx={{ fontSize: 18 }} />
+                    ) : item.isDone ? (
+                        <CheckCircle fontSize="small" />
+                    ) : (
+                        <PlayCircle fontSize="small" />
+                    )}
                 </ListItemIcon>
-                
+
                 {/* 3. Content (Text or Input) */}
                 <ListItemText
                     primary={
                         isEditing ? (
-                            <TextField 
+                            <TextField
                                 variant="standard" fullWidth autoFocus
                                 value={editTitle}
                                 onChange={(e) => setEditTitle(e.target.value)}
@@ -115,7 +131,7 @@ const SortableLessonItem = ({
                     }
                     secondary={
                         isEditing ? (
-                            <TextField 
+                            <TextField
                                 variant="standard" fullWidth
                                 value={editTime}
                                 onChange={(e) => setEditTime(e.target.value)}
@@ -131,21 +147,21 @@ const SortableLessonItem = ({
 
                 {/* 4. Action Buttons (Right) */}
                 {isEditMode && !isEditing && (
-                    <Stack 
-                        direction="row" 
-                        spacing={0.5} 
-                        className="item-actions" 
+                    <Stack
+                        direction="row"
+                        spacing={0.5}
+                        className="item-actions"
                         sx={{ opacity: 0, transition: '0.2s' }}
                     >
-                        <IconButton 
-                            size="small" 
+                        <IconButton
+                            size="small"
                             onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
                             sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#6366f1' } }}
                         >
                             <EditIcon sx={{ fontSize: 18 }} />
                         </IconButton>
-                        <IconButton 
-                            size="small" 
+                        <IconButton
+                            size="small"
                             onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
                             sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#f43f5e' } }}
                         >

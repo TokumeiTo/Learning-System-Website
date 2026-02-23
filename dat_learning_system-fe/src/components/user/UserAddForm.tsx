@@ -64,7 +64,7 @@ const UserAddForm: React.FC<UserAddFormProps> = ({ onSuccess, onCancel, loading 
                 const posId = Number(selectedPosition);
                 let data = [];
 
-                if (posId === 6) {
+                if (posId === 6 || posId === 7) {
                     // 1. Fetch specifically for Management
                     const divisions = await getDivisions();
                     const normalized = normalizeOrgData(divisions);
@@ -162,10 +162,10 @@ const UserAddForm: React.FC<UserAddFormProps> = ({ onSuccess, onCancel, loading 
                             <TextField
                                 {...field}
                                 select
-                                label={selectedPosition === 6 ? "Assigned Unit (Fixed)" : "Assign to Unit"}
+                                label={selectedPosition === 6 || selectedPosition === 7 ? "Assigned Unit (Fixed)" : "Assign to Unit"}
                                 fullWidth
                                 // Lock only for position 6
-                                disabled={!selectedPosition || fetchingUnits || selectedPosition === 6}
+                                disabled={!selectedPosition || fetchingUnits || selectedPosition === 6 || selectedPosition === 7}
                                 value={field.value ?? ""}
                                 onChange={(e) => field.onChange(Number(e.target.value))}
                                 sx={{ bgcolor: 'background.paper', borderRadius: 5 }}

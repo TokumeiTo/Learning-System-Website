@@ -125,7 +125,7 @@ const ClassroomPage = () => {
             {(isEditMode && canEdit) ? (
               <LessonContentSection currentLesson={currentLesson} />
             ) : (
-              <LessonContentViewer contents={currentLesson?.contents || []} />
+              <LessonContentViewer contents={currentLesson?.contents || []} lessonId={currentLesson?.id} />
             )}
           </Paper>
         </Box>

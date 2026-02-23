@@ -11,7 +11,6 @@ using LMS.Backend.DTOs.Topic;
 using LMS.Backend.DTOs.Audit;
 using LMS.Backend.DTOs.Notification;
 
-
 namespace LMS.Backend.Helpers;
 
 public class MappingProfile : Profile
@@ -64,25 +63,36 @@ public class MappingProfile : Profile
         CreateMap<Topic, TopicDto>();
         CreateMap<Lesson, LessonDto>();
 
-        // Classroom Profile
-        CreateMap<LessonContent, ClassroomContentDto>();
-        CreateMap<Lesson, ClassroomLessonDto>();
-        CreateMap<Course, ClassroomViewDto>()
-            .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.CourseTitle, opt => opt.MapFrom(src => src.Title));
-
-        // Lesson
-        CreateMap<CreateLessonDto, Lesson>();
+        // --- LESSON MAPPING ---
+        // Consolidate into one mapping for creation
         CreateMap<CreateLessonDto, Lesson>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
-            .ForMember(dest => dest.Contents, opt => opt.MapFrom(_ => new List<LessonContent>()))
-            .ForMember(dest => dest.IsLocked, opt => opt.MapFrom(_ => false))
-            .ForMember(dest => dest.IsDone, opt => opt.MapFrom(_ => false));
-        CreateMap<UpsertLessonContentDto, LessonContent>();
+            .ForMember(dest => dest.Contents, opt => opt.MapFrom(_ => new List<LessonContent>()));
+
+        // Update mapping: ensure we don't overwrite structural data
         CreateMap<UpdateLessonDto, Lesson>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.CourseId, opt => opt.Ignore())
             .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
             .ForMember(dest => dest.Contents, opt => opt.Ignore());
+
+        // --- CLASSROOM PROFILE MAPPING ---
+        CreateMap<LessonContent, ClassroomContentDto>();
+
+        CreateMap<Lesson, ClassroomLessonDto>()
+            // We explicitly ignore these because they no longer exist in the Lesson entity.
+            // They are destination-only properties that the Service will calculate.
+            .ForMember(dest => dest.IsDone, opt => opt.Ignore())
+            .ForMember(dest => dest.IsLocked, opt => opt.Ignore());
+
+        CreateMap<Course, ClassroomViewDto>()
+            .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.CourseTitle, opt => opt.MapFrom(src => src.Title))
+            .ForMember(dest => dest.Lessons, opt => opt.MapFrom(src => src.Lessons));
+
+        // --- PROGRESS MAPPING ---
+        CreateMap<UserLessonProgress, LessonProgressDto>();
+        CreateMap<UpsertLessonContentDto, LessonContent>();
 
         // Enrollments
         CreateMap<Enrollment, EnrollmentRequestDto>()

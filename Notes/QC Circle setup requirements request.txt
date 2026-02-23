@@ -54,9 +54,10 @@ npm install @hookform/resolvers yup
 npm install @tanstack/react-query-devtools
 npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
 npm install date-fns
+npm install react-player
 
 Chat gpt
-⚠️ Intentionally NOT installed yet (good move):
+⚠️ Intentionally NOT installed yet:
 
 Redis
 
@@ -66,4 +67,10 @@ Background jobs
 
 Caching libs
 
-We don’t need them yet.
+
+External APIs
+
+- Jisho API = $"https://jisho.org/api/v1/search/words?keyword={System.Net.WebUtility.UrlEncode(keyword)}";
+- MyMemory API= _config["Translation:ApiUrl"] ?? "https://api.mymemory.translated.net/get";
+- Kawazu to show furigana
+- Language detection

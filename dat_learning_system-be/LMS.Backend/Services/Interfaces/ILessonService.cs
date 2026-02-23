@@ -2,9 +2,10 @@ using LMS.Backend.DTOs.Classroom;
 using LMS.Backend.DTOs.Lesson;
 
 namespace LMS.Backend.Services.Interfaces;
+
 public interface ILessonService
 {
-    Task<ClassroomViewDto?> GetClassroomViewAsync(Guid courseId);
+    Task<ClassroomViewDto?> GetClassroomViewAsync(Guid courseId, string userId);
     Task<ClassroomLessonDto> CreateLessonAsync(CreateLessonDto dto);
     Task ReorderLessonsAsync(ReorderLessonsDto dto);
     Task BulkSaveContentsAsync(SaveLessonContentsDto dto);

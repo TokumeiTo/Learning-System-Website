@@ -1,3 +1,5 @@
+using LMS.Backend.Data.Repositories;
+using LMS.Backend.Data.Repositories.Interfaces;
 using LMS.Backend.Helpers;
 using LMS.Backend.Repo.Implement;
 using LMS.Backend.Repo.Interface;
@@ -22,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<IAuditRepository, AuditRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IUserProgressRepository, UserProgressRepository>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
@@ -34,6 +37,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<ITranslationService, TranslationService>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IUserProgressService, UserProgressService>();
 
         // Helpers
         services.AddSingleton<JwtHelper>();
