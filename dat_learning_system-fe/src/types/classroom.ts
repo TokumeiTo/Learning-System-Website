@@ -1,9 +1,12 @@
+import type { Test } from "./test";
+
 export interface LessonContent {
     id: string;
     lessonId: string;
-    contentType: 'text' | 'image' | 'video';
+    contentType: 'text' | 'image' | 'video' | 'test';
     body: string;
     sortOrder: number;
+    test?: Test;
 }
 
 export interface Lesson {

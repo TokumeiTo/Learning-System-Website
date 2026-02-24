@@ -1,27 +1,36 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { Box, Typography, Stack, Paper, Button, CircularProgress } from '@mui/material';
-import { AutoStories, CheckCircleOutline } from '@mui/icons-material'
+import { AutoStories, CheckCircleOutline, Lock } from '@mui/icons-material';
 import ReactPlayer from 'react-player';
 import type { LessonContent } from '../../types/classroom';
 import { sendHeartbeat, markLessonComplete } from '../../api/lessonProgress.api';
+import QuizViewer from '../quiz/QuizViewer';
 
-// Added lessonId to props so we know what to track
 interface Props {
     contents: LessonContent[];
     lessonId?: string;
-    isDone?: boolean; // Pass the current status from the parent
+    isDone?: boolean; 
     onComplete?: () => void;
 }
 
 const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isCompleting, setIsCompleting] = useState(false);
+    const [completedQuizzes, setCompletedQuizzes] = useState<Record<string, boolean>>({});
+    
     const lastActivityRef = useRef<number>(Date.now());
     const Player = ReactPlayer as any;
 
+    // --- LOGIC: QUIZ GATE ---
+    const allTestsPassed = useMemo(() => {
+        const testBlocks = contents.filter(c => c.contentType === 'test');
+        if (testBlocks.length === 0) return true;
+        return testBlocks.every(block => completedQuizzes[block.id]);
+    }, [contents, completedQuizzes]);
+
     // --- TRACKING LOGIC ---
     useEffect(() => {
-        if (!lessonId || !contents.length) return;
+        if (!lessonId || !contents.length || isDone) return;
 
         const updateActivity = () => {
             lastActivityRef.current = Date.now();
@@ -35,14 +44,11 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
             const isTabHidden = document.visibilityState === 'hidden';
             const hasVideo = contents.some(c => c.contentType === 'video');
 
-            // Track if: (Video is playing) OR (Text content AND user is moving/scrolling)
             const shouldTrack = hasVideo ? isPlaying : !isInactive;
 
-            if (shouldTrack && !isTabHidden) {
+            if (shouldTrack && !isTabHidden && !isDone) {
                 console.log(`%c 📈 KPI Pulse: Tracking Lesson ${lessonId}`, "color: #3b82f6");
                 sendHeartbeat({ lessonId, seconds: 15 }).catch(console.error);
-            } else {
-                console.log("%c ⏸️ Tracking Paused", "color: #ef4444");
             }
         }, 15000);
 
@@ -51,14 +57,18 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
             window.removeEventListener('scroll', updateActivity);
             clearInterval(interval);
         };
-    }, [lessonId, isPlaying, contents]);
+    }, [lessonId, isPlaying, contents, isDone]);
+
+    const handleQuizFinish = (blockId: string, score: number, passed: boolean) => {
+        setCompletedQuizzes(prev => ({ ...prev, [blockId]: passed }));
+    };
 
     const handleMarkAsComplete = async () => {
-        if (!lessonId) return;
+        if (!lessonId || !allTestsPassed) return;
         setIsCompleting(true);
         try {
             await markLessonComplete(lessonId);
-            if (onComplete) onComplete(); // Refresh parent state
+            if (onComplete) onComplete();
         } catch (error) {
             console.error("Failed to complete lesson", error);
         } finally {
@@ -71,26 +81,29 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
             <Paper sx={{ py: 10, px: 3, bgcolor: 'transparent', border: '2px dashed rgba(255,255,255,0.05)', borderRadius: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <AutoStories sx={{ fontSize: 60, color: 'rgba(99, 101, 241, 0.47)', mb: 2 }} />
                 <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>No Lesson Content Yet</Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5) ' }}>The instructor hasn't added any materials yet.</Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>The instructor hasn't added any materials yet.</Typography>
             </Paper>
         );
     }
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
-            <Stack spacing={4}>
+            <Stack spacing={6}>
                 {contents.map((block) => (
                     <Box key={block.id}>
+                        {/* TYPE: TEXT */}
                         {block.contentType === 'text' && (
                             <Typography sx={{ color: 'white', lineHeight: 1.8, fontSize: '1.1rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                                 {block.body}
                             </Typography>
                         )}
 
+                        {/* TYPE: IMAGE */}
                         {block.contentType === 'image' && block.body && (
-                            <Box component="img" src={block.body} sx={{ mx: 'auto', my: '20px', width: '70%', borderRadius: 3, boxShadow: '0 4px 20px rgba(255,255,255,0.1)', display: 'block' }} />
+                            <Box component="img" src={block.body} sx={{ mx: 'auto', my: '20px', borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.4)', display: 'block', maxWidth: '100%' }} />
                         )}
 
+                        {/* TYPE: VIDEO */}
                         {block.contentType === 'video' && block.body && (
                             <Box sx={{ width: '100%', aspectRatio: '16/9', borderRadius: 3, overflow: 'hidden', bgcolor: 'black' }}>
                                 <Player
@@ -106,33 +119,46 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
                                 />
                             </Box>
                         )}
+
+                        {/* TYPE: TEST / QUIZ */}
+                        {block.contentType === 'test' && block.body && (
+                            <QuizViewer 
+                                data={JSON.parse(block.body)} 
+                                onFinish={(score, passed) => handleQuizFinish(block.id, score, passed)}
+                                isLocked={isDone}
+                            />
+                        )}
                     </Box>
                 ))}
 
                 {/* --- COMPLETION SECTION --- */}
                 <Box sx={{
-                    mt: 6,
-                    pt: 4,
+                    mt: 6, pt: 4,
                     borderTop: '1px solid rgba(255,255,255,0.1)',
                     display: 'flex',
-                    justifyContent: 'end'
+                    flexDirection: 'column',
+                    alignItems: 'flex-end',
+                    gap: 2
                 }}>
+                    {!allTestsPassed && !isDone && (
+                        <Typography variant="body2" sx={{ color: '#fb7185', display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Lock sx={{ fontSize: 16 }} /> Complete all quizzes above to unlock completion.
+                        </Typography>
+                    )}
+
                     <Button
                         variant={isDone ? "outlined" : "contained"}
                         color={isDone ? "success" : "primary"}
                         size="large"
                         startIcon={isDone ? <CheckCircleOutline /> : null}
-                        disabled={isCompleting || isDone}
+                        disabled={isCompleting || isDone || !allTestsPassed}
                         onClick={handleMarkAsComplete}
                         sx={{
-                            borderRadius: 3,
-                            px: 6,
-                            py: 1.5,
+                            borderRadius: 3, px: 6, py: 1.5,
                             textTransform: 'none',
                             fontSize: '1rem',
                             fontWeight: 700,
                             boxShadow: isDone ? 'none' : '0 4px 14px 0 rgba(99, 102, 241, 0.39)',
-                            bgcolor: isDone ? 'green' : 'rgba(99, 102, 241, 0.39)',
                         }}
                     >
                         {isCompleting ? <CircularProgress size={24} color="inherit" /> :

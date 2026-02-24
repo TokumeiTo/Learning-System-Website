@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     ListItem, ListItemButton, ListItemIcon, ListItemText,
     Typography, TextField, Stack, IconButton
@@ -6,8 +6,10 @@ import {
 import {
     CheckCircle, PlayCircle, DragIndicator as DragIcon,
     Edit as EditIcon, DeleteOutline as DeleteIcon,
-    Lock as LockIcon
+    Lock as LockIcon,
+    LockOpen as LockOpenIcon,
 } from '@mui/icons-material';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Lesson } from '../../types/classroom';
@@ -33,6 +35,8 @@ const SortableLessonItem = ({
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(item.title);
     const [editTime, setEditTime] = useState(item.time);
+    const [prevLocked, setPrevLocked] = useState(item.isLocked);
+    const [showUnlockAnim, setShowUnlockAnim] = useState(false);
 
     const {
         attributes, listeners, setNodeRef, transform, transition, isDragging
@@ -50,11 +54,32 @@ const SortableLessonItem = ({
     };
 
     const handleSave = async () => {
+        // 1. Prevent saving if it's already in progress or title is empty
+        if (!editTitle.trim()) {
+            setEditTitle(item.title); // Reset to original
+            setIsEditing(false);
+            return;
+        }
+
         if (editTitle.trim() !== item.title || editTime !== item.time) {
-            await onUpdate(item.id, editTitle, editTime);
+            // 2. Wrap in a try-catch to handle network errors during edit
+            try {
+                await onUpdate(item.id, editTitle, editTime);
+            } catch (err) {
+                setEditTitle(item.title); // Rollback on error
+            }
         }
         setIsEditing(false);
     };
+
+    useEffect(() => {
+        // If it was locked and now it's not -> trigger animation
+        if (prevLocked && !item.isLocked) {
+            setShowUnlockAnim(true);
+            setTimeout(() => setShowUnlockAnim(false), 2000); // Reset after anim
+        }
+        setPrevLocked(item.isLocked);
+    }, [item.isLocked]);
 
     return (
         <ListItem
@@ -102,13 +127,46 @@ const SortableLessonItem = ({
                         ? 'rgba(255,255,255,0.2)'
                         : item.isDone ? '#10b981' : '#6366f1'
                 }}>
-                    {item.isLocked && !isEditMode ? (
-                        <LockIcon sx={{ fontSize: 18 }} />
-                    ) : item.isDone ? (
-                        <CheckCircle fontSize="small" />
-                    ) : (
-                        <PlayCircle fontSize="small" />
-                    )}
+                    <AnimatePresence mode="wait">
+                        {item.isLocked && !isEditMode ? (
+                            <motion.div
+                                key="locked"
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 1.2, opacity: 0, rotate: -10 }}
+                            >
+                                <LockIcon sx={{ fontSize: 18 }} />
+                            </motion.div>
+                        ) : showUnlockAnim ? (
+                            <motion.div
+                                key="unlocking"
+                                initial={{ y: 0 }}
+                                animate={{
+                                    y: [0, -5, 0],
+                                    color: ['#rgba(255,255,255,0.2)', '#6366f1']
+                                }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                <LockOpenIcon sx={{ fontSize: 18, color: '#6366f1' }} />
+                            </motion.div>
+                        ) : item.isDone ? (
+                            <motion.div
+                                key="done"
+                                initial={{ scale: 0.5, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                            >
+                                <CheckCircle fontSize="small" />
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="play"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                <PlayCircle fontSize="small" />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </ListItemIcon>
 
                 {/* 3. Content (Text or Input) */}

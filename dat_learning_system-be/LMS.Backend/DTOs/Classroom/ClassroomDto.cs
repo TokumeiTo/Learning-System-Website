@@ -1,3 +1,5 @@
+using LMS.Backend.DTOs.Test_Quest;
+
 namespace LMS.Backend.DTOs.Classroom;
 
 public class ClassroomContentDto
@@ -6,6 +8,7 @@ public class ClassroomContentDto
     public string ContentType { get; set; } = null!;
     public string Body { get; set; } = null!;
     public int SortOrder { get; set; }
+    public TestDto? Test { get; set; }
 }
 
 public class ClassroomLessonDto

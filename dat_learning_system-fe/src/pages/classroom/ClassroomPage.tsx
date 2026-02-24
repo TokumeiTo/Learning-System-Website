@@ -16,7 +16,7 @@ import ClassroomSidebar from '../../components/classroom/ClassroomSidebar';
 const ClassroomPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
+
   // NEW: Get user and check permissions
   const { user } = useAuth();
   const canEdit = user?.position === "Admin" || user?.position === "SuperAdmin";
@@ -28,19 +28,50 @@ const ClassroomPage = () => {
   // Default to Viewer (false)
   const [isEditMode, setIsEditMode] = useState(false);
 
+
+  const handleLessonComplete = (wasPassedFromQuiz: boolean = true) => {
+    if (!currentLesson || !data || !wasPassedFromQuiz) return;
+
+    // We only unlock/complete if the result was actually a 'Pass'
+    const updatedLessons = data.lessons.map((lesson, index) => {
+      if (lesson.id === currentLesson.id) {
+        return { ...lesson, isDone: true };
+      }
+
+      const currentIndex = data.lessons.findIndex(l => l.id === currentLesson.id);
+      if (index === currentIndex + 1) {
+        return { ...lesson, isLocked: false };
+      }
+      return lesson;
+    });
+
+    setData({ ...data, lessons: updatedLessons });
+    setCurrentLesson(prev => prev ? { ...prev, isDone: true } : null);
+  };
+
   useEffect(() => {
-    if (id) {
-      setLoading(true);
-      fetchClassroomData(id)
-        .then((res) => {
-          setData(res);
-          if (res.lessons.length > 0 && !currentLesson) {
-            setCurrentLesson(res.lessons[0]);
-          }
-        })
-        .catch(err => console.error("Error loading classroom:", err))
-        .finally(() => setLoading(false));
-    }
+    const loadClassroom = async () => {
+      if (!id) return;
+      try {
+        setLoading(true); // ONLY set this for the initial course load
+        const res = await fetchClassroomData(id);
+        setData(res);
+
+        // Initial lesson selection
+        if (res.lessons.length > 0) {
+          const resumeLesson = res.lessons.find(l => !l.isDone && !l.isLocked);
+          setCurrentLesson(resumeLesson || res.lessons[0]);
+        }
+      } catch (err) {
+        console.error("Error loading classroom:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadClassroom();
+    // REMOVE currentLesson from here! 
+    // We only want to reload if the classroom ID in the URL changes.
   }, [id]);
 
   if (loading) return (
@@ -61,10 +92,18 @@ const ClassroomPage = () => {
           <Typography variant="caption" sx={{ color: 'primary.light', fontWeight: 700 }}>
             {currentLesson?.title || 'Overview'}
           </Typography>
+          {isEditMode && (
+            <Typography
+              variant="button"
+              sx={{ color: 'warning.main', fontWeight: 'bold', ml: 2 }}
+            >
+              ● Editing Mode
+            </Typography>
+          )}
         </Box>
 
         <Stack direction="row" spacing={2} alignItems="center">
-          
+
           {/* --- CONDITIONALLY RENDER TOGGLE --- */}
           {canEdit && (
             <Stack direction="row" sx={{ bgcolor: '#1e293b', p: 0.5, borderRadius: 2 }}>
@@ -102,7 +141,7 @@ const ClassroomPage = () => {
             onClick={() => navigate('/courses')}
             sx={{ color: '#405d8b', borderColor: 'rgba(255,255,255,0.2)' }}
           >
-            <ExitToAppIcon fontSize='medium' sx={{ mr: 1 }}/> Exit Classroom
+            <ExitToAppIcon fontSize='medium' sx={{ mr: 1 }} /> Exit Classroom
           </Button>
         </Stack>
       </Stack>
@@ -125,7 +164,12 @@ const ClassroomPage = () => {
             {(isEditMode && canEdit) ? (
               <LessonContentSection currentLesson={currentLesson} />
             ) : (
-              <LessonContentViewer contents={currentLesson?.contents || []} lessonId={currentLesson?.id} />
+              <LessonContentViewer
+                contents={currentLesson?.contents || []}
+                lessonId={currentLesson?.id}
+                isDone={currentLesson?.isDone}
+                onComplete={handleLessonComplete}
+              />
             )}
           </Paper>
         </Box>

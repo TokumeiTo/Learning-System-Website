@@ -15,6 +15,12 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Course> Courses { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
     public DbSet<LessonContent> LessonContents { get; set; }
+    // --- TEST SYSTEM TABLES ---
+    public DbSet<Test> Tests { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<QuestionOption> QuestionOptions { get; set; }
+    public DbSet<LessonAttempt> LessonAttempts { get; set; }
+    // ------------------------------
     public DbSet<AuditLog> AuditLogs { get; set; }
     public DbSet<Topic> Topics { get; set; }
     public DbSet<Assignment> Assignments { get; set; }

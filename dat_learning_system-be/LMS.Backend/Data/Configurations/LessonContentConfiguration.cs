@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LMS.Backend.Data.Configurations;
 
+// Data/Configurations/LessonContentConfiguration.cs
 public class LessonContentConfiguration : IEntityTypeConfiguration<LessonContent>
 {
     public void Configure(EntityTypeBuilder<LessonContent> builder)
@@ -12,19 +13,22 @@ public class LessonContentConfiguration : IEntityTypeConfiguration<LessonContent
         builder.HasKey(c => c.Id);
 
         builder.Property(c => c.ContentType).IsRequired().HasMaxLength(50);
-        
-        builder.Property(c => c.Body).IsRequired().HasColumnType("text");
+        builder.Property(c => c.Body).IsRequired(false).HasColumnType("text");
 
-        // Explicitly link the Navigation Property and the Foreign Key
+        // Relationship
         builder.HasOne(lc => lc.Lesson)
                .WithMany(l => l.Contents)
                .HasForeignKey(lc => lc.LessonId)
                .OnDelete(DeleteBehavior.Cascade);
 
-        // Index for performance when rendering
+        // One-to-One with Test
+        builder.HasOne(lc => lc.Test)
+               .WithOne(t => t.LessonContent)
+               .HasForeignKey<Test>(t => t.LessonContentId)
+               .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasIndex(c => c.SortOrder);
 
-        // Global Query Filter for Soft Delete propagation
         builder.HasQueryFilter(lc => lc.Lesson.Course.Status != CourseStatus.Closed);
     }
 }

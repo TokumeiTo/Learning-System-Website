@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuditRepository, AuditRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IUserProgressRepository, UserProgressRepository>();
+        services.AddScoped<ITestRepository, TestRepository>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
@@ -38,6 +39,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITranslationService, TranslationService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IUserProgressService, UserProgressService>();
+        services.AddScoped<ITestService, TestService>();
 
         // Helpers
         services.AddSingleton<JwtHelper>();

@@ -37,30 +37,48 @@ public class LessonService(
 
     public async Task<ClassroomViewDto?> GetClassroomViewAsync(Guid courseId, string userId)
     {
-        // 1. Fetch the static structure (Lessons + Contents)
+        // 1. Fetch the static structure (Now including Tests/Questions/Options via the Repo update)
         var course = await repo.GetClassroomStructureAsync(courseId);
         if (course == null) return null;
 
-        // 2. Map to DTO (IsDone and IsLocked are 'false' by default here)
+        // 2. Map to DTO
         var viewDto = mapper.Map<ClassroomViewDto>(course);
 
-        // 3. Fetch the specific user's progress for all lessons in this course
+        // --- NEW: TEST SHUFFLE & SECURITY LOGIC ---
+        foreach (var lessonDto in viewDto.Lessons)
+        {
+            // Filter for content blocks that are tests and have data
+            var testContents = lessonDto.Contents
+                .Where(c => c.ContentType == "test" && c.Test != null);
+
+            foreach (var content in testContents)
+            {
+                foreach (var question in content.Test!.Questions)
+                {
+                    // 1. Randomize Option Order
+                    question.Options = question.Options.OrderBy(_ => Guid.NewGuid()).ToList();
+
+                    // 2. Hide Correct Answers (Set bool? to null)
+                    foreach (var opt in question.Options)
+                    {
+                        opt.IsCorrect = null;
+                    }
+                }
+            }
+        }
+        // ------------------------------------------
+
+        // 3. Fetch user progress
         var userProgress = await progressRepo.GetUserProgressForCourseAsync(userId, courseId);
 
-        // 4. DYNAMIC LOGIC: Calculate checkmarks and padlocks
-        bool previousCompleted = true; // The first lesson is always unlocked
+        // 4. DYNAMIC LOGIC: Checkmarks and padlocks
+        bool previousCompleted = true;
 
         foreach (var lessonDto in viewDto.Lessons)
         {
             var progress = userProgress.FirstOrDefault(p => p.LessonId == lessonDto.Id);
-
-            // IsDone comes from the database record
             lessonDto.IsDone = progress?.IsCompleted ?? false;
-
-            // IsLocked is true if the one before it wasn't finished
             lessonDto.IsLocked = !previousCompleted;
-
-            // Update for the next lesson in the loop
             previousCompleted = lessonDto.IsDone;
         }
 

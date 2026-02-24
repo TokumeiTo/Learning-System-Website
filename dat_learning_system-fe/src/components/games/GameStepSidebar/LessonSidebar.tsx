@@ -64,6 +64,7 @@ export default function LessonSidebar({
             />
           );
         })}
+
       </Box>
     </Box>
   );

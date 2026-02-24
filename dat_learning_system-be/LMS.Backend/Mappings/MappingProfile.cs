@@ -10,6 +10,7 @@ using LMS.Backend.DTOs.Enrollment;
 using LMS.Backend.DTOs.Topic;
 using LMS.Backend.DTOs.Audit;
 using LMS.Backend.DTOs.Notification;
+using LMS.Backend.DTOs.Test_Quest;
 
 namespace LMS.Backend.Helpers;
 
@@ -77,7 +78,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Contents, opt => opt.Ignore());
 
         // --- CLASSROOM PROFILE MAPPING ---
-        CreateMap<LessonContent, ClassroomContentDto>();
+        CreateMap<LessonContent, ClassroomContentDto>()
+            .ForMember(dest => dest.Test, opt => opt.MapFrom(src => src.Test));
 
         CreateMap<Lesson, ClassroomLessonDto>()
             // We explicitly ignore these because they no longer exist in the Lesson entity.
@@ -114,5 +116,20 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
             .ForMember(dest => dest.IsRead, opt => opt.MapFrom(_ => false));
+
+        // --- TESTS AND QUESTIONS ---
+        // Entity -> DTO (For Reading)
+        CreateMap<Test, TestDto>();
+        CreateMap<Question, QuestionDto>();
+        CreateMap<QuestionOption, OptionDto>();
+        CreateMap<LessonAttempt, LessonResultDto>();
+
+        // DTO -> Entity (For Admin Saving/Upserting)
+        CreateMap<TestDto, Test>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore()); // Usually ignore ID on create/update if generating new
+        CreateMap<QuestionDto, Question>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
+        CreateMap<OptionDto, QuestionOption>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
     }
 }

@@ -59,6 +59,9 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
         return await _context.Courses
             .Include(c => c.Lessons.OrderBy(l => l.SortOrder))
                 .ThenInclude(l => l.Contents.OrderBy(lc => lc.SortOrder))
+                    .ThenInclude(lc => lc.Test!)
+                        .ThenInclude(t => t.Questions)
+                            .ThenInclude(q => q.Options) // Add this
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == courseId);
     }

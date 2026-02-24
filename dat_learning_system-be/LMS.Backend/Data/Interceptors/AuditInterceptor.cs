@@ -62,9 +62,10 @@ public class AuditInterceptor : SaveChangesInterceptor
         {
             // 1. IGNORE LOGIC: Skip AuditLogs and the new CourseRating table entirely
             if (entry.Entity is AuditLog ||
-             entry.Entity is CourseRating ||
-             entry.State == EntityState.Detached ||
-             entry.State == EntityState.Unchanged)
+                entry.Entity is CourseRating ||
+                entry.Entity is UserLessonProgress ||
+                entry.State == EntityState.Detached ||
+                entry.State == EntityState.Unchanged)
             {
                 continue;
             }
