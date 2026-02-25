@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Stack, CircularProgress, Button, Paper } from '@mui/material';
 import { Edit, Visibility } from '@mui/icons-material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { fetchClassroomData } from '../../api/classroom.api';
-import type { ClassroomView, Lesson } from '../../types/classroom';
 
-// NEW: Import useAuth
+import { fetchClassroomData } from '../../api/classroom.api';
+import type { ClassroomView } from '../../types/classroom';
 import { useAuth } from '../../hooks/useAuth';
 
 import LessonContentSection from '../../components/classroom/LessonContentSection';
@@ -16,29 +15,61 @@ import ClassroomSidebar from '../../components/classroom/ClassroomSidebar';
 const ClassroomPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
-  // NEW: Get user and check permissions
   const { user } = useAuth();
+
+  // Permissions
   const canEdit = user?.position === "Admin" || user?.position === "SuperAdmin";
 
+  // State
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ClassroomView | null>(null);
-  const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
-
-  // Default to Viewer (false)
+  const [currentLessonId, setCurrentLessonId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
+  /**
+   * Derived State: Always find the current lesson from the fresh data array.
+   * This prevents "stale data" bugs when the sidebar updates lesson titles or status.
+   */
+  const currentLesson = data?.lessons.find((l) => l.id === currentLessonId) || null;
 
+  /**
+   * Load Data: 
+   * @param isSilent - If true, reloads data in background (useful for Manual Sync updates)
+   */
+  const loadClassroom = useCallback(async (isSilent: boolean = false) => {
+    if (!id) return;
+    try {
+      if (!isSilent) setLoading(true);
+      const res = await fetchClassroomData(id);
+      setData(res);
+
+      // Set initial lesson only if one isn't already selected
+      if (res.lessons.length > 0 && !currentLessonId) {
+        const resumeLesson = res.lessons.find((l) => !l.isDone && !l.isLocked);
+        setCurrentLessonId(resumeLesson?.id || res.lessons[0].id);
+      }
+    } catch (err) {
+      console.error("Error loading classroom:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [id, currentLessonId]);
+
+  useEffect(() => {
+    loadClassroom();
+  }, [id]); // Only re-run when the course ID changes
+
+  /**
+   * Local state update for immediate UI feedback when a student passes a quiz
+   */
   const handleLessonComplete = (wasPassedFromQuiz: boolean = true) => {
     if (!currentLesson || !data || !wasPassedFromQuiz) return;
 
-    // We only unlock/complete if the result was actually a 'Pass'
     const updatedLessons = data.lessons.map((lesson, index) => {
       if (lesson.id === currentLesson.id) {
         return { ...lesson, isDone: true };
       }
-
-      const currentIndex = data.lessons.findIndex(l => l.id === currentLesson.id);
+      const currentIndex = data.lessons.findIndex((l) => l.id === currentLesson.id);
       if (index === currentIndex + 1) {
         return { ...lesson, isLocked: false };
       }
@@ -46,33 +77,7 @@ const ClassroomPage = () => {
     });
 
     setData({ ...data, lessons: updatedLessons });
-    setCurrentLesson(prev => prev ? { ...prev, isDone: true } : null);
   };
-
-  useEffect(() => {
-    const loadClassroom = async () => {
-      if (!id) return;
-      try {
-        setLoading(true); // ONLY set this for the initial course load
-        const res = await fetchClassroomData(id);
-        setData(res);
-
-        // Initial lesson selection
-        if (res.lessons.length > 0) {
-          const resumeLesson = res.lessons.find(l => !l.isDone && !l.isLocked);
-          setCurrentLesson(resumeLesson || res.lessons[0]);
-        }
-      } catch (err) {
-        console.error("Error loading classroom:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadClassroom();
-    // REMOVE currentLesson from here! 
-    // We only want to reload if the classroom ID in the URL changes.
-  }, [id]);
 
   if (loading) return (
     <Box sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: '#0f172a' }}>
@@ -80,7 +85,7 @@ const ClassroomPage = () => {
     </Box>
   );
 
-  if (!data) return <Typography color="white">Course Not Found</Typography>;
+  if (!data) return <Typography color="white" sx={{ p: 4 }}>Course Not Found</Typography>;
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#0f172a', color: 'white', p: { xs: 2, md: 4 } }}>
@@ -92,19 +97,14 @@ const ClassroomPage = () => {
           <Typography variant="caption" sx={{ color: 'primary.light', fontWeight: 700 }}>
             {currentLesson?.title || 'Overview'}
           </Typography>
-          {isEditMode && (
-            <Typography
-              variant="button"
-              sx={{ color: 'warning.main', fontWeight: 'bold', ml: 2 }}
-            >
+          {isEditMode && canEdit && (
+            <Typography variant="button" sx={{ color: 'warning.main', fontWeight: 'bold', ml: 2 }}>
               ● Editing Mode
             </Typography>
           )}
         </Box>
 
         <Stack direction="row" spacing={2} alignItems="center">
-
-          {/* --- CONDITIONALLY RENDER TOGGLE --- */}
           {canEdit && (
             <Stack direction="row" sx={{ bgcolor: '#1e293b', p: 0.5, borderRadius: 2 }}>
               <Button
@@ -114,8 +114,8 @@ const ClassroomPage = () => {
                 sx={{
                   color: !isEditMode ? 'white' : 'rgba(255,255,255,0.4)',
                   bgcolor: !isEditMode ? '#6366f1' : 'transparent',
-                  '&:hover': { bgcolor: !isEditMode ? '#4f46e5' : 'rgba(255,255,255,0.05)' },
-                  borderRadius: 1.5, textTransform: 'none', px: 2
+                  borderRadius: 1.5, textTransform: 'none', px: 2,
+                  '&:hover': { bgcolor: !isEditMode ? '#4f46e5' : 'rgba(255,255,255,0.05)' }
                 }}
               >
                 Preview
@@ -127,8 +127,8 @@ const ClassroomPage = () => {
                 sx={{
                   color: isEditMode ? 'white' : 'rgba(255,255,255,0.4)',
                   bgcolor: isEditMode ? '#6366f1' : 'transparent',
-                  '&:hover': { bgcolor: isEditMode ? '#4f46e5' : 'rgba(255,255,255,0.05)' },
-                  borderRadius: 1.5, textTransform: 'none', px: 2
+                  borderRadius: 1.5, textTransform: 'none', px: 2,
+                  '&:hover': { bgcolor: isEditMode ? '#4f46e5' : 'rgba(255,255,255,0.05)' }
                 }}
               >
                 Edit
@@ -139,9 +139,10 @@ const ClassroomPage = () => {
           <Button
             variant="outlined"
             onClick={() => navigate('/courses')}
-            sx={{ color: '#405d8b', borderColor: 'rgba(255,255,255,0.2)' }}
+            startIcon={<ExitToAppIcon />}
+            sx={{ color: '#405d8b', borderColor: 'rgba(255,255,255,0.2)', textTransform: 'none' }}
           >
-            <ExitToAppIcon fontSize='medium' sx={{ mr: 1 }} /> Exit Classroom
+            Exit Classroom
           </Button>
         </Stack>
       </Stack>
@@ -149,7 +150,7 @@ const ClassroomPage = () => {
       {/* Main Layout Grid */}
       <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', lg: 'row' } }}>
 
-        {/* Left: Content Renderer */}
+        {/* Left: Content Area (Renderer or Editor) */}
         <Box sx={{ flex: 2, width: '100%' }}>
           <Paper
             elevation={0}
@@ -160,9 +161,11 @@ const ClassroomPage = () => {
               border: (isEditMode && canEdit) ? 'none' : '1px solid rgba(255,255,255,0.05)'
             }}
           >
-            {/* Double-check canEdit here just to be safe */}
             {(isEditMode && canEdit) ? (
-              <LessonContentSection currentLesson={currentLesson} />
+              <LessonContentSection 
+                currentLesson={currentLesson} 
+                onSaveSuccess={() => loadClassroom(true)} // Trigger background refresh to get new IDs
+              />
             ) : (
               <LessonContentViewer
                 contents={currentLesson?.contents || []}
@@ -174,14 +177,14 @@ const ClassroomPage = () => {
           </Paper>
         </Box>
 
-        {/* Right: Sidebar */}
+        {/* Right: Sidebar Navigation */}
         <Box sx={{ flex: 1, width: '100%' }}>
           <ClassroomSidebar
             data={data}
             setData={setData}
-            currentLesson={currentLesson}
-            setCurrentLesson={setCurrentLesson}
-            isEditMode={isEditMode && canEdit} // Ensure sidebar knows if edit is restricted
+            currentLessonId={currentLessonId}
+            setCurrentLessonId={setCurrentLessonId}
+            isEditMode={isEditMode && canEdit}
           />
         </Box>
       </Box>

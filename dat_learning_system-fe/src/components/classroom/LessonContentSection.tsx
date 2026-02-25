@@ -9,7 +9,13 @@ import { bulkSaveLessonContents } from '../../api/classroom.api';
 import MessagePopup from '../feedback/MessagePopup';
 
 // --- Main Section ---
-const LessonContentSection = ({ currentLesson }: { currentLesson: Lesson | null }) => {
+const LessonContentSection = ({
+  currentLesson,
+  onSaveSuccess 
+}: {
+  currentLesson: Lesson | null;
+  onSaveSuccess: () => void;
+}) => {
   const [drafts, setDrafts] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -22,23 +28,30 @@ const LessonContentSection = ({ currentLesson }: { currentLesson: Lesson | null 
   // When lesson changes, load its existing content into drafts
   useEffect(() => {
     if (currentLesson) {
-      setDrafts(currentLesson.contents.map(c => ({ ...c, tempId: String(c.id) })));
+      setDrafts(currentLesson.contents.map(c => ({
+        ...c,
+        tempId: String(c.id),
+        test: c.test || null
+      })));
     }
   }, [currentLesson]);
 
   const addDraft = (type: 'text' | 'image' | 'video' | 'test') => {
-    const newBlock = {
+    const newBlock: any = {
       tempId: Math.random().toString(),
       contentType: type,
-      // If it's a test, we initialize it with a basic JSON structure
-      body: type === 'test' ? JSON.stringify({ questions: [] }) : '',
-      lessonId: currentLesson?.id
+      body: '',
+      lessonId: currentLesson?.id,
+      // Initialize the relational structure
+      test: type === 'test' ? { questions: [], passingScore: 70 } : null
     };
     setDrafts([...drafts, newBlock]);
   };
 
-  const updateBlock = (tempId: string, value: string) => {
-    setDrafts(drafts.map(d => d.tempId === tempId ? { ...d, body: value } : d));
+  const updateBlock = (tempId: string, updates: any) => {
+    setDrafts(prev => prev.map(d =>
+      d.tempId === tempId ? { ...d, ...updates } : d
+    ));
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -57,16 +70,21 @@ const LessonContentSection = ({ currentLesson }: { currentLesson: Lesson | null 
     const payload: BulkSaveContentsRequest = {
       lessonId: currentLesson.id,
       contents: drafts.map((d, index) => ({
-        id: d.id || undefined, // Send real ID if it exists, undefined if new
+        // Manual Sync Logic: 
+        // If id is a real string/number from DB, keep it. 
+        // If it was newly added in UI, it won't have 'id', so it's a 'Create'.
+        id: d.id || undefined,
         contentType: d.contentType,
         body: d.body,
-        sortOrder: index // Use the actual array index for ordering
+        sortOrder: index,
+        test: d.contentType === 'test' ? d.test : null
       }))
     };
 
     try {
       await bulkSaveLessonContents(payload);
       setShowSuccessModal(true);
+      onSaveSuccess(); // Trigger the parent refresh logic
     } catch (e) {
       setErrorPopup({ open: true, message: "Save failed. Check your connection." });
     } finally {
@@ -137,21 +155,22 @@ const LessonContentSection = ({ currentLesson }: { currentLesson: Lesson | null 
       {/* --- SUCCESS MODAL --- */}
       <Dialog
         open={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)} // Allow closing
         PaperProps={{ sx: { bgcolor: '#1e293b', color: 'white', borderRadius: 3, p: 1 } }}
       >
-        <DialogTitle sx={{ fontWeight: 800 }}>Save Successful!</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 800 }}>Lesson Saved</DialogTitle>
         <DialogContent>
           <Typography sx={{ opacity: 0.8 }}>
-            The lesson content has been updated. We need to refresh the page to show the live changes.
+            All changes to "{currentLesson?.title}" have been synchronized successfully.
           </Typography>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
           <Button
             variant="contained"
-            onClick={() => window.location.reload()} // Simple & Reliable Refresh
-            sx={{ borderRadius: 2, textTransform: 'none', px: 4 }}
+            onClick={() => setShowSuccessModal(false)} // Just close it
+            sx={{ borderRadius: 2, textTransform: 'none', px: 4, bgcolor: '#6366f1' }}
           >
-            Refresh & View
+            Done
           </Button>
         </DialogActions>
       </Dialog>

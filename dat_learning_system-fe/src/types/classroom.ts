@@ -39,13 +39,16 @@ export interface ReOrderLessonsRequest {
 }
 
 export type UpsertContentRequest = {
-  contentType: string;
-  body: string;
+    id?: string;
+    contentType: 'text' | 'image' | 'video' | 'test';
+    body: string;
+    sortOrder: number;
+    test?: Test;
 };
 
 export type BulkSaveContentsRequest = {
-  lessonId: string;
-  contents: UpsertContentRequest[];
+    lessonId: string;
+    contents: UpsertContentRequest[];
 };
 
 export interface UpdateLessonRequest {

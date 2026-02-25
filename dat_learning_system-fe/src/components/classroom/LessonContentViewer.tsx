@@ -9,15 +9,17 @@ import QuizViewer from '../quiz/QuizViewer';
 interface Props {
     contents: LessonContent[];
     lessonId?: string;
-    isDone?: boolean; 
+    isDone?: boolean;
     onComplete?: () => void;
 }
 
 const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isCompleting, setIsCompleting] = useState(false);
-    const [completedQuizzes, setCompletedQuizzes] = useState<Record<string, boolean>>({});
     
+    // Initialize completed quizzes based on content status if the backend provides it
+    const [completedQuizzes, setCompletedQuizzes] = useState<Record<string, boolean>>({});
+
     const lastActivityRef = useRef<number>(Date.now());
     const Player = ReactPlayer as any;
 
@@ -25,16 +27,18 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
     const allTestsPassed = useMemo(() => {
         const testBlocks = contents.filter(c => c.contentType === 'test');
         if (testBlocks.length === 0) return true;
+
+        // If it's already marked as done globally, ignore the gate
+        if (isDone) return true;
+
         return testBlocks.every(block => completedQuizzes[block.id]);
-    }, [contents, completedQuizzes]);
+    }, [contents, completedQuizzes, isDone]);
 
     // --- TRACKING LOGIC ---
     useEffect(() => {
         if (!lessonId || !contents.length || isDone) return;
 
-        const updateActivity = () => {
-            lastActivityRef.current = Date.now();
-        };
+        const updateActivity = () => { lastActivityRef.current = Date.now(); };
 
         window.addEventListener('mousemove', updateActivity);
         window.addEventListener('scroll', updateActivity);
@@ -44,11 +48,13 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
             const isTabHidden = document.visibilityState === 'hidden';
             const hasVideo = contents.some(c => c.contentType === 'video');
 
+            // If there's a video, only track if it's actually playing
             const shouldTrack = hasVideo ? isPlaying : !isInactive;
 
-            if (shouldTrack && !isTabHidden && !isDone) {
-                console.log(`%c 📈 KPI Pulse: Tracking Lesson ${lessonId}`, "color: #3b82f6");
-                sendHeartbeat({ lessonId, seconds: 15 }).catch(console.error);
+            if (shouldTrack && !isTabHidden) {
+                sendHeartbeat({ lessonId, seconds: 15 }).catch(() => {
+                    /* Silent fail to not disrupt student */
+                });
             }
         }, 15000);
 
@@ -59,7 +65,7 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
         };
     }, [lessonId, isPlaying, contents, isDone]);
 
-    const handleQuizFinish = (blockId: string, score: number, passed: boolean) => {
+    const handleQuizFinish = (blockId: string, _score: number, passed: boolean) => {
         setCompletedQuizzes(prev => ({ ...prev, [blockId]: passed }));
     };
 
@@ -76,73 +82,78 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
         }
     };
 
+    // Helper for YouTube links (Matches Editor Logic)
+    const formatVideoUrl = (url: string) => {
+        if (url.includes('youtube.com/watch')) {
+            return url.replace("watch?v=", "embed/").split('&')[0];
+        }
+        return url.includes('http') ? url : `${import.meta.env.VITE_API_URL}/videos/${url}`;
+    };
+
     if (!contents || contents.length === 0) {
         return (
-            <Paper sx={{ py: 10, px: 3, bgcolor: 'transparent', border: '2px dashed rgba(255,255,255,0.05)', borderRadius: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <AutoStories sx={{ fontSize: 60, color: 'rgba(99, 101, 241, 0.47)', mb: 2 }} />
-                <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>No Lesson Content Yet</Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>The instructor hasn't added any materials yet.</Typography>
+            <Paper sx={{ py: 10, px: 3, bgcolor: 'transparent', border: '2px dashed rgba(255,255,255,0.1)', borderRadius: 4, textAlign: 'center' }}>
+                <AutoStories sx={{ fontSize: 60, color: 'rgba(99, 102, 241, 0.3)', mb: 2 }} />
+                <Typography variant="h6" sx={{ color: 'white' }}>No Content Available</Typography>
             </Paper>
         );
     }
 
     return (
-        <Box sx={{ maxWidth: '100%' }}>
+        <Box>
             <Stack spacing={6}>
                 {contents.map((block) => (
                     <Box key={block.id}>
                         {/* TYPE: TEXT */}
                         {block.contentType === 'text' && (
-                            <Typography sx={{ color: 'white', lineHeight: 1.8, fontSize: '1.1rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                            <Typography sx={{ color: 'white', lineHeight: 1.8, fontSize: '1.05rem', whiteSpace: 'pre-wrap' }}>
                                 {block.body}
                             </Typography>
                         )}
 
                         {/* TYPE: IMAGE */}
                         {block.contentType === 'image' && block.body && (
-                            <Box component="img" src={block.body} sx={{ mx: 'auto', my: '20px', borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.4)', display: 'block', maxWidth: '100%' }} />
+                            <Box 
+                                component="img" 
+                                src={block.body} 
+                                sx={{ width: '100%', borderRadius: 3, boxShadow: 4, display: 'block' }} 
+                            />
                         )}
 
                         {/* TYPE: VIDEO */}
                         {block.contentType === 'video' && block.body && (
                             <Box sx={{ width: '100%', aspectRatio: '16/9', borderRadius: 3, overflow: 'hidden', bgcolor: 'black' }}>
                                 <Player
-                                    url={block.body.includes('http') ? block.body : `${import.meta.env.VITE_API_URL}/videos/${block.body}`}
+                                    url={formatVideoUrl(block.body)}
                                     width="100%"
                                     height="100%"
                                     controls
                                     playing={isPlaying}
                                     onPlay={() => setIsPlaying(true)}
                                     onPause={() => setIsPlaying(false)}
-                                    onEnded={() => setIsPlaying(false)}
                                     config={{ file: { attributes: { controlsList: 'nodownload' } } }}
                                 />
                             </Box>
                         )}
 
                         {/* TYPE: TEST / QUIZ */}
-                        {block.contentType === 'test' && block.body && (
-                            <QuizViewer 
-                                data={JSON.parse(block.body)} 
+                        {block.contentType === 'test' && block.test && (
+                            <QuizViewer
+                                data={block.test}
+                                lessonId={lessonId}
                                 onFinish={(score, passed) => handleQuizFinish(block.id, score, passed)}
-                                isLocked={isDone}
+                                // Disable the quiz if the lesson is already done
+                                isLocked={isDone} 
                             />
                         )}
                     </Box>
                 ))}
 
                 {/* --- COMPLETION SECTION --- */}
-                <Box sx={{
-                    mt: 6, pt: 4,
-                    borderTop: '1px solid rgba(255,255,255,0.1)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-end',
-                    gap: 2
-                }}>
+                <Box sx={{ mt: 4, pt: 4, borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
                     {!allTestsPassed && !isDone && (
-                        <Typography variant="body2" sx={{ color: '#fb7185', display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Lock sx={{ fontSize: 16 }} /> Complete all quizzes above to unlock completion.
+                        <Typography variant="body2" sx={{ color: '#fb7185', mb: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
+                            <Lock sx={{ fontSize: 16 }} /> Please pass all quizzes to finish this lesson.
                         </Typography>
                     )}
 
@@ -150,19 +161,12 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
                         variant={isDone ? "outlined" : "contained"}
                         color={isDone ? "success" : "primary"}
                         size="large"
-                        startIcon={isDone ? <CheckCircleOutline /> : null}
-                        disabled={isCompleting || isDone || !allTestsPassed}
+                        disabled={isCompleting || (isDone ? false : !allTestsPassed)}
                         onClick={handleMarkAsComplete}
-                        sx={{
-                            borderRadius: 3, px: 6, py: 1.5,
-                            textTransform: 'none',
-                            fontSize: '1rem',
-                            fontWeight: 700,
-                            boxShadow: isDone ? 'none' : '0 4px 14px 0 rgba(99, 102, 241, 0.39)',
-                        }}
+                        sx={{ borderRadius: 3, px: 8, py: 1.5, fontWeight: 700 }}
                     >
                         {isCompleting ? <CircularProgress size={24} color="inherit" /> :
-                            isDone ? "Lesson Completed" : "Mark as Completed"}
+                         isDone ? "Completed ✓" : "Mark as Completed"}
                     </Button>
                 </Box>
             </Stack>

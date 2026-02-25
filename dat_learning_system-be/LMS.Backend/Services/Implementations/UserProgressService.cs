@@ -1,5 +1,4 @@
 using AutoMapper;
-using LMS.Backend.Data.Repositories.Interfaces;
 using LMS.Backend.DTOs.Lesson;
 using LMS.Backend.Repo.Interface;
 using LMS.Backend.Services.Interfaces;

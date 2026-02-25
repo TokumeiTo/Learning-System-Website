@@ -1,34 +1,52 @@
 import { useState } from 'react';
 import { Paper, Tabs, Tab, Box, Typography, Fade } from '@mui/material';
-import type { ClassroomView, Lesson } from '../../types/classroom';
+import type { ClassroomView } from '../../types/classroom';
 import CurriculumTab from './CurriculumTab';
 
 interface Props {
   data: ClassroomView;
   setData: React.Dispatch<React.SetStateAction<ClassroomView | null>>;
-  currentLesson: Lesson | null;
-  setCurrentLesson: (lesson: Lesson) => void;
+  currentLessonId: string | null;
+  setCurrentLessonId: (id: string) => void;
   isEditMode: boolean;
 }
 
-const ClassroomSidebar = ({ data, setData, currentLesson, setCurrentLesson, isEditMode }: Props) => {
+const ClassroomSidebar = ({ 
+  data, 
+  setData, 
+  currentLessonId, 
+  setCurrentLessonId, 
+  isEditMode 
+}: Props) => {
   const [activeTab, setActiveTab] = useState(0);
 
-  // Helper to handle lesson switching with future-proofing for "Unsaved Changes" or "Active Test"
-  const handleLessonChange = (lesson: Lesson) => {
-    if (lesson.id === currentLesson?.id) return;
-    
-    // Logic check: Only allow navigation if not locked OR if in Edit Mode
-    if (lesson.isLocked && !isEditMode) return;
+  /**
+   * Guarded navigation:
+   * Prevents students from clicking into locked lessons, 
+   * while allowing Admins full access during Edit Mode.
+   */
+  const handleLessonChange = (lessonId: string) => {
+    if (lessonId === currentLessonId) return;
 
-    setCurrentLesson(lesson);
+    // Find the lesson in our current data to check its status
+    const targetLesson = data.lessons.find(l => l.id === lessonId);
+    
+    if (!targetLesson) return;
+
+    // Logic check: Only allow if not locked OR if user is an Admin in Edit Mode
+    if (targetLesson.isLocked && !isEditMode) {
+      console.warn("This lesson is locked. Complete previous lessons first.");
+      return;
+    }
+
+    setCurrentLessonId(lessonId);
   };
 
   return (
     <Paper 
       elevation={0}
       sx={{ 
-        bgcolor: '#1e293b', // Match ClassroomPage depth
+        bgcolor: '#1e293b', 
         borderRadius: 4, 
         overflow: 'hidden', 
         border: '1px solid rgba(255,255,255,0.05)',
@@ -49,7 +67,7 @@ const ClassroomSidebar = ({ data, setData, currentLesson, setCurrentLesson, isEd
             textTransform: 'none', 
             fontWeight: 700,
             fontSize: '0.875rem',
-            color: 'rgba(255,255,255,0.5)',
+            color: 'rgba(255,255,255,0.4)',
             '&.Mui-selected': { color: '#818cf8' } 
           }
         }}
@@ -67,8 +85,8 @@ const ClassroomSidebar = ({ data, setData, currentLesson, setCurrentLesson, isEd
               <CurriculumTab
                 data={data}
                 setData={setData}
-                currentLesson={currentLesson}
-                setCurrentLesson={handleLessonChange} // Using our guarded function
+                currentLessonId={currentLessonId}
+                onLessonSelect={handleLessonChange} 
                 isEditMode={isEditMode}
               />
             </Box>

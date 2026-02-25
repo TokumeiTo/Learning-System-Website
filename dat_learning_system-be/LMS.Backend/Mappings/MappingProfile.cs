@@ -94,7 +94,10 @@ public class MappingProfile : Profile
 
         // --- PROGRESS MAPPING ---
         CreateMap<UserLessonProgress, LessonProgressDto>();
-        CreateMap<UpsertLessonContentDto, LessonContent>();
+        CreateMap<UpsertLessonContentDto, LessonContent>()
+            .ForMember(dest => dest.Test, opt => opt.MapFrom(src => src.Test))
+            // If Body is null (which it will be for a Test), ensure we don't crash
+            .ForMember(dest => dest.Body, opt => opt.NullSubstitute(string.Empty));
 
         // Enrollments
         CreateMap<Enrollment, EnrollmentRequestDto>()
@@ -122,14 +125,38 @@ public class MappingProfile : Profile
         CreateMap<Test, TestDto>();
         CreateMap<Question, QuestionDto>();
         CreateMap<QuestionOption, OptionDto>();
-        CreateMap<LessonAttempt, LessonResultDto>();
+        CreateMap<LessonAttempt, LessonResultDto>()
+            .ForMember(dest => dest.Percentage, opt => opt.MapFrom(src => (double)src.Percentage));
+
+        CreateMap<LessonAttempt, LessonAttemptDto>();
 
         // DTO -> Entity (For Admin Saving/Upserting)
         CreateMap<TestDto, Test>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore()); // Usually ignore ID on create/update if generating new
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions));
         CreateMap<QuestionDto, Question>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore());
-        CreateMap<OptionDto, QuestionOption>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore());
+            .ForMember(dest => dest.Options, opt => opt.MapFrom(src => src.Options));
+        CreateMap<OptionDto, QuestionOption>();
+
+
+        // This ensures IsCorrect is hidden if the Student is the one requesting the data
+        // Entity -> DTO (Student Viewing)
+        CreateMap<QuestionOption, OptionDto>()
+         .ForMember(dest => dest.IsCorrect, opt => opt.MapFrom((src, dest, destMember, context) =>
+            {
+                // TryGetItems is safer and prevents the "Context.Items are only available when..." error
+                try
+                {
+                    if (context.Items.TryGetValue("IsAdmin", out var isAdmin) && isAdmin is bool adminBool)
+                    {
+                        return adminBool ? src.IsCorrect : (bool?)null;
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    // If items aren't initialized at all, we assume not an admin for safety
+                    return (bool?)null;
+                }
+                return (bool?)null;
+            }));
     }
 }

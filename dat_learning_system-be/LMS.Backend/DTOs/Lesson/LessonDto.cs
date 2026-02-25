@@ -50,9 +50,32 @@ public class UpdateLessonDto
     public Guid Id { get; set; }
     public string Title { get; set; } = null!;
     public string Time { get; set; } = "-:--";
+    public int SortOrder { get; set; }
 }
 public class UpsertLessonContentDto
 {
+    public Guid? Id { get; set; } // Added Id to track existing blocks vs new ones
     public string ContentType { get; set; } = "text";
-    public string Body { get; set; } = string.Empty;
+    public string? Body { get; set; }
+    public int SortOrder { get; set; }
+
+    // This is the key! This maps to the JSON object we built in React
+    public TestDto? Test { get; set; } 
+}
+
+public class SubmitQuizDto
+{
+    public Guid TestId { get; set; }
+    // Key: QuestionId, Value: SelectedOptionId
+    public Dictionary<Guid, Guid> Answers { get; set; } = new();
+}
+
+public class QuizResultDto
+{
+    public int Score { get; set; }
+    public int MaxScore { get; set; }
+    public double Percentage { get; set; }
+    public bool IsPassed { get; set; }
+    // You can send back which questions were wrong if you want
+    public List<Guid> CorrectOptionIds { get; set; } = new(); 
 }

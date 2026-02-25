@@ -14,12 +14,15 @@ export interface Question {
 
 export interface Test {
   id?: string;
+  title?: string;
   questions: Question[];
+  passingGrade: number;
 }
 
 export interface LessonSubmission {
   lessonId: string;
-  selectedOptionIds: string[];
+  // TypeScript equivalent of Dictionary<Guid, Guid>
+  answers: { [questionId: string]: string }; 
 }
 
 export interface LessonResult {
@@ -28,4 +31,34 @@ export interface LessonResult {
   percentage: number;
   isPassed: boolean;
   attemptedAt: string;
+  correctOptionIds?: string[];
+}
+
+// Attempts handling
+
+export interface LessonAttempt {
+  id: string;
+  score: number;
+  maxScore: number;
+  percentage: number;
+  isPassed: boolean;
+  attemptedAt: string;
+}
+
+export interface AdminLessonStats {
+  lessonId: string;
+  lessonTitle: string;
+  totalAttempts: number;
+  passCount: number;
+  averagePercentage: number;
+  successRate: number;
+}
+
+export interface StudentPerformanceKPI {
+  userId: string;
+  fullName: string;
+  email: string;
+  lessonsCompleted: number;
+  overallAverageScore: number;
+  lastActivity?: string;
 }

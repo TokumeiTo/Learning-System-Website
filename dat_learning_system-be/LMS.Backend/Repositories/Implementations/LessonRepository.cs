@@ -88,34 +88,46 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
         await SaveChangesAsync();
     }
 
-    public async Task SaveLessonContentsAsync(Guid lessonId, IEnumerable<LessonContent> contents)
+    public async Task SaveLessonContentsAsync(Guid lessonId, IEnumerable<LessonContent> incomingContents)
     {
-        // 1. Get the strategy
         var strategy = _context.Database.CreateExecutionStrategy();
 
-        // 2. Wrap everything in the strategy execution
         await strategy.ExecuteAsync(async () =>
         {
-            // 3. Start the transaction INSIDE the strategy
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Remove existing
-                var existing = await _context.LessonContents
+                // 1. Fetch existing contents including the Test link
+                var existingItems = await _context.LessonContents
                     .Where(c => c.LessonId == lessonId)
                     .ToListAsync();
 
-                _context.LessonContents.RemoveRange(existing);
-                await SaveChangesAsync();
+                // 2. Identify items to Delete (In DB but not in incoming list)
+                var incomingIds = incomingContents.Select(x => x.Id).ToList();
+                var toDelete = existingItems.Where(x => !incomingIds.Contains(x.Id)).ToList();
+                _context.LessonContents.RemoveRange(toDelete);
 
-                // Add new
                 int order = 1;
-                foreach (var item in contents)
+                foreach (var incoming in incomingContents)
                 {
-                    item.Id = Guid.NewGuid();
-                    item.LessonId = lessonId;
-                    item.SortOrder = order++;
-                    await _context.LessonContents.AddAsync(item);
+                    var existing = existingItems.FirstOrDefault(x => x.Id == incoming.Id);
+
+                    if (existing == null)
+                    {
+                        // ADD NEW
+                        incoming.Id = incoming.Id == Guid.Empty ? Guid.NewGuid() : incoming.Id;
+                        incoming.LessonId = lessonId;
+                        incoming.SortOrder = order++;
+                        await _context.LessonContents.AddAsync(incoming);
+                    }
+                    else
+                    {
+                        // UPDATE EXISTING (Manual Sync - prevents breaking Test links)
+                        existing.ContentType = incoming.ContentType;
+                        existing.Body = incoming.Body;
+                        existing.SortOrder = order++;
+                        // We don't touch existing.Test here; that's for the TestSync logic
+                    }
                 }
 
                 await SaveChangesAsync();
@@ -124,8 +136,14 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
             catch
             {
                 await transaction.RollbackAsync();
-                throw; // Re-throw so the strategy knows it might need to retry
+                throw;
             }
         });
+    }
+    public async Task<double> GetAverageScoreForLessonAsync(Guid lessonId)
+    {
+        return await _context.LessonAttempts
+            .Where(a => a.LessonId == lessonId)
+            .AverageAsync(a => a.Percentage);
     }
 }

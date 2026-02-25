@@ -17,8 +17,8 @@ import type { Lesson } from '../../types/classroom';
 type SortableItemProps = {
     item: Lesson;
     isEditMode: boolean;
-    currentLessonId?: string;
-    onSelect: (item: Lesson) => void;
+    currentLessonId: string | null;
+    onSelect: () => void;
     onUpdate: (id: string, title: string, time: string) => Promise<void>;
     onDelete: (id: string) => void;
 };
@@ -95,7 +95,7 @@ const SortableLessonItem = ({
             <ListItemButton
                 disabled={item.isLocked && !isEditMode}
                 selected={currentLessonId === item.id}
-                onClick={() => !isEditing && onSelect(item)}
+                onClick={() => !isEditing && onSelect()}
                 sx={{
                     borderRadius: 2,
                     px: 1,
@@ -182,7 +182,13 @@ const SortableLessonItem = ({
                                 InputProps={{ disableUnderline: true, sx: { color: 'white', fontSize: '0.875rem', fontWeight: 600 } }}
                             />
                         ) : (
-                            <Typography variant="body2" sx={{ color: 'white', fontWeight: currentLessonId === item.id ? 700 : 500 }}>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: 'white',
+                                    fontWeight: currentLessonId === item.id ? 900 : 500 // Bold if active
+                                }}
+                            >
                                 {item.title}
                             </Typography>
                         )

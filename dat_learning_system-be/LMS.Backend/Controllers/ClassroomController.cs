@@ -7,42 +7,49 @@ using System.Security.Claims;
 
 namespace LMS.Backend.Controllers;
 
-[Authorize] // Ensure the user is logged in to access the classroom
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ClassroomController(ILessonService lessonService) : ControllerBase
 {
+    // --- STUDENT & ADMIN VIEW ---
     [HttpGet("{courseId}")]
     public async Task<ActionResult<ClassroomViewDto>> GetClassroom(Guid courseId)
     {
-        // Extract the UserId from the claims (Sub or NameIdentifier)
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        // Now passing both the courseId AND the userId to calculate progress
         var result = await lessonService.GetClassroomViewAsync(courseId, userId);
-        
         if (result == null) return NotFound();
+        
         return Ok(result);
     }
 
+    // --- NEW: STUDENT QUIZ SUBMISSION ---
+    [HttpPost("lessons/quiz/submit")]
+    public async Task<ActionResult<QuizResultDto>> SubmitQuiz([FromBody] SubmitQuizDto dto)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        // This triggers the grading, attempt recording, and progress logic
+        var result = await lessonService.SubmitQuizAsync(userId, dto);
+        return Ok(result);
+    }
+
+    // --- ADMIN ONLY OPERATIONS ---
+
     [HttpPost("lessons")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ClassroomLessonDto>> CreateLesson([FromBody] CreateLessonDto dto)
     {
-        try
-        {
-            var result = await lessonService.CreateLessonAsync(dto);
-            // Updated to be more RESTful with the actual ID
-            return CreatedAtAction(nameof(GetClassroom), new { courseId = dto.CourseId }, result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var result = await lessonService.CreateLessonAsync(dto);
+        // Using courseId from result to be safe
+        return CreatedAtAction(nameof(GetClassroom), new { courseId = result.CourseId }, result);
     }
 
     [HttpPost("lessons/contents/bulk")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> BulkSaveContents([FromBody] SaveLessonContentsDto dto)
     {
         await lessonService.BulkSaveContentsAsync(dto);
@@ -50,6 +57,7 @@ public class ClassroomController(ILessonService lessonService) : ControllerBase
     }
 
     [HttpPut("lessons/reorder")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> ReorderLessons([FromBody] ReorderLessonsDto dto)
     {
         await lessonService.ReorderLessonsAsync(dto);
@@ -57,31 +65,19 @@ public class ClassroomController(ILessonService lessonService) : ControllerBase
     }
 
     [HttpPut("lessons/{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ClassroomLessonDto>> UpdateLesson(Guid id, [FromBody] UpdateLessonDto dto)
     {
         if (id != dto.Id) return BadRequest("ID mismatch");
-
-        try
-        {
-            var result = await lessonService.UpdateLessonAsync(dto);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var result = await lessonService.UpdateLessonAsync(dto);
+        return Ok(result);
     }
 
     [HttpDelete("lessons/{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteLesson(Guid id)
     {
         var deleted = await lessonService.DeleteLessonAsync(id);
-        if (!deleted) return NotFound();
-
-        return NoContent();
+        return deleted ? NoContent() : NotFound();
     }
 }

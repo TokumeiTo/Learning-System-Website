@@ -1,9 +1,9 @@
 using LMS.Backend.Data.Dbcontext;
 using LMS.Backend.Data.Entities;
-using LMS.Backend.Data.Repositories.Interfaces;
+using LMS.Backend.Repo.Interface;
 using Microsoft.EntityFrameworkCore;
 
-namespace LMS.Backend.Data.Repositories;
+namespace LMS.Backend.Repo.Implement;
 
 public class UserProgressRepository : IUserProgressRepository
 {
@@ -40,27 +40,43 @@ public class UserProgressRepository : IUserProgressRepository
         {
             progress.TimeSpentSeconds += secondsToAdd;
             progress.LastAccessedAt = DateTime.UtcNow;
-            _context.UserLessonProgresses.Update(progress);
+            // EF Core tracks 'progress', so .Update(progress) is technically optional but fine
         }
 
         await _context.SaveChangesAsync();
     }
 
+    // RENAMED/MODIFIED to handle cases where progress record doesn't exist yet
     public async Task MarkAsCompleteAsync(string userId, Guid lessonId)
     {
         var progress = await GetProgressAsync(userId, lessonId);
-        if (progress != null)
+        
+        if (progress == null)
+        {
+            // If they passed the quiz before the timer-sync happened, create the record
+            _context.UserLessonProgresses.Add(new UserLessonProgress
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                LessonId = lessonId,
+                IsCompleted = true,
+                TimeSpentSeconds = 0,
+                LastAccessedAt = DateTime.UtcNow
+            });
+        }
+        else
         {
             progress.IsCompleted = true;
             progress.LastAccessedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
         }
+
+        await _context.SaveChangesAsync();
     }
 
     public async Task<List<UserLessonProgress>> GetUserProgressForCourseAsync(string userId, Guid courseId)
     {
         return await _context.UserLessonProgresses
-            .Include(p => p.Lesson) // Join with Lesson table
+            .Include(p => p.Lesson)
             .Where(p => p.UserId == userId && p.Lesson.CourseId == courseId)
             .ToListAsync();
     }

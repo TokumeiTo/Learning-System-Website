@@ -2,7 +2,6 @@ using AutoMapper;
 using LMS.Backend.Data.Entities;
 using LMS.Backend.DTOs.Test_Quest;
 using LMS.Backend.Repo.Interface;
-using LMS.Backend.Data.Repositories.Interfaces;
 using LMS.Backend.Services.Interfaces;
 
 namespace LMS.Backend.Services.Implement;
@@ -15,8 +14,8 @@ public class TestService : ITestService
     private readonly IMapper _mapper;
 
     public TestService(
-        ITestRepository testRepo, 
-        ILessonRepository lessonRepo, 
+        ITestRepository testRepo,
+        ILessonRepository lessonRepo,
         IUserProgressRepository progressRepo,
         IMapper mapper)
     {
@@ -35,18 +34,31 @@ public class TestService : ITestService
 
     public async Task<LessonResultDto> GradeLessonAsync(string userId, LessonSubmissionDto submission)
     {
-        // 1. Fetch correct IDs and Max points
-        var correctOptionIds = await _testRepo.GetCorrectOptionIdsForLessonAsync(submission.LessonId);
-        var maxScore = await _testRepo.GetTotalPointsForLessonAsync(submission.LessonId);
-        
-        // 2. Calculate score
-        var score = submission.SelectedOptionIds.Count(id => correctOptionIds.Contains(id));
-        double percentage = maxScore > 0 ? (double)score / maxScore * 100 : 0;
+        // 1. Fetch the Test with its Questions and Correct Options
+        // Note: We need the actual Test entity to get the PassingGrade and Question Points
+        var test = await _testRepo.GetTestWithCorrectAnswersAsync(submission.LessonId);
+        if (test == null) throw new KeyNotFoundException("No test found for this lesson");
 
-        // 3. Check against passing threshold
-        var lesson = await _lessonRepo.GetByIdAsync(submission.LessonId);
-        int passingThreshold = lesson?.PassingScore ?? 70;
-        bool isPassed = percentage >= passingThreshold;
+        int earnedPoints = 0;
+        int totalPoints = test.Questions.Sum(q => q.Points);
+
+        // 2. Calculate weighted score
+        foreach (var question in test.Questions)
+        {
+            if (submission.Answers.TryGetValue(question.Id, out Guid selectedOptionId))
+            {
+                var correctOption = question.Options.FirstOrDefault(o => o.IsCorrect);
+                if (correctOption != null && correctOption.Id == selectedOptionId)
+                {
+                    earnedPoints += question.Points;
+                }
+            }
+        }
+
+        double percentage = totalPoints > 0 ? (double)earnedPoints / totalPoints * 100 : 0;
+
+        // 3. Use PassingGrade from the TEST entity (not the Lesson)
+        bool isPassed = percentage >= test.PassingGrade;
 
         // 4. Record the specific attempt
         var attempt = new LessonAttempt
@@ -54,26 +66,26 @@ public class TestService : ITestService
             Id = Guid.NewGuid(),
             UserId = userId,
             LessonId = submission.LessonId,
-            Score = score,
-            MaxScore = maxScore,
+            TestId = test.Id, // Link to the specific test version
+            Score = earnedPoints,
+            MaxScore = totalPoints,
             Percentage = Math.Round(percentage, 2),
             IsPassed = isPassed,
             AttemptedAt = DateTime.UtcNow
         };
         await _testRepo.CreateAttemptAsync(attempt);
 
-        // 5. AUTOMATION: Use your existing MarkAsCompleteAsync
+        // 5. Automation: Mark lesson as done if passed
         if (isPassed)
         {
-            // This ensures the green checkmark appears in the classroom view
             await _progressRepo.MarkAsCompleteAsync(userId, submission.LessonId);
         }
 
         return new LessonResultDto
         {
-            Score = score,
-            MaxScore = maxScore,
-            Percentage = attempt.Percentage,
+            Score = earnedPoints,
+            MaxScore = totalPoints,
+            Percentage = (double)attempt.Percentage,
             IsPassed = isPassed,
             AttemptedAt = attempt.AttemptedAt
         };

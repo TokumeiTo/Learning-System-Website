@@ -1,103 +1,112 @@
 import { useState } from 'react';
 import { Box, Paper, Typography, Button, Stack, Radio, RadioGroup, FormControlLabel, Alert } from '@mui/material';
-import { CheckCircle, Cancel, Send, Refresh } from '@mui/icons-material';
+import { Send, Refresh } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface Question {
-    question: string;
-    options: string[];
-    correctAnswer: string;
-}
-
-interface QuizData {
-    questions: Question[];
-    passingGrade?: number; // Now dynamic from the Admin Creator
-}
+import type { Test, Question, Option } from '../../types/test';
+import { submitLessonQuiz } from '../../api/test.api'; // Ensure this matches your API file
 
 interface Props {
-    data: QuizData;
-    onFinish: (score: number, passed: boolean) => void; // Parent now expects passed status
+    data: Test;
+    onFinish: (score: number, passed: boolean) => void;
     isLocked?: boolean;
+    lessonId?: string;
 }
 
-const QuizViewer = ({ data, onFinish, isLocked }: Props) => {
-    const [answers, setAnswers] = useState<Record<number, string>>({});
+const QuizViewer = ({ data, onFinish, isLocked, lessonId }: Props) => {
+    // 1. answers state now stores QuestionID -> OptionID (GUID strings)
+    const [answers, setAnswers] = useState<Record<string, string>>({});
     const [submitted, setSubmitted] = useState(false);
     const [score, setScore] = useState(0);
 
-    const passingThreshold = data.passingGrade ?? 70; // Fallback to 70 if not set
+    const passingThreshold = data.passingGrade || 70;
 
-    const handleOptionChange = (qIndex: number, value: string) => {
+    const handleOptionChange = (questionId: string, optionId: string) => {
         if (submitted || isLocked) return;
-        setAnswers({ ...answers, [qIndex]: value });
+        setAnswers(prev => ({ ...prev, [questionId]: optionId }));
     };
 
-    const handleSubmit = () => {
-        if (isLocked) return;
+    const handleSubmit = async () => {
+        if (isLocked || !lessonId) return;
 
-        let correctCount = 0;
-        data.questions.forEach((q, index) => {
-            if (answers[index] === q.correctAnswer) correctCount++;
-        });
+        // Transform Record<string, string> into { questionId, selectedOptionText }[]
+        const formattedAnswers = Object.entries(answers).map(([qId, optId]) => ({
+            questionId: qId,
+            selectedOptionText: optId // Even though it's named 'Text', we are passing the ID
+        }));
 
-        const finalScore = Math.round((correctCount / data.questions.length) * 100);
-        const hasPassed = finalScore >= passingThreshold;
+        const submission = {
+            lessonId: lessonId,
+            answers: formattedAnswers
+        };
 
-        setScore(finalScore);
-        setSubmitted(true);
+        try {
+            const result = await submitLessonQuiz(submission);
 
-        // Notify parent with the dynamic results
-        onFinish(finalScore, hasPassed);
+            setScore(result.percentage);
+            setSubmitted(true);
+            onFinish(result.percentage, result.isPassed);
+        } catch (error) {
+            console.error("Submission failed", error);
+            alert("Failed to submit quiz.");
+        }
     };
 
     if (!data.questions || data.questions.length === 0) return null;
 
     return (
-        <Paper sx={{ bgcolor: '#1e293b'}}>
+        <Paper sx={{ bgcolor: '#1e293b', p: 3, borderRadius: 3, border: '1px solid #334155' }}>
             <Typography variant="h6" sx={{ color: '#818cf8', mb: 3, fontWeight: 700 }}>
-                Knowledge Check 
-                {isLocked && <Typography component="span" sx={{ ml: 2, color: '#10b981', fontSize: '0.8rem' }}>(Completed)</Typography>}
+                {data.title || 'Knowledge Check'}
             </Typography>
 
             <Stack spacing={4}>
-                {data.questions.map((q, index) => (
-                    <Box key={index} sx={{ p: 2, borderRadius: 2, bgcolor: 'rgba(255,255,255,0.03)' }}>
-                        <Typography sx={{ color: 'white', mb: 2, fontWeight: 500 }}>
-                            {index + 1}. {q.question}
-                        </Typography>
+                {data.questions.map((q, index) => {
+                    const questionId = q.id || `q-${index}`;
+                    return (
+                        <Box key={questionId} sx={{ p: 2, borderRadius: 2, bgcolor: 'rgba(255,255,255,0.03)' }}>
+                            <Stack direction="row" justifyContent="space-between">
+                                <Typography sx={{ color: 'white', mb: 2, fontWeight: 500 }}>
+                                    {index + 1}. {q.questionText}
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>
+                                    {q.points} pts
+                                </Typography>
+                            </Stack>
 
-                        <RadioGroup
-                            value={answers[index] || ''}
-                            onChange={(e) => handleOptionChange(index, e.target.value)}
-                        >
-                            {q.options.map((opt, optIdx) => {
-                                const isCorrect = opt === q.correctAnswer;
-                                const isSelected = answers[index] === opt;
+                            <RadioGroup
+                                value={answers[questionId] || ''}
+                                onChange={(e) => handleOptionChange(questionId, e.target.value)}
+                            >
+                                {q.options.map((opt: Option) => {
+                                    // 3. UI logic: We only highlight green/red if the backend 
+                                    // returned the 'isCorrect' flag (which it only does for Admins)
+                                    const isCorrect = opt.isCorrect;
+                                    const isSelected = answers[questionId] === opt.id;
 
-                                let labelColor = 'rgba(255,255,255,0.7)';
-                                if (submitted || isLocked) {
-                                    if (isCorrect) labelColor = '#10b981';
-                                    else if (isSelected) labelColor = '#f43f5e';
-                                }
+                                    let labelColor = 'rgba(255,255,255,0.7)';
+                                    if (submitted || isLocked) {
+                                        if (isCorrect === true) labelColor = '#10b981';
+                                        else if (isSelected && isCorrect === false) labelColor = '#f43f5e';
+                                    }
 
-                                return (
-                                    <FormControlLabel
-                                        key={optIdx}
-                                        value={opt}
-                                        control={<Radio size="small" sx={{ color: 'rgba(255,255,255,0.3)', '&.Mui-checked': { color: '#818cf8' } }} />}
-                                        label={opt}
-                                        disabled={submitted || isLocked}
-                                        sx={{
-                                            color: labelColor,
-                                            transition: '0.2s',
-                                            '& .MuiTypography-root': { fontSize: '0.95rem' }
-                                        }}
-                                    />
-                                );
-                            })}
-                        </RadioGroup>
-                    </Box>
-                ))}
+                                    return (
+                                        <FormControlLabel
+                                            key={opt.id}
+                                            value={opt.id} // STORE THE ID, NOT THE TEXT
+                                            control={<Radio size="small" sx={{ color: 'rgba(255,255,255,0.3)', '&.Mui-checked': { color: '#818cf8' } }} />}
+                                            label={opt.optionText} // SHOW THE TEXT
+                                            disabled={submitted || isLocked}
+                                            sx={{
+                                                color: labelColor,
+                                                '& .MuiTypography-root': { transition: 'color 0.2s' }
+                                            }}
+                                        />
+                                    );
+                                })}
+                            </RadioGroup>
+                        </Box>
+                    );
+                })}
             </Stack>
 
             <Box sx={{ mt: 4, textAlign: 'center' }}>
@@ -108,7 +117,7 @@ const QuizViewer = ({ data, onFinish, isLocked }: Props) => {
                             startIcon={<Send />}
                             onClick={handleSubmit}
                             disabled={Object.keys(answers).length < data.questions.length}
-                            sx={{ bgcolor: '#6366f1', px: 4, borderRadius: 2, textTransform: 'none' }}
+                            sx={{ bgcolor: '#6366f1', px: 4, borderRadius: 2, '&:hover': { bgcolor: '#4f46e5' } }}
                         >
                             Submit Quiz
                         </Button>
@@ -116,31 +125,20 @@ const QuizViewer = ({ data, onFinish, isLocked }: Props) => {
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                             <Alert
                                 severity={score >= passingThreshold ? "success" : "error"}
-                                icon={score >= passingThreshold ? <CheckCircle /> : <Cancel />}
-                                sx={{ 
-                                    borderRadius: 2, 
-                                    bgcolor: score >= passingThreshold ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)', 
-                                    color: 'white',
-                                    '& .MuiAlert-icon': { color: score >= passingThreshold ? '#10b981' : '#f43f5e' }
-                                }}
+                                sx={{ borderRadius: 2, bgcolor: score >= passingThreshold ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)', color: 'white', border: '1px solid' }}
                             >
                                 <Typography fontWeight={700}>
-                                    Score: {score}% — {score >= passingThreshold ? "Passed!" : "Keep Practicing!"}
-                                </Typography>
-                                <Typography variant="caption">
-                                    Required: {passingThreshold}%
+                                    Score: {score}% — {score >= passingThreshold ? "Passed!" : "Try again to unlock the next lesson."}
                                 </Typography>
                             </Alert>
-                            
-                            {/* Only show Try Again if they failed and the lesson isn't locked */}
+
                             {score < passingThreshold && !isLocked && (
                                 <Button
-                                    size="small"
                                     startIcon={<Refresh />}
-                                    sx={{ mt: 1, color: '#818cf8', textTransform: 'none' }}
+                                    sx={{ mt: 2, color: '#818cf8', fontWeight: 600 }}
                                     onClick={() => { setSubmitted(false); setAnswers({}); }}
                                 >
-                                    Try Again
+                                    Retake Quiz
                                 </Button>
                             )}
                         </motion.div>

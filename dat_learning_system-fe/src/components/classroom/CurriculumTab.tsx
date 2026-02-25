@@ -16,18 +16,18 @@ import {
 } from '@dnd-kit/sortable';
 
 import { createLesson, reorderLessons, updateLesson, deleteLesson } from '../../api/classroom.api';
-import type { ClassroomView, Lesson } from '../../types/classroom';
+import type { ClassroomView } from '../../types/classroom';
 import SortableLessonItem from './SortTableLessonItem';
 
 type CurriculumTabProps = {
     data: ClassroomView;
     setData: React.Dispatch<React.SetStateAction<ClassroomView | null>>;
-    currentLesson: Lesson | null;
-    setCurrentLesson: (lesson: Lesson) => void;
+    currentLessonId: string | null;
+    onLessonSelect: (id: string) => void; // Changed to take ID
     isEditMode: boolean;
 };
 
-const CurriculumTab = ({ data, setData, currentLesson, setCurrentLesson, isEditMode }: CurriculumTabProps) => {
+const CurriculumTab = ({ data, setData, currentLessonId, onLessonSelect, isEditMode }: CurriculumTabProps) => {
     const [isSaving, setIsSaving] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [title, setTitle] = useState('');
@@ -50,7 +50,7 @@ const CurriculumTab = ({ data, setData, currentLesson, setCurrentLesson, isEditM
             const originalOrder = [...data.lessons];
             const newOrder = arrayMove(data.lessons, oldIndex, newIndex);
             
-            // 1. Optimistic Update (Immediate UI feedback)
+            // 1. Optimistic Update
             setData({ ...data, lessons: newOrder });
             
             setIsSaving(true);
@@ -58,11 +58,11 @@ const CurriculumTab = ({ data, setData, currentLesson, setCurrentLesson, isEditM
                 // 2. Persist to DB
                 await reorderLessons({
                     courseId: data.courseId,
-                    lessonIds: newOrder.map(l => l.id as string)
+                    lessonIds: newOrder.map(l => l.id)
                 });
             } catch (e) {
                 console.error("Reorder failed", e);
-                // 3. Rollback on failure
+                // 3. Rollback
                 setData({ ...data, lessons: originalOrder });
             } finally {
                 setIsSaving(false);
@@ -88,6 +88,9 @@ const CurriculumTab = ({ data, setData, currentLesson, setCurrentLesson, isEditM
             setData({ ...data, lessons: [...data.lessons, newLesson] });
             setIsAdding(false);
             setTitle(''); setTime('');
+            
+            // Auto-select the newly created lesson
+            onLessonSelect(newLesson.id);
         } catch (e) { console.error("Creation failed", e); }
     };
 
@@ -110,8 +113,11 @@ const CurriculumTab = ({ data, setData, currentLesson, setCurrentLesson, isEditM
             const filteredLessons = data.lessons.filter(l => l.id !== deleteId);
             setData({ ...data, lessons: filteredLessons });
 
-            if (currentLesson?.id === deleteId) {
-                setCurrentLesson(filteredLessons[0] || null);
+            // If we deleted the active lesson, move to the first available one
+            if (currentLessonId === deleteId) {
+                if (filteredLessons.length > 0) {
+                    onLessonSelect(filteredLessons[0].id);
+                }
             }
         } catch (e) { console.error("Delete failed", e); } finally {
             setDeleteId(null);
@@ -130,15 +136,15 @@ const CurriculumTab = ({ data, setData, currentLesson, setCurrentLesson, isEditM
 
             {/* Draggable List */}
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={data.lessons.map(l => l.id as string)} strategy={verticalListSortingStrategy}>
+                <SortableContext items={data.lessons.map(l => l.id)} strategy={verticalListSortingStrategy}>
                     <List sx={{ pt: 0, '& > *:not(:last-child)': { mb: 0.5 } }}>
                         {data.lessons.map((item) => (
                             <SortableLessonItem
                                 key={item.id}
                                 item={item}
                                 isEditMode={isEditMode}
-                                currentLessonId={currentLesson?.id}
-                                onSelect={setCurrentLesson}
+                                currentLessonId={currentLessonId}
+                                onSelect={() => onLessonSelect(item.id)}
                                 onUpdate={handleUpdateLesson}
                                 onDelete={setDeleteId}
                             />
@@ -154,7 +160,7 @@ const CurriculumTab = ({ data, setData, currentLesson, setCurrentLesson, isEditM
                         <Paper elevation={0} sx={{ p: 2, bgcolor: 'rgba(99, 102, 241, 0.05)', borderRadius: 3, border: '1px solid #6366f1' }}>
                             <Stack spacing={2}>
                                 <TextField
-                                    autoFocus fullWidth size="small" placeholder="Lesson Title (e.g., Intro to Hiragana)"
+                                    autoFocus fullWidth size="small" placeholder="Lesson Title..."
                                     value={title} onChange={(e) => setTitle(e.target.value)} variant="standard"
                                     InputProps={{ disableUnderline: true, sx: { color: 'white', fontSize: '0.95rem', fontWeight: 600 } }}
                                 />
@@ -198,7 +204,7 @@ const CurriculumTab = ({ data, setData, currentLesson, setCurrentLesson, isEditM
                 <DialogTitle sx={{ fontWeight: 800 }}>Confirm Deletion</DialogTitle>
                 <DialogContent>
                     <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                        Deleting this lesson will permanently remove all associated Kanji, videos, and Japanese tests. This cannot be undone.
+                        Deleting this lesson will permanently remove all associated contents and tests. This action cannot be undone.
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ p: 3 }}>

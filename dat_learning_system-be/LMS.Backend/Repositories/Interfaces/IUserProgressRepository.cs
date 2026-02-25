@@ -1,6 +1,6 @@
 using LMS.Backend.Data.Entities;
 
-namespace LMS.Backend.Data.Repositories.Interfaces;
+namespace LMS.Backend.Repo.Interface;
 
 public interface IUserProgressRepository
 {

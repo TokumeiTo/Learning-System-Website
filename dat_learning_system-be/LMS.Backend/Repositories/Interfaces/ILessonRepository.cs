@@ -11,4 +11,6 @@ public interface ILessonRepository : IBaseRepository<Lesson>
     Task<int> GetNextSortOrderAsync(Guid courseId);
     Task ReOrderLessonsAsync(Guid courseId, List<Guid> lessonIds);
     Task SaveLessonContentsAsync(Guid lessonId, IEnumerable<LessonContent> contents);
+    Task<double> GetAverageScoreForLessonAsync(Guid lessonId);
+
 }
