@@ -23,6 +23,7 @@ public class TestRepository : ITestRepository
     }
     public async Task<Test> UpsertTestAsync(Guid lessonContentId, Test incomingTest)
     {
+        // 1. Load the existing test with the full tracking tree
         var existingTest = await _context.Tests
             .Include(t => t.Questions)
                 .ThenInclude(q => q.Options)
@@ -31,54 +32,90 @@ public class TestRepository : ITestRepository
         if (existingTest == null)
         {
             incomingTest.LessonContentId = lessonContentId;
+            ProcessNewTestTree(incomingTest);
             await _context.Tests.AddAsync(incomingTest);
             await _context.SaveChangesAsync();
             return incomingTest;
         }
 
-        // 1. Update Test Metadata
+        // 2. Update Test Metadata
         existingTest.Title = incomingTest.Title;
         existingTest.PassingGrade = incomingTest.PassingGrade;
 
-        // 2. Manual Sync for Questions
-        var incomingQIds = incomingTest.Questions.Select(q => q.Id).ToList();
+        // 3. Sync Questions
+        var incomingQs = incomingTest.Questions.ToList();
+        var incomingQIds = incomingQs.Select(q => q.Id).Where(id => id != Guid.Empty).ToList();
 
-        // Delete questions not in the incoming list
-        var questionsToRemove = existingTest.Questions.Where(q => !incomingQIds.Contains(q.Id)).ToList();
-        _context.Questions.RemoveRange(questionsToRemove);
+        // REMOVE: Questions that are in DB but NOT in the incoming request
+        var questionsToRemove = existingTest.Questions
+            .Where(q => !incomingQIds.Contains(q.Id))
+            .ToList();
 
-        foreach (var incomingQ in incomingTest.Questions)
+        foreach (var qRem in questionsToRemove)
         {
-            var existingQ = existingTest.Questions.FirstOrDefault(q => q.Id == incomingQ.Id);
+            _context.Questions.Remove(qRem); // Use Remove on context for cleaner tracking
+        }
+
+        for (int i = 0; i < incomingQs.Count; i++)
+        {
+            var incomingQ = incomingQs[i];
+
+            // Find existing question ONLY if ID is not empty
+            var existingQ = (incomingQ.Id == Guid.Empty)
+                ? null
+                : existingTest.Questions.FirstOrDefault(q => q.Id == incomingQ.Id);
 
             if (existingQ == null)
             {
-                // NEW Question
-                existingTest.Questions.Add(incomingQ);
+                // --- NEW QUESTION ---
+                incomingQ.Id = Guid.NewGuid();
+                incomingQ.TestId = existingTest.Id;
+                incomingQ.SortOrder = i + 1;
+
+                foreach (var opt in incomingQ.Options)
+                {
+                    opt.Id = Guid.NewGuid();
+                    opt.QuestionId = incomingQ.Id;
+                }
+                // Use the context to Add specifically to ensure it's marked as 'Added'
+                await _context.Questions.AddAsync(incomingQ);
             }
             else
             {
-                // UPDATE Existing Question
+                // --- UPDATE EXISTING QUESTION ---
                 existingQ.QuestionText = incomingQ.QuestionText;
                 existingQ.Points = incomingQ.Points;
-                existingQ.SortOrder = incomingQ.SortOrder;
+                existingQ.SortOrder = i + 1;
 
-                // 3. Manual Sync for Options (Nested)
-                var incomingOptIds = incomingQ.Options.Select(o => o.Id).ToList();
+                // Sync Options
+                var incomingOpts = incomingQ.Options.ToList();
+                var incomingOptIds = incomingOpts.Select(o => o.Id).Where(id => id != Guid.Empty).ToList();
 
-                // Delete removed options
-                var optionsToRemove = existingQ.Options.Where(o => !incomingOptIds.Contains(o.Id)).ToList();
-                _context.QuestionOptions.RemoveRange(optionsToRemove);
+                var optionsToRemove = existingQ.Options
+                    .Where(o => !incomingOptIds.Contains(o.Id))
+                    .ToList();
 
-                foreach (var incomingOpt in incomingQ.Options)
+                foreach (var oRem in optionsToRemove)
                 {
-                    var existingOpt = existingQ.Options.FirstOrDefault(o => o.Id == incomingOpt.Id);
+                    _context.QuestionOptions.Remove(oRem);
+                }
+
+                foreach (var incomingOpt in incomingOpts)
+                {
+                    var existingOpt = (incomingOpt.Id == Guid.Empty)
+                        ? null
+                        : existingQ.Options.FirstOrDefault(o => o.Id == incomingOpt.Id);
+
                     if (existingOpt == null)
                     {
-                        existingQ.Options.Add(incomingOpt);
+                        // NEW OPTION
+                        incomingOpt.Id = Guid.NewGuid();
+                        incomingOpt.QuestionId = existingQ.Id;
+                        await _context.QuestionOptions.AddAsync(incomingOpt);
                     }
                     else
                     {
+                        // UPDATE OPTION
                         existingOpt.OptionText = incomingOpt.OptionText;
                         existingOpt.IsCorrect = incomingOpt.IsCorrect;
                     }
@@ -89,6 +126,25 @@ public class TestRepository : ITestRepository
         await _context.SaveChangesAsync();
         return existingTest;
     }
+    private void ProcessNewTestTree(Test test)
+    {
+        // Convert to list locally so we can use [i] and .Count
+        var questionsList = test.Questions.ToList();
+
+        for (int i = 0; i < questionsList.Count; i++)
+        {
+            var q = questionsList[i];
+
+            if (q.Id == Guid.Empty) q.Id = Guid.NewGuid();
+            q.SortOrder = i + 1; // Fixes your SortOrder bug
+
+            foreach (var opt in q.Options)
+            {
+                if (opt.Id == Guid.Empty) opt.Id = Guid.NewGuid();
+            }
+        }
+    }
+
     public async Task<List<Guid>> GetCorrectOptionIdsForLessonAsync(Guid lessonId)
     {
         // Get all correct options across ALL test blocks in a specific lesson

@@ -132,7 +132,8 @@ public class MappingProfile : Profile
 
         // DTO -> Entity (For Admin Saving/Upserting)
         CreateMap<TestDto, Test>()
-            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions));
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions))
+            .ForMember(dest => dest.PassingGrade, opt => opt.MapFrom(src => src.PassingGrade == 0 ? 70 : src.PassingGrade));
         CreateMap<QuestionDto, Question>()
             .ForMember(dest => dest.Options, opt => opt.MapFrom(src => src.Options));
         CreateMap<OptionDto, QuestionOption>();
@@ -141,21 +142,19 @@ public class MappingProfile : Profile
         // This ensures IsCorrect is hidden if the Student is the one requesting the data
         // Entity -> DTO (Student Viewing)
         CreateMap<QuestionOption, OptionDto>()
-         .ForMember(dest => dest.IsCorrect, opt => opt.MapFrom((src, dest, destMember, context) =>
+            .ForMember(dest => dest.IsCorrect, opt => opt.MapFrom((src, dest, destMember, context) =>
             {
-                // TryGetItems is safer and prevents the "Context.Items are only available when..." error
-                try
+                // 1. Check if the context allows items at all without triggering the exception
+                // TryGetItems is the officially recommended way to handle this safely.
+                if (context.TryGetItems(out var items) && items.TryGetValue("IsAdmin", out var isAdmin))
                 {
-                    if (context.Items.TryGetValue("IsAdmin", out var isAdmin) && isAdmin is bool adminBool)
+                    if (isAdmin is bool adminBool)
                     {
                         return adminBool ? src.IsCorrect : (bool?)null;
                     }
                 }
-                catch (InvalidOperationException)
-                {
-                    // If items aren't initialized at all, we assume not an admin for safety
-                    return (bool?)null;
-                }
+
+                // 2. Default to null (Student view) if anything is missing or fails
                 return (bool?)null;
             }));
     }

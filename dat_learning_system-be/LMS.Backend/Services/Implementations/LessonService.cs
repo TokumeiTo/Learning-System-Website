@@ -33,14 +33,16 @@ public class LessonService(
         await repo.ReOrderLessonsAsync(dto.CourseId, dto.LessonIds);
     }
 
-    public async Task<ClassroomViewDto?> GetClassroomViewAsync(Guid courseId, string userId)
+    public async Task<ClassroomViewDto?> GetClassroomViewAsync(Guid courseId, string userId, bool isAdmin)
     {
+        // 1. Fetch course structure
         var course = await repo.GetClassroomStructureAsync(courseId);
         if (course == null) return null;
 
-        var viewDto = mapper.Map<ClassroomViewDto>(course);
+        // 2. Map to DTO
+        var viewDto = mapper.Map<ClassroomViewDto>(course, opt => opt.Items["IsAdmin"] = isAdmin);
 
-        // --- SHUFFLE & SECURITY LOGIC ---
+        // 3. Shuffle Options & Hide Answers for Students
         foreach (var lessonDto in viewDto.Lessons)
         {
             var testContents = lessonDto.Contents
@@ -50,27 +52,46 @@ public class LessonService(
             {
                 foreach (var question in content.Test!.Questions)
                 {
-                    // 1. Randomize Option Order for student
+                    // Randomize for student variety
                     question.Options = question.Options.OrderBy(_ => Guid.NewGuid()).ToList();
 
-                    // 2. Hide Correct Answers from Network Tab
-                    foreach (var opt in question.Options)
+                    if (!isAdmin)
                     {
-                        opt.IsCorrect = null;
+                        foreach (var opt in question.Options)
+                        {
+                            opt.IsCorrect = null;
+                        }
                     }
                 }
             }
         }
 
-        // --- PROGRESS & LOCKING LOGIC ---
+        // 4. Progress, Scoring & Locking Logic
         var userProgress = await progressRepo.GetUserProgressForCourseAsync(userId, courseId);
         bool previousCompleted = true;
 
         foreach (var lessonDto in viewDto.Lessons)
         {
+            // A. Set Completion Status
             var progress = userProgress.FirstOrDefault(p => p.LessonId == lessonDto.Id);
             lessonDto.IsDone = progress?.IsCompleted ?? false;
+
+            // B. Get Best Score for this User (from the included Attempts)
+            var lessonEntity = course.Lessons.FirstOrDefault(l => l.Id == lessonDto.Id);
+            if (lessonEntity != null)
+            {
+                var bestAttempt = lessonEntity.Attempts
+                    .Where(a => a.UserId == userId)
+                    .OrderByDescending(a => a.Percentage)
+                    .FirstOrDefault();
+
+                lessonDto.LastScore = bestAttempt?.Percentage;
+            }
+
+            // C. Handle Locking
             lessonDto.IsLocked = !previousCompleted;
+
+            // The next lesson is unlocked if the current one is done
             previousCompleted = lessonDto.IsDone;
         }
 
@@ -79,24 +100,33 @@ public class LessonService(
 
     public async Task BulkSaveContentsAsync(SaveLessonContentsDto dto)
     {
+        // 1. Map everything
         var contents = mapper.Map<List<LessonContent>>(dto.Contents);
 
+        // 2. Save the primary content list first to generate IDs for new items
+        // This is the "Manual Sync" step in your repository
         await repo.SaveLessonContentsAsync(dto.LessonId, contents);
 
-        foreach (var itemDto in dto.Contents.Where(x => x.ContentType == "test" && x.Test != null))
+        // 3. Iterate through the DTOs using a loop to maintain the relationship
+        for (int i = 0; i < dto.Contents.Count; i++)
         {
-            var contentId = itemDto.Id ?? Guid.Empty;
+            var itemDto = dto.Contents[i];
 
-            if (contentId == Guid.Empty)
+            // Only proceed if it's a test
+            if (itemDto.ContentType == "test" && itemDto.Test != null)
             {
-                contentId = contents.First(c => c.SortOrder == itemDto.SortOrder).Id;
-            }
+                // Get the ID from the saved entity at the same position
+                var contentId = contents[i].Id;
 
-            var testEntity = mapper.Map<Test>(itemDto.Test);
-            await testRepo.UpsertTestAsync(contentId, testEntity);
+                // 4. Map and Upsert the Test
+                var testEntity = mapper.Map<Test>(itemDto.Test);
+                testEntity.LessonContentId = contentId;
+
+                // This ensures the Test is linked to the correct Content record
+                await testRepo.UpsertTestAsync(contentId, testEntity);
+            }
         }
     }
-
     // --- ADDED: THE MISSING GRADING FUNCTION ---
     public async Task<QuizResultDto> SubmitQuizAsync(string userId, SubmitQuizDto dto)
     {

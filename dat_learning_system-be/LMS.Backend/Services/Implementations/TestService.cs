@@ -9,7 +9,6 @@ namespace LMS.Backend.Services.Implement;
 public class TestService : ITestService
 {
     private readonly ITestRepository _testRepo;
-    private readonly ILessonRepository _lessonRepo;
     private readonly IUserProgressRepository _progressRepo;
     private readonly IMapper _mapper;
 
@@ -20,7 +19,6 @@ public class TestService : ITestService
         IMapper mapper)
     {
         _testRepo = testRepo;
-        _lessonRepo = lessonRepo;
         _progressRepo = progressRepo;
         _mapper = mapper;
     }
@@ -71,7 +69,8 @@ public class TestService : ITestService
             MaxScore = totalPoints,
             Percentage = Math.Round(percentage, 2),
             IsPassed = isPassed,
-            AttemptedAt = DateTime.UtcNow
+            AttemptedAt = DateTime.UtcNow,
+            AnswerJson = System.Text.Json.JsonSerializer.Serialize(submission.Answers)
         };
         await _testRepo.CreateAttemptAsync(attempt);
 

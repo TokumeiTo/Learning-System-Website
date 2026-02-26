@@ -10,15 +10,31 @@ interface Props {
     contents: LessonContent[];
     lessonId?: string;
     isDone?: boolean;
+    lastScore?: number | null;
     onComplete?: () => void;
 }
 
-const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) => {
+const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete }: Props) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isCompleting, setIsCompleting] = useState(false);
-    
+
     // Initialize completed quizzes based on content status if the backend provides it
     const [completedQuizzes, setCompletedQuizzes] = useState<Record<string, boolean>>({});
+
+    // Effect to "Hydrate" the passed status from the backend score
+    useEffect(() => {
+        if (isDone || (lastScore !== null && lastScore !== undefined)) {
+            // We assume if isDone is true or there's a score, the user has fulfilled the requirement
+            // We'll mark all quiz blocks as passed initially so the "Mark as Complete" button is active
+            const initialCompleted: Record<string, boolean> = {};
+            contents.forEach(block => {
+                if (block.contentType === 'test') {
+                    initialCompleted[block.id] = true;
+                }
+            });
+            setCompletedQuizzes(initialCompleted);
+        }
+    }, [isDone, lastScore, contents]);
 
     const lastActivityRef = useRef<number>(Date.now());
     const Player = ReactPlayer as any;
@@ -113,10 +129,10 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
 
                         {/* TYPE: IMAGE */}
                         {block.contentType === 'image' && block.body && (
-                            <Box 
-                                component="img" 
-                                src={block.body} 
-                                sx={{ width: '100%', borderRadius: 3, boxShadow: 4, display: 'block' }} 
+                            <Box
+                                component="img"
+                                src={block.body}
+                                sx={{ borderRadius: 3, boxShadow: 4, display: 'block', m: 'auto' }}
                             />
                         )}
 
@@ -142,8 +158,9 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
                                 data={block.test}
                                 lessonId={lessonId}
                                 onFinish={(score, passed) => handleQuizFinish(block.id, score, passed)}
-                                // Disable the quiz if the lesson is already done
-                                isLocked={isDone} 
+                                existingScore={lastScore}
+                                isCompleted={isDone}
+                                isLocked={false}
                             />
                         )}
                     </Box>
@@ -161,12 +178,24 @@ const LessonContentViewer = ({ contents, lessonId, isDone, onComplete }: Props) 
                         variant={isDone ? "outlined" : "contained"}
                         color={isDone ? "success" : "primary"}
                         size="large"
-                        disabled={isCompleting || (isDone ? false : !allTestsPassed)}
+                        // Disable if it's currently saving OR if it's already finished
+                        disabled={isCompleting || isDone || !allTestsPassed}
                         onClick={handleMarkAsComplete}
-                        sx={{ borderRadius: 3, px: 8, py: 1.5, fontWeight: 700 }}
+                        sx={{
+                            borderRadius: 3,
+                            px: 8,
+                            py: 1.5,
+                            fontWeight: 700,
+                            "&.Mui-disabled": isDone ? {
+                                borderColor: '#10b981',
+                                bgcolor: '#49a586',
+                                color: 'lightgray',
+                                opacity: 0.8
+                            } : {}
+                        }}
                     >
                         {isCompleting ? <CircularProgress size={24} color="inherit" /> :
-                         isDone ? "Completed ✓" : "Mark as Completed"}
+                            isDone ? "Lesson Completed ✓" : "Mark as Completed"}
                     </Button>
                 </Box>
             </Stack>

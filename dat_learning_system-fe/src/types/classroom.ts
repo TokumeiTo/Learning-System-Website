@@ -17,6 +17,7 @@ export interface Lesson {
     sortOrder: number;
     isLocked: boolean;
     isDone: boolean;
+    lastScore?: number | null;
     contents: LessonContent[];
 }
 

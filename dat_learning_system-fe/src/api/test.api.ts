@@ -50,7 +50,7 @@ export const fetchDepartmentKPI = async (orgUnitId: string): Promise<StudentPerf
 // api/test.api.ts
 export const submitLessonQuiz = async (submission: { 
     lessonId: string, 
-    answers: { questionId: string, selectedOptionText: string }[] 
+    answers: Record<string, string>;
 }) => {
     const response = await api.post('/api/Test/submit', submission);
     return response.data; // Should return LessonResultDto

@@ -61,7 +61,9 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
                 .ThenInclude(l => l.Contents.OrderBy(lc => lc.SortOrder))
                     .ThenInclude(lc => lc.Test!)
                         .ThenInclude(t => t.Questions)
-                            .ThenInclude(q => q.Options) // Add this
+                            .ThenInclude(q => q.Options)
+            .Include(c => c.Lessons)
+                .ThenInclude(l => l.Attempts)
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == courseId);
     }

@@ -4,6 +4,7 @@ public class TestDto
 {
     public Guid Id { get; set; }
     public List<QuestionDto> Questions { get; set; } = new();
+    public int PassingGrade { get; set; }
 }
 
 public class QuestionDto

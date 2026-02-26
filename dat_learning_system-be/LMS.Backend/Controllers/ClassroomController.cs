@@ -19,7 +19,9 @@ public class ClassroomController(ILessonService lessonService) : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        var result = await lessonService.GetClassroomViewAsync(courseId, userId);
+        var isAdmin = User.IsInRole("Admin") || User.IsInRole("SuperAdmin");
+
+        var result = await lessonService.GetClassroomViewAsync(courseId, userId, isAdmin);
         if (result == null) return NotFound();
         
         return Ok(result);

@@ -62,12 +62,12 @@ const ClassroomPage = () => {
   /**
    * Local state update for immediate UI feedback when a student passes a quiz
    */
-  const handleLessonComplete = (wasPassedFromQuiz: boolean = true) => {
+  const handleLessonComplete = (wasPassedFromQuiz: boolean = true, newScore?: number) => {
     if (!currentLesson || !data || !wasPassedFromQuiz) return;
 
     const updatedLessons = data.lessons.map((lesson, index) => {
       if (lesson.id === currentLesson.id) {
-        return { ...lesson, isDone: true };
+        return { ...lesson, isDone: true, lastScore: newScore ?? lesson.lastScore };
       }
       const currentIndex = data.lessons.findIndex((l) => l.id === currentLesson.id);
       if (index === currentIndex + 1) {
@@ -162,8 +162,8 @@ const ClassroomPage = () => {
             }}
           >
             {(isEditMode && canEdit) ? (
-              <LessonContentSection 
-                currentLesson={currentLesson} 
+              <LessonContentSection
+                currentLesson={currentLesson}
                 onSaveSuccess={() => loadClassroom(true)} // Trigger background refresh to get new IDs
               />
             ) : (
@@ -171,6 +171,7 @@ const ClassroomPage = () => {
                 contents={currentLesson?.contents || []}
                 lessonId={currentLesson?.id}
                 isDone={currentLesson?.isDone}
+                lastScore={currentLesson?.lastScore}
                 onComplete={handleLessonComplete}
               />
             )}
