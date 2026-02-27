@@ -21,7 +21,7 @@ public class TestController : ControllerBase
     }
 
     [HttpPost("content/{contentId}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
     public async Task<IActionResult> SaveTest(Guid contentId, [FromBody] TestDto dto)
     {
         // Service handles the "Sync" logic (check if ID exists -> Update; if not -> Add)
@@ -54,7 +54,7 @@ public class TestController : ControllerBase
     }
 
     [HttpGet("admin/stats/{lessonId}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
     public async Task<ActionResult<AdminLessonStatsDto>> GetLessonStats(Guid lessonId)
     {
         var stats = await _attemptService.GetLessonStatsForAdminAsync(lessonId);
@@ -62,7 +62,7 @@ public class TestController : ControllerBase
     }
 
     [HttpGet("admin/kpi/department/{orgUnitId}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
     public async Task<ActionResult<List<StudentPerformanceDto>>> GetDepartmentKpi(int orgUnitId)
     {
         var kpi = await _attemptService.GetDepartmentKpiAsync(orgUnitId);

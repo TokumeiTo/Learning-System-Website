@@ -3,6 +3,7 @@ using LMS.Backend.Data.Entities;
 using LMS.Backend.DTOs.Test_Quest;
 using LMS.Backend.Repo.Interface;
 using LMS.Backend.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Backend.Services.Implement;
 
@@ -14,7 +15,6 @@ public class TestService : ITestService
 
     public TestService(
         ITestRepository testRepo,
-        ILessonRepository lessonRepo,
         IUserProgressRepository progressRepo,
         IMapper mapper)
     {
@@ -25,22 +25,19 @@ public class TestService : ITestService
 
     public async Task<bool> SaveTestToContentAsync(Guid contentId, TestDto dto)
     {
-        var testEntity = _mapper.Map<Test>(dto);
-        await _testRepo.UpsertTestAsync(contentId, testEntity);
-        return true;
+        var incomingTest = _mapper.Map<Test>(dto);
+        var result = await _testRepo.UpsertTestAsync(contentId, incomingTest);
+        return result != null;
     }
 
     public async Task<LessonResultDto> GradeLessonAsync(string userId, LessonSubmissionDto submission)
     {
-        // 1. Fetch the Test with its Questions and Correct Options
-        // Note: We need the actual Test entity to get the PassingGrade and Question Points
-        var test = await _testRepo.GetTestWithCorrectAnswersAsync(submission.LessonId);
-        if (test == null) throw new KeyNotFoundException("No test found for this lesson");
-
-        int earnedPoints = 0;
-        int totalPoints = test.Questions.Sum(q => q.Points);
+        // 1. Fetch the Test (Specific Version) with Answers
+        var test = await _testRepo.GetTestByIdWithAnswersAsync(submission.TestId);
+        if (test == null) throw new KeyNotFoundException("Specified test not found.");
 
         // 2. Calculate weighted score
+        int earnedPoints = 0;
         foreach (var question in test.Questions)
         {
             if (submission.Answers.TryGetValue(question.Id, out Guid selectedOptionId))
@@ -53,9 +50,15 @@ public class TestService : ITestService
             }
         }
 
-        double percentage = totalPoints > 0 ? (double)earnedPoints / totalPoints * 100 : 0;
+        int totalPoints = test.Questions.Sum(q => q.Points);
 
-        // 3. Use PassingGrade from the TEST entity (not the Lesson)
+        // 3. Calculate percentage using decimal for precision
+        // We cast the numerator to decimal first to avoid integer division bugs
+        decimal percentage = totalPoints > 0
+            ? (decimal)earnedPoints / totalPoints * 100
+            : 0m;
+
+        // Compare decimal percentage against int PassingGrade
         bool isPassed = percentage >= test.PassingGrade;
 
         // 4. Record the specific attempt
@@ -64,27 +67,29 @@ public class TestService : ITestService
             Id = Guid.NewGuid(),
             UserId = userId,
             LessonId = submission.LessonId,
-            TestId = test.Id, // Link to the specific test version
+            TestId = test.Id,
             Score = earnedPoints,
             MaxScore = totalPoints,
-            Percentage = Math.Round(percentage, 2),
+            Percentage = Math.Round(percentage, 2), // Keep 2 decimal places
             IsPassed = isPassed,
             AttemptedAt = DateTime.UtcNow,
             AnswerJson = System.Text.Json.JsonSerializer.Serialize(submission.Answers)
         };
+
         await _testRepo.CreateAttemptAsync(attempt);
 
-        // 5. Automation: Mark lesson as done if passed
+        // 5. Automation: Mark lesson as complete if passed
         if (isPassed)
         {
             await _progressRepo.MarkAsCompleteAsync(userId, submission.LessonId);
         }
 
+        // 6. Return Result (Cast percentage to double if your DTO requires it)
         return new LessonResultDto
         {
             Score = earnedPoints,
             MaxScore = totalPoints,
-            Percentage = (double)attempt.Percentage,
+            Percentage = attempt.Percentage,
             IsPassed = isPassed,
             AttemptedAt = attempt.AttemptedAt
         };

@@ -7,6 +7,7 @@ public class Test
 
     public string Title { get; set; } = "Lesson Quiz"; // New
     public int PassingGrade { get; set; } = 70;      // New: Specific to this quiz
+    public bool IsActive {get; set;} = true;
 
     public ICollection<Question> Questions { get; set; } = new List<Question>();
 }

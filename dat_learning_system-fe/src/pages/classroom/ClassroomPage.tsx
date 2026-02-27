@@ -43,6 +43,10 @@ const ClassroomPage = () => {
       const res = await fetchClassroomData(id);
       setData(res);
 
+      if (currentLessonId && !res.lessons.some(l => l.id === currentLessonId)) {
+        setCurrentLessonId(res.lessons[0]?.id || null);
+      }
+
       // Set initial lesson only if one isn't already selected
       if (res.lessons.length > 0 && !currentLessonId) {
         const resumeLesson = res.lessons.find((l) => !l.isDone && !l.isLocked);
@@ -62,15 +66,17 @@ const ClassroomPage = () => {
   /**
    * Local state update for immediate UI feedback when a student passes a quiz
    */
-  const handleLessonComplete = (wasPassedFromQuiz: boolean = true, newScore?: number) => {
-    if (!currentLesson || !data || !wasPassedFromQuiz) return;
+  const handleLessonComplete = (wasPassed: boolean = true, percentage?: number) => {
+    if (!currentLesson || !data || !wasPassed) return;
 
-    const updatedLessons = data.lessons.map((lesson, index) => {
+    const updatedLessons = data.lessons.map((lesson) => {
       if (lesson.id === currentLesson.id) {
-        return { ...lesson, isDone: true, lastScore: newScore ?? lesson.lastScore };
+        return { ...lesson, isDone: true, lastScore: percentage ?? lesson.lastScore };
       }
       const currentIndex = data.lessons.findIndex((l) => l.id === currentLesson.id);
-      if (index === currentIndex + 1) {
+      const nextLesson = data.lessons[currentIndex +1];
+      
+      if (nextLesson && lesson.id === nextLesson.id) {
         return { ...lesson, isLocked: false };
       }
       return lesson;

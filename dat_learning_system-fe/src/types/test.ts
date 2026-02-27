@@ -21,6 +21,7 @@ export interface Test {
 
 export interface LessonSubmission {
   lessonId: string;
+  testId: string;
   // TypeScript equivalent of Dictionary<Guid, Guid>
   answers: { [questionId: string]: string }; 
 }
@@ -45,13 +46,19 @@ export interface LessonAttempt {
   attemptedAt: string;
 }
 
+export interface QuestionAnalytic {
+    questionId: string;
+    questionText: string;
+    failureRate: number;
+}
+
 export interface AdminLessonStats {
   lessonId: string;
   lessonTitle: string;
   totalAttempts: number;
   passCount: number;
   averagePercentage: number;
-  successRate: number;
+  difficultQuestions: QuestionAnalytic[];
 }
 
 export interface StudentPerformanceKPI {

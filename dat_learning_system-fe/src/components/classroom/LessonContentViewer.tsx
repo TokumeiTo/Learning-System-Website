@@ -21,9 +21,8 @@ const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete
     // Initialize completed quizzes based on content status if the backend provides it
     const [completedQuizzes, setCompletedQuizzes] = useState<Record<string, boolean>>({});
 
-    // Effect to "Hydrate" the passed status from the backend score
     useEffect(() => {
-        if (isDone || (lastScore !== null && lastScore !== undefined)) {
+        if (isDone) {
             // We assume if isDone is true or there's a score, the user has fulfilled the requirement
             // We'll mark all quiz blocks as passed initially so the "Mark as Complete" button is active
             const initialCompleted: Record<string, boolean> = {};
@@ -34,7 +33,7 @@ const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete
             });
             setCompletedQuizzes(initialCompleted);
         }
-    }, [isDone, lastScore, contents]);
+    }, [isDone, contents]);
 
     const lastActivityRef = useRef<number>(Date.now());
     const Player = ReactPlayer as any;
@@ -81,7 +80,7 @@ const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete
         };
     }, [lessonId, isPlaying, contents, isDone]);
 
-    const handleQuizFinish = (blockId: string, _score: number, passed: boolean) => {
+    const handleQuizFinish = (blockId: string, _percentage: number, passed: boolean) => {
         setCompletedQuizzes(prev => ({ ...prev, [blockId]: passed }));
     };
 
@@ -155,9 +154,11 @@ const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete
                         {/* TYPE: TEST / QUIZ */}
                         {block.contentType === 'test' && block.test && (
                             <QuizViewer
+                                key={block.test.id}
                                 data={block.test}
+                                testId={block.test.id!}
                                 lessonId={lessonId}
-                                onFinish={(score, passed) => handleQuizFinish(block.id, score, passed)}
+                                onFinish={(percentage, passed) => handleQuizFinish(block.id, percentage, passed)}
                                 existingScore={lastScore}
                                 isCompleted={isDone}
                                 isLocked={false}
@@ -168,9 +169,9 @@ const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete
 
                 {/* --- COMPLETION SECTION --- */}
                 <Box sx={{ mt: 4, pt: 4, borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
-                    {!allTestsPassed && !isDone && (
+                    {!allTestsPassed && !isDone && contents.some(c=>c.contentType === 'test') && (
                         <Typography variant="body2" sx={{ color: '#fb7185', mb: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
-                            <Lock sx={{ fontSize: 16 }} /> Please pass all quizzes to finish this lesson.
+                            <Lock sx={{ fontSize: 16 }} /> Please pass the quiz with a valid score to finish this lesson.
                         </Typography>
                     )}
 

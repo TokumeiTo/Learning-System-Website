@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj": {}
+    "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj": {}
   },
   "projects": {
-    "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj": {
+    "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
+        "projectUniqueName": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
         "projectName": "LMS.Backend",
-        "projectPath": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
+        "projectPath": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\LMS.Backend.csproj",
         "packagesPath": "C:\\Users\\25-00372\\.nuget\\packages\\",
-        "outputPath": "c:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\obj\\",
+        "outputPath": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\25-00372\\AppData\\Roaming\\NuGet\\NuGet.Config"

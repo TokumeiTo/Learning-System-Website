@@ -27,9 +27,9 @@ public class LessonContentConfiguration : IEntityTypeConfiguration<LessonContent
         // One-to-One with Test
         // This ensures that when a Content block of type 'test' is deleted, 
         // the Questions and Options are cleared via Cascade.
-        builder.HasOne(lc => lc.Test)
+        builder.HasMany(lc => lc.Tests)
                .WithOne(t => t.LessonContent)
-               .HasForeignKey<Test>(t => t.LessonContentId)
+               .HasForeignKey(t => t.LessonContentId)
                .OnDelete(DeleteBehavior.Cascade);
 
         // Optimization: Index LessonId + SortOrder

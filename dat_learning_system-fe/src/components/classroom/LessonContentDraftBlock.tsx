@@ -170,8 +170,13 @@ const DraftBlock = ({ block, updateBlock, removeBlock }: any) => {
                         <TestBuilder
                             initialData={block.test} // Pass the structured test object
                             onSave={(updatedTest) => {
-                                // Instead of JSON.stringify(body), we update the 'test' property
-                                updateBlock(block.tempId, { test: updatedTest, body: '' });
+                                updateBlock(block.tempId, {
+                                    test: {
+                                        ...updatedTest,
+                                        passingGrade: Number(updatedTest.passingGrade || 70)
+                                    },
+                                    body: ''
+                                });
                             }}
                         />
                     )}

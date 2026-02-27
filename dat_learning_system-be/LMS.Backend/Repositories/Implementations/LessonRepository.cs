@@ -59,7 +59,7 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
         return await _context.Courses
             .Include(c => c.Lessons.OrderBy(l => l.SortOrder))
                 .ThenInclude(l => l.Contents.OrderBy(lc => lc.SortOrder))
-                    .ThenInclude(lc => lc.Test!)
+                    .ThenInclude(lc => lc.Tests)
                         .ThenInclude(t => t.Questions)
                             .ThenInclude(q => q.Options)
             .Include(c => c.Lessons)
@@ -144,8 +144,14 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
     }
     public async Task<double> GetAverageScoreForLessonAsync(Guid lessonId)
     {
-        return await _context.LessonAttempts
+        var hasAttempts = await _context.LessonAttempts.AnyAsync(a => a.LessonId == lessonId);
+        if (!hasAttempts) return 0;
+
+        // 2. Calculate average
+        var average = await _context.LessonAttempts
             .Where(a => a.LessonId == lessonId)
             .AverageAsync(a => a.Percentage);
+
+        return (double)average;
     }
 }

@@ -11,7 +11,7 @@ import MessagePopup from '../feedback/MessagePopup';
 // --- Main Section ---
 const LessonContentSection = ({
   currentLesson,
-  onSaveSuccess 
+  onSaveSuccess
 }: {
   currentLesson: Lesson | null;
   onSaveSuccess: () => void;
@@ -69,16 +69,25 @@ const LessonContentSection = ({
 
     const payload: BulkSaveContentsRequest = {
       lessonId: currentLesson.id,
-      contents: drafts.map((d, index) => ({
-        // Manual Sync Logic: 
-        // If id is a real string/number from DB, keep it. 
-        // If it was newly added in UI, it won't have 'id', so it's a 'Create'.
-        id: d.id || undefined,
-        contentType: d.contentType,
-        body: d.body,
-        sortOrder: index,
-        test: d.contentType === 'test' ? d.test : null
-      }))
+      contents: drafts.map((d, index) => {
+        const contentBlock: any = {
+          // Manual Sync Logic: 
+          // If id is a real string/number from DB, keep it. 
+          // If it was newly added in UI, it won't have 'id', so it's a 'Create'.
+          id: d.id || undefined,
+          contentType: d.contentType,
+          body: d.body,
+          sortOrder: index,
+        };
+
+        if (d.contentType === 'test' && d.test) {
+          contentBlock.test = {
+            ...d.test,
+            id: d.test.id || undefined
+          };
+        }
+        return contentBlock;
+      })
     };
 
     try {

@@ -14,5 +14,6 @@ public interface ITestRepository
     // Track attempt
     Task<LessonAttempt> CreateAttemptAsync(LessonAttempt attempt);
     Task<int> GetTotalPointsForLessonAsync(Guid lessonId);
-    Task<Test?> GetTestWithCorrectAnswersAsync(Guid testId);
+    Task<Test?> GetTestByIdWithAnswersAsync(Guid testId);
+
 }

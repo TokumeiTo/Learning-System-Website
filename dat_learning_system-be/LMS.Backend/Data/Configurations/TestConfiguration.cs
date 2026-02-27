@@ -18,8 +18,8 @@ public class TestConfiguration : IEntityTypeConfiguration<Test>
         // Explicitly link back to LessonContent. 
         // This ensures the Guid TestId matches the LessonContentId logic.
         builder.HasOne(t => t.LessonContent)
-               .WithOne(lc => lc.Test)
-               .HasForeignKey<Test>(t => t.LessonContentId)
+               .WithMany(lc => lc.Tests)
+               .HasForeignKey(t => t.LessonContentId)
                .OnDelete(DeleteBehavior.Cascade);
 
         // Test -> Questions (One-to-Many)

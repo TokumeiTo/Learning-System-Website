@@ -10,8 +10,7 @@ namespace LMS.Backend.Services.Implement;
 
 public class LessonService(
     ILessonRepository repo,
-    ITestRepository testRepo,
-    ILessonAttemptRepository attemptRepo,
+    ITestService testService,
     IUserProgressRepository progressRepo,
     IMapper mapper) : ILessonService
 {
@@ -118,78 +117,10 @@ public class LessonService(
                 // Get the ID from the saved entity at the same position
                 var contentId = contents[i].Id;
 
-                // 4. Map and Upsert the Test
-                var testEntity = mapper.Map<Test>(itemDto.Test);
-                testEntity.LessonContentId = contentId;
-
-                // This ensures the Test is linked to the correct Content record
-                await testRepo.UpsertTestAsync(contentId, testEntity);
+                await testService.SaveTestToContentAsync(contentId, itemDto.Test);
             }
         }
     }
-    // --- ADDED: THE MISSING GRADING FUNCTION ---
-    public async Task<QuizResultDto> SubmitQuizAsync(string userId, SubmitQuizDto dto)
-    {
-        // 1. Fetch Test with Answers (Server-side Truth)
-        var test = await testRepo.GetTestWithCorrectAnswersAsync(dto.TestId);
-        if (test == null) throw new KeyNotFoundException("Test not found");
-
-        int earnedPoints = 0;
-        int totalPoints = test.Questions.Sum(q => q.Points);
-
-        // 2. Manual Grading Logic
-        foreach (var question in test.Questions)
-        {
-            if (dto.Answers.TryGetValue(question.Id, out Guid selectedOptionId))
-            {
-                var correctOption = question.Options.FirstOrDefault(o => o.IsCorrect);
-                if (correctOption != null && correctOption.Id == selectedOptionId)
-                {
-                    earnedPoints += question.Points;
-                }
-            }
-        }
-
-        double percentage = totalPoints > 0 ? (double)earnedPoints / totalPoints * 100 : 0;
-        bool isPassed = percentage >= test.PassingGrade;
-
-        // 3. Save Attempt (Uses attemptRepo)
-        var attempt = new LessonAttempt
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            LessonId = test.LessonContent.LessonId,
-            TestId = test.Id,
-            Score = earnedPoints,
-            MaxScore = totalPoints,
-            Percentage = percentage,
-            IsPassed = isPassed,
-            AnswerJson = JsonSerializer.Serialize(dto.Answers),
-            AttemptedAt = DateTime.UtcNow
-        };
-
-        await attemptRepo.CreateAttemptAsync(attempt);
-
-        // 4. Update Course Progress if Passed
-        if (isPassed)
-        {
-            await progressRepo.MarkAsCompleteAsync(userId, attempt.LessonId);
-        }
-
-        return new QuizResultDto
-        {
-            Score = earnedPoints,
-            MaxScore = totalPoints,
-            Percentage = Math.Round(percentage, 2),
-            IsPassed = isPassed,
-            CorrectOptionIds = test.Questions
-                .SelectMany(q => q.Options)
-                .Where(o => o.IsCorrect)
-                .Select(o => o.Id)
-                .ToList()
-        };
-    }
-
     public async Task<ClassroomLessonDto> UpdateLessonAsync(UpdateLessonDto dto)
     {
         var lesson = await repo.GetByIdAsync(dto.Id);

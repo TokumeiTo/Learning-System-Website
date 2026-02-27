@@ -12,5 +12,5 @@ public class LessonContent
 
     // Navigation for Test logic
     // If ContentType == "test", this relationship will be used
-    public Test? Test { get; set; } 
+    public ICollection<Test> Tests { get; set; } = new List<Test>(); 
 }

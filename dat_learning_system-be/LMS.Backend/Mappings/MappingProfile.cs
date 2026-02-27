@@ -79,7 +79,7 @@ public class MappingProfile : Profile
 
         // --- CLASSROOM PROFILE MAPPING ---
         CreateMap<LessonContent, ClassroomContentDto>()
-            .ForMember(dest => dest.Test, opt => opt.MapFrom(src => src.Test));
+            .ForMember(dest => dest.Test, opt => opt.MapFrom(src => src.Tests.FirstOrDefault(t => t.IsActive)));
 
         CreateMap<Lesson, ClassroomLessonDto>()
             // We explicitly ignore these because they no longer exist in the Lesson entity.
@@ -95,7 +95,7 @@ public class MappingProfile : Profile
         // --- PROGRESS MAPPING ---
         CreateMap<UserLessonProgress, LessonProgressDto>();
         CreateMap<UpsertLessonContentDto, LessonContent>()
-            .ForMember(dest => dest.Test, opt => opt.MapFrom(src => src.Test))
+            .ForMember(dest => dest.Tests, opt => opt.Ignore())
             // If Body is null (which it will be for a Test), ensure we don't crash
             .ForMember(dest => dest.Body, opt => opt.NullSubstitute(string.Empty));
 
@@ -124,7 +124,6 @@ public class MappingProfile : Profile
         // Entity -> DTO (For Reading)
         CreateMap<Test, TestDto>();
         CreateMap<Question, QuestionDto>();
-        CreateMap<QuestionOption, OptionDto>();
         CreateMap<LessonAttempt, LessonResultDto>()
             .ForMember(dest => dest.Percentage, opt => opt.MapFrom(src => (double)src.Percentage));
 

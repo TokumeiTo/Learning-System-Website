@@ -9,10 +9,13 @@ import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PageLayout from '../../components/layout/PageLayout';
+import DifficultQuestionsCard from '../../components/admin/DifficultQuestionInsight';
 
 // API & Types
+import { fetchAdminLessonStats } from '../../api/test.api';
 import { fetchDepartmentKPI } from '../../api/test.api';
 import type { StudentPerformanceKPI } from '../../types/test';
+import type { AdminLessonStats } from '../../types/test';
 
 /* --- Stat Card --- */
 const StatCard = ({ title, value, icon, color, delay, isMock }: any) => (
@@ -28,8 +31,8 @@ const StatCard = ({ title, value, icon, color, delay, isMock }: any) => (
     >
         <Card sx={{ height: '100%', boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)', borderRadius: 3, position: 'relative' }}>
             {isMock && (
-                <Typography 
-                    variant="caption" 
+                <Typography
+                    variant="caption"
                     sx={{ position: 'absolute', top: 8, right: 40, color: 'text.disabled', fontStyle: 'italic' }}
                 >
                     Mock
@@ -54,6 +57,7 @@ const StatCard = ({ title, value, icon, color, delay, isMock }: any) => (
 const AdminDashboard: React.FC = () => {
     const theme = useTheme();
     const [kpiData, setKpiData] = useState<StudentPerformanceKPI[]>([]);
+    const [lessonStats, setLessonStats] = useState<AdminLessonStats | null>(null);
     const [loading, setLoading] = useState(true);
 
     // Assuming we have an OrgUnitId for the current admin's department
@@ -75,10 +79,10 @@ const AdminDashboard: React.FC = () => {
     }, []);
 
     // REAL DATA CALCULATIONS
-    const avgScore = kpiData.length > 0 
+    const avgScore = kpiData.length > 0
         ? Math.round(kpiData.reduce((acc, curr) => acc + curr.overallAverageScore, 0) / kpiData.length)
         : 0;
-    
+
     const totalCompletions = kpiData.reduce((acc, curr) => acc + curr.lessonsCompleted, 0);
 
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}><CircularProgress /></Box>;
@@ -99,7 +103,7 @@ const AdminDashboard: React.FC = () => {
                     <StatCard title="Total Students" value={kpiData.length} icon={<PeopleAltIcon />} color={theme.palette.primary.main} delay={0.1} />
                     <StatCard title="Total Lesson Passes" value={totalCompletions} icon={<AssignmentTurnedInIcon />} color="#ed6c02" delay={0.2} />
                     <StatCard title="Avg. Dept Score" value={`${avgScore}%`} icon={<TrendingUpIcon />} color="#9c27b0" delay={0.3} />
-                    
+
                     {/* MOCK DATA - Backend aggregate for course count not yet built */}
                     <StatCard isMock title="Active Courses" value="42" icon={<SchoolIcon />} color="#2e7d32" delay={0.4} />
                 </Box>
@@ -118,6 +122,7 @@ const AdminDashboard: React.FC = () => {
                                         </Box>
                                     ))}
                                 </Stack>
+                                   
                             </CardContent>
                         </Card>
                     </Box>

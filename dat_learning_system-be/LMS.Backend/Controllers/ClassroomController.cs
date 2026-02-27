@@ -27,18 +27,6 @@ public class ClassroomController(ILessonService lessonService) : ControllerBase
         return Ok(result);
     }
 
-    // --- NEW: STUDENT QUIZ SUBMISSION ---
-    [HttpPost("lessons/quiz/submit")]
-    public async Task<ActionResult<QuizResultDto>> SubmitQuiz([FromBody] SubmitQuizDto dto)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId)) return Unauthorized();
-
-        // This triggers the grading, attempt recording, and progress logic
-        var result = await lessonService.SubmitQuizAsync(userId, dto);
-        return Ok(result);
-    }
-
     // --- ADMIN ONLY OPERATIONS ---
 
     [HttpPost("lessons")]

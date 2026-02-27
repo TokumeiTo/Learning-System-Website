@@ -21,9 +21,10 @@ public class LessonContentDto
     public string ContentType { get; set; } = "text"; // text, image, video, test
     public string Body { get; set; } = string.Empty;
     public int SortOrder { get; set; }
+    public List<TestDto> Tests { get; set; } = new();
 
     // If ContentType is "test", this will be populated
-    public TestDto? Test { get; set; }
+    public TestDto? ActiveTest => Tests.FirstOrDefault(t => t.IsActive);
 }
 
 public record ProgressRequestDto(Guid LessonId, int Seconds);
@@ -60,22 +61,15 @@ public class UpsertLessonContentDto
     public int SortOrder { get; set; }
 
     // This is the key! This maps to the JSON object we built in React
-    public TestDto? Test { get; set; } 
-}
-
-public class SubmitQuizDto
-{
-    public Guid TestId { get; set; }
-    // Key: QuestionId, Value: SelectedOptionId
-    public Dictionary<Guid, Guid> Answers { get; set; } = new();
+    public TestDto? Test { get; set; }
 }
 
 public class QuizResultDto
 {
     public int Score { get; set; }
     public int MaxScore { get; set; }
-    public double Percentage { get; set; }
+    public decimal Percentage { get; set; }
     public bool IsPassed { get; set; }
     // You can send back which questions were wrong if you want
-    public List<Guid> CorrectOptionIds { get; set; } = new(); 
+    public List<Guid> CorrectOptionIds { get; set; } = new();
 }

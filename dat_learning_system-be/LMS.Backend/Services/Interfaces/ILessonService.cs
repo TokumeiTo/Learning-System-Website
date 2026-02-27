@@ -11,5 +11,4 @@ public interface ILessonService
     Task BulkSaveContentsAsync(SaveLessonContentsDto dto);
     Task<bool> DeleteLessonAsync(Guid id);
     Task<ClassroomLessonDto> UpdateLessonAsync(UpdateLessonDto dto);
-    Task<QuizResultDto> SubmitQuizAsync(string userId, SubmitQuizDto dto);
 }

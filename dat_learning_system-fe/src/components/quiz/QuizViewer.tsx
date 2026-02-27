@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Box, Paper, Typography, Button, Stack, Radio, RadioGroup, FormControlLabel, Alert, CircularProgress, Divider } from '@mui/material';
 import { Send, Refresh, Quiz, Visibility } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
-import type { Test, Option } from '../../types/test';
-import { submitLessonQuiz } from '../../api/test.api';
+import { motion } from 'framer-motion';
+import type { Test } from '../../types/test';
+import { submitLessonTest } from '../../api/test.api';
 
 interface Props {
     data: Test;
+    testId: string;
     onFinish: (score: number, passed: boolean) => void;
     isLocked?: boolean;
     lessonId?: string;
@@ -14,7 +15,7 @@ interface Props {
     isCompleted?: boolean;
 }
 
-const QuizViewer = ({ data, onFinish, isLocked, lessonId, existingScore, isCompleted }: Props) => {
+const QuizViewer = ({ data, testId, onFinish, isLocked, lessonId, existingScore, isCompleted }: Props) => {
     const [answers, setAnswers] = useState<Record<string, string>>({});
     const [submitted, setSubmitted] = useState(isCompleted || false);
     const [score, setScore] = useState(existingScore || 0);
@@ -44,18 +45,18 @@ const QuizViewer = ({ data, onFinish, isLocked, lessonId, existingScore, isCompl
 
         // Notice: We ONLY watch lessonId. 
         // This prevents the "flash to 0%" when the parent re-renders after completion.
-    }, [lessonId]);
+    }, [lessonId, testId]);
 
     const handleSubmit = async () => {
         if (isLocked || !lessonId || isSubmitting) return;
         setIsSubmitting(true);
         try {
-            const result = await submitLessonQuiz({ lessonId, answers });
-            const newScore = result.percentage ?? result.Percentage ?? 0;
-            const passed = result.isPassed ?? result.IsPassed ?? false;
-            setScore(newScore);
+            const result = await submitLessonTest({ lessonId: lessonId!, testId: testId, answers });
+            const newPercentage = result.percentage;
+            const passed = result.isPassed;
+            setScore(newPercentage);
             setSubmitted(true);
-            onFinish(newScore, passed);
+            onFinish(newPercentage, passed);
         } catch (error) {
             console.error("Submission failed", error);
         } finally {
@@ -144,10 +145,10 @@ const QuizViewer = ({ data, onFinish, isLocked, lessonId, existingScore, isCompl
                                 {q.options.map((opt) => {
                                     const isCorrect = opt.isCorrect;
                                     const isSelected = answers[questionId] === opt.id;
-                                    let color = 'rgba(255,255,255,0.7)';
+                                    let labelColor = 'rgba(255,255,255,0.7)';
                                     if (submitted) {
-                                        if (isCorrect) color = '#10b981';
-                                        else if (isSelected) color = '#f43f5e';
+                                        if (isCorrect) labelColor = '#10b981';
+                                        else if (isSelected) labelColor = '#f43f5e';
                                     }
 
                                     return (
@@ -156,7 +157,7 @@ const QuizViewer = ({ data, onFinish, isLocked, lessonId, existingScore, isCompl
                                             value={opt.id}
                                             disabled={submitted || isLocked}
                                             control={<Radio size="small" sx={{ color: 'rgba(255,255,255,0.3)', '&.Mui-checked': { color: '#818cf8' } }} />}
-                                            sx={{ color }}
+                                            sx={{ color: labelColor }}
                                             label={
                                                 <Stack direction="row" spacing={1} alignItems="center">
                                                     <Typography variant="body2">{opt.optionText}</Typography>
@@ -188,7 +189,7 @@ const QuizViewer = ({ data, onFinish, isLocked, lessonId, existingScore, isCompl
                         Submit Quiz
                     </Button>
                 ) : (
-                    <Alert severity={isPassed ? "success" : "error"} sx={{ borderRadius: 2, bgcolor: 'transparent', color: 'white', border: '1px solid' }}>
+                    <Alert severity={isPassed ? "success" : "error"} variant='outlined' sx={{ borderRadius: 2, bgcolor: 'transparent', color: 'white', border: '1px solid' }}>
                         Final Score: {score}% — {isPassed ? "Passed!" : "Try again to unlock progress."}
                     </Alert>
                 )}

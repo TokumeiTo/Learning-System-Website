@@ -21,17 +21,19 @@ public class LessonAttemptConfiguration : IEntityTypeConfiguration<LessonAttempt
         builder.HasOne(la => la.Test)
                .WithMany() // One test can have many attempts
                .HasForeignKey(la => la.TestId)
-               .OnDelete(DeleteBehavior.NoAction); // Keep attempts for history even if test is deleted
+               .OnDelete(DeleteBehavior.Restrict); // Keep attempts for history even if test is deleted
 
-        // Link to Lesson (for high-level progress tracking)
-        builder.HasOne(la => la.Lesson)
-               .WithMany(l => l.Attempts)
-               .HasForeignKey(la => la.LessonId)
-               .OnDelete(DeleteBehavior.Cascade);
-
-        // --- UPDATED INDEXING ---
-        // We need to quickly find a student's best attempt for a SPECIFIC test
-        builder.HasIndex(la => new { la.UserId, la.TestId, la.AttemptedAt });
+        /*
+            Scenario A (Admin/Audit): "Show me the history of all attempts." -> Use AttemptedAt.
+            Scenario B (Student/KPI): "Did I pass this lesson yet?" -> Use Percentage or IsPassed.
+        */
+        builder.HasIndex(la => new { la.UserId, la.LessonId, la.AttemptedAt, la.Percentage })
+            .HasDatabaseName("IX_User_Lesson_Performance");
+    
+        builder.HasOne(la => la.Test)
+               .WithMany()
+               .HasForeignKey(la => la.TestId)
+               .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasQueryFilter(la => la.Lesson.Course.Status != CourseStatus.Closed);
     }

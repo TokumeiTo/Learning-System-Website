@@ -20,7 +20,7 @@ public class ClassroomLessonDto
     public int SortOrder { get; set; }
     public bool IsLocked { get; set; }
     public bool IsDone { get; set; }
-    public double? LastScore { get; set; }
+    public decimal? LastScore { get; set; }
     public List<ClassroomContentDto> Contents { get; set; } = new();
 }
 

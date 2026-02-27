@@ -5,6 +5,7 @@ public class TestDto
     public Guid Id { get; set; }
     public List<QuestionDto> Questions { get; set; } = new();
     public int PassingGrade { get; set; }
+    public bool IsActive {get; set;} = true;
 }
 
 public class QuestionDto
@@ -29,6 +30,7 @@ public class OptionDto
 public class LessonSubmissionDto
 {
     public Guid LessonId { get; set; }
+    public Guid TestId { get; set; }
     // Key: QuestionId, Value: OptionId
     public Dictionary<Guid, Guid> Answers { get; set; } = new();
 }
@@ -37,7 +39,7 @@ public class LessonResultDto
 {
     public int Score { get; set; }           // Points earned
     public int MaxScore { get; set; }        // Total possible points
-    public double Percentage { get; set; }    // (Score / MaxScore) * 100
+    public decimal Percentage { get; set; }    // (Score / MaxScore) * 100
     public bool IsPassed { get; set; }       // Based on Lesson.PassingScore
     public DateTime AttemptedAt { get; set; }
 }
@@ -79,14 +81,14 @@ public class LessonAttemptDto
     public Guid Id { get; set; }
     public string UserId { get; set; } = string.Empty;
     public Guid LessonId { get; set; }
-    
+
     public int Score { get; set; }
     public int MaxScore { get; set; }
     public double Percentage { get; set; }
     public bool IsPassed { get; set; }
-    
+
     public DateTime AttemptedAt { get; set; }
-    
+
     // Optional: Useful for KPIs to see if students are rushing or taking their time
-    public int? TimeTakenSeconds { get; set; } 
+    public int? TimeTakenSeconds { get; set; }
 }
