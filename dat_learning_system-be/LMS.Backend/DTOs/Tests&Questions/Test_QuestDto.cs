@@ -3,6 +3,7 @@ namespace LMS.Backend.DTOs.Test_Quest;
 public class TestDto
 {
     public Guid Id { get; set; }
+    public string? title {get;set;}
     public List<QuestionDto> Questions { get; set; } = new();
     public int PassingGrade { get; set; }
     public bool IsActive {get; set;} = true;

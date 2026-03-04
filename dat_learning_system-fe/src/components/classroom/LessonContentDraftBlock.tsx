@@ -9,7 +9,7 @@ import {
 } from '@mui/icons-material';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import TestBuilder from './TestBuilderComponent';
+import TestBuilder from './TestBuilder';
 
 const DraftBlock = ({ block, updateBlock, removeBlock }: any) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.tempId });

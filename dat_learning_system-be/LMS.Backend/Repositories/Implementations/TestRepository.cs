@@ -18,7 +18,8 @@ public class TestRepository : ITestRepository
         return await _context.Tests
             .Include(t => t.Questions)
                 .ThenInclude(q => q.Options)
-            // Ensure you are matching the LESSON ID stored on the LessonContent
+            .AsSplitQuery() // Tells Npgsql to send separate SELECT commands
+            .AsNoTracking() // Use this if you're just fetching for the initial load
             .FirstOrDefaultAsync(t => t.Id == testId);
     }
     public async Task<Test?> GetActiveTestByContentIdAsync(Guid contentId)

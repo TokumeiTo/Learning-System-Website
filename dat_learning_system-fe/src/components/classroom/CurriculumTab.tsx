@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
-    List, Typography, Box, Paper, TextField, Stack, Button, 
+    List, Typography, Box, Paper, TextField, Stack, Button,
     CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
 import { AccessTime, Add as AddIcon } from '@mui/icons-material';
@@ -36,9 +36,14 @@ const CurriculumTab = ({ data, setData, currentLessonId, onLessonSelect, isEditM
 
     // Sensors configured for better UX (distance prevents accidental drags on click)
     const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+        useSensor(PointerSensor, {
+            activationConstraint: { distance: 8 }
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates
+        })
     );
+    const lessonIds = useMemo(() => data.lessons.map(l => l.id), [data.lessons]);
 
     // --- REORDER LOGIC ---
     const handleDragEnd = async (event: DragEndEvent) => {
@@ -46,13 +51,13 @@ const CurriculumTab = ({ data, setData, currentLessonId, onLessonSelect, isEditM
         if (over && active.id !== over.id && isEditMode) {
             const oldIndex = data.lessons.findIndex((l) => l.id === active.id);
             const newIndex = data.lessons.findIndex((l) => l.id === over.id);
-            
+
             const originalOrder = [...data.lessons];
             const newOrder = arrayMove(data.lessons, oldIndex, newIndex);
-            
+
             // 1. Optimistic Update
             setData({ ...data, lessons: newOrder });
-            
+
             setIsSaving(true);
             try {
                 // 2. Persist to DB
@@ -74,10 +79,10 @@ const CurriculumTab = ({ data, setData, currentLessonId, onLessonSelect, isEditM
     const handleCreate = async () => {
         if (!title.trim()) return;
         try {
-            const nextOrder = data.lessons.length > 0 
-                ? Math.max(...data.lessons.map(l => l.sortOrder)) + 1 
+            const nextOrder = data.lessons.length > 0
+                ? Math.max(...data.lessons.map(l => l.sortOrder)) + 1
                 : 1;
-                
+
             const newLesson = await createLesson({
                 courseId: data.courseId,
                 title,
@@ -88,7 +93,7 @@ const CurriculumTab = ({ data, setData, currentLessonId, onLessonSelect, isEditM
             setData({ ...data, lessons: [...data.lessons, newLesson] });
             setIsAdding(false);
             setTitle(''); setTime('');
-            
+
             // Auto-select the newly created lesson
             onLessonSelect(newLesson.id);
         } catch (e) { console.error("Creation failed", e); }
@@ -136,7 +141,7 @@ const CurriculumTab = ({ data, setData, currentLessonId, onLessonSelect, isEditM
 
             {/* Draggable List */}
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={data.lessons.map(l => l.id)} strategy={verticalListSortingStrategy}>
+                <SortableContext items={lessonIds} strategy={verticalListSortingStrategy}>
                     <List sx={{ pt: 0, '& > *:not(:last-child)': { mb: 0.5 } }}>
                         {data.lessons.map((item) => (
                             <SortableLessonItem
@@ -165,7 +170,7 @@ const CurriculumTab = ({ data, setData, currentLessonId, onLessonSelect, isEditM
                                     InputProps={{ disableUnderline: true, sx: { color: 'white', fontSize: '0.95rem', fontWeight: 600 } }}
                                 />
                                 <TextField
-                                    fullWidth size="small" placeholder="Duration" 
+                                    fullWidth size="small" placeholder="Duration"
                                     value={time} onChange={(e) => setTime(e.target.value)} variant="standard"
                                     InputProps={{
                                         disableUnderline: true,
@@ -183,8 +188,8 @@ const CurriculumTab = ({ data, setData, currentLessonId, onLessonSelect, isEditM
                         <Button
                             fullWidth startIcon={<AddIcon />}
                             onClick={() => setIsAdding(true)}
-                            sx={{ 
-                                py: 1.5, border: '1px dashed rgba(255,255,255,0.1)', 
+                            sx={{
+                                py: 1.5, border: '1px dashed rgba(255,255,255,0.1)',
                                 color: 'rgba(255,255,255,0.5)', textTransform: 'none', borderRadius: 3,
                                 '&:hover': { border: '1px dashed #6366f1', color: '#6366f1', bgcolor: 'rgba(99, 102, 241, 0.05)' }
                             }}
@@ -196,8 +201,8 @@ const CurriculumTab = ({ data, setData, currentLessonId, onLessonSelect, isEditM
             )}
 
             {/* Global Delete Confirmation */}
-            <Dialog 
-                open={Boolean(deleteId)} 
+            <Dialog
+                open={Boolean(deleteId)}
                 onClose={() => setDeleteId(null)}
                 PaperProps={{ sx: { bgcolor: '#1e293b', color: 'white', borderRadius: 4, backgroundImage: 'none' } }}
             >

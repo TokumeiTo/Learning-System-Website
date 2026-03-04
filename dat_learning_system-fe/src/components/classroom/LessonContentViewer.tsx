@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { Box, Typography, Stack, Paper, Button, CircularProgress } from '@mui/material';
-import { AutoStories, CheckCircleOutline, Lock } from '@mui/icons-material';
+import { AutoStories, Lock } from '@mui/icons-material';
 import ReactPlayer from 'react-player';
 import type { LessonContent } from '../../types/classroom';
 import { sendHeartbeat, markLessonComplete } from '../../api/lessonProgress.api';
@@ -20,6 +20,12 @@ const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete
 
     // Initialize completed quizzes based on content status if the backend provides it
     const [completedQuizzes, setCompletedQuizzes] = useState<Record<string, boolean>>({});
+
+    const isPlayingRef = useRef(isPlaying);
+
+    useEffect(() => {
+        isPlayingRef.current = isPlaying;
+    }, [isPlaying]);
 
     useEffect(() => {
         if (isDone) {
@@ -64,7 +70,7 @@ const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete
             const hasVideo = contents.some(c => c.contentType === 'video');
 
             // If there's a video, only track if it's actually playing
-            const shouldTrack = hasVideo ? isPlaying : !isInactive;
+            const shouldTrack = hasVideo ? isPlayingRef : !isInactive;
 
             if (shouldTrack && !isTabHidden) {
                 sendHeartbeat({ lessonId, seconds: 15 }).catch(() => {
@@ -78,7 +84,7 @@ const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete
             window.removeEventListener('scroll', updateActivity);
             clearInterval(interval);
         };
-    }, [lessonId, isPlaying, contents, isDone]);
+    }, [lessonId, isDone]);
 
     const handleQuizFinish = (blockId: string, _percentage: number, passed: boolean) => {
         setCompletedQuizzes(prev => ({ ...prev, [blockId]: passed }));

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { Paper, Tabs, Tab, Box, Typography, Fade } from '@mui/material';
 import type { ClassroomView } from '../../types/classroom';
 import CurriculumTab from './CurriculumTab';
@@ -11,12 +11,12 @@ interface Props {
   isEditMode: boolean;
 }
 
-const ClassroomSidebar = ({ 
-  data, 
-  setData, 
-  currentLessonId, 
-  setCurrentLessonId, 
-  isEditMode 
+const ClassroomSidebar = memo(({
+  data,
+  setData,
+  currentLessonId,
+  setCurrentLessonId,
+  isEditMode
 }: Props) => {
   const [activeTab, setActiveTab] = useState(0);
 
@@ -25,12 +25,12 @@ const ClassroomSidebar = ({
    * Prevents students from clicking into locked lessons, 
    * while allowing Admins full access during Edit Mode.
    */
-  const handleLessonChange = (lessonId: string) => {
+  const handleLessonChange = useCallback((lessonId: string) => {
     if (lessonId === currentLessonId) return;
 
     // Find the lesson in our current data to check its status
     const targetLesson = data.lessons.find(l => l.id === lessonId);
-    
+
     if (!targetLesson) return;
 
     // Logic check: Only allow if not locked OR if user is an Admin in Edit Mode
@@ -40,19 +40,20 @@ const ClassroomSidebar = ({
     }
 
     setCurrentLessonId(lessonId);
-  };
+  }, [currentLessonId, data.lessons, isEditMode, setCurrentLessonId]);
 
   return (
-    <Paper 
+    <Paper
       elevation={0}
-      sx={{ 
-        bgcolor: '#1e293b', 
-        borderRadius: 4, 
-        overflow: 'hidden', 
+      sx={{
+        bgcolor: '#1e293b',
+        borderRadius: 4,
+        overflow: 'hidden',
         border: '1px solid rgba(255,255,255,0.05)',
         height: 'fit-content',
         position: 'sticky',
-        top: 24
+        top: 24,
+        minWidth: { lg: 350 }
       }}
     >
       <Tabs
@@ -61,14 +62,14 @@ const ClassroomSidebar = ({
         variant="fullWidth"
         indicatorColor="primary"
         textColor="inherit"
-        sx={{ 
+        sx={{
           borderBottom: '1px solid rgba(255,255,255,0.05)',
-          '& .MuiTab-root': { 
-            textTransform: 'none', 
+          '& .MuiTab-root': {
+            textTransform: 'none',
             fontWeight: 700,
             fontSize: '0.875rem',
             color: 'rgba(255,255,255,0.4)',
-            '&.Mui-selected': { color: '#818cf8' } 
+            '&.Mui-selected': { color: '#818cf8' }
           }
         }}
       >
@@ -80,13 +81,13 @@ const ClassroomSidebar = ({
       <Box sx={{ p: 1, minHeight: 400 }}>
         {/* Tab Panel: Curriculum */}
         {activeTab === 0 && (
-          <Fade in={activeTab === 0}>
+          <Fade in={activeTab === 0} timeout={300}>
             <Box>
               <CurriculumTab
                 data={data}
                 setData={setData}
                 currentLessonId={currentLessonId}
-                onLessonSelect={handleLessonChange} 
+                onLessonSelect={handleLessonChange}
                 isEditMode={isEditMode}
               />
             </Box>
@@ -117,6 +118,8 @@ const ClassroomSidebar = ({
       </Box>
     </Paper>
   );
-};
+});
+
+ClassroomSidebar.displayName = 'ClassroomSidebar';
 
 export default ClassroomSidebar;

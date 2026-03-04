@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { login as loginApi } from "../api/auth.api";
-import { setToken, getToken, clearToken } from "../utils/token";
+import { setToken, getToken, clearToken, isTokenExpired } from "../utils/token";
 
 type AuthUser = {
   fullName: string;
@@ -28,14 +28,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = getToken();
       const savedUser = localStorage.getItem("lms_user");
 
-      if (token && savedUser) {
+      if (token && savedUser && !isTokenExpired) {
         try {
           setUser(JSON.parse(savedUser));
         } catch (e) {
-          // If JSON is corrupted, clear everything
-          clearToken();
-          localStorage.removeItem("lms_user");
+          logout();
         }
+      } else {
+        logout();
       }
       setIsInitialized(true);
     };
@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {/* Prevent the rest of the app from rendering until we've checked 
         localStorage, otherwise routes might redirect to login mid-load.
       */}
-      {isInitialized ? children : null} 
+      {isInitialized ? children : null}
     </AuthContext.Provider>
   );
 };

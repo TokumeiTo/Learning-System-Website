@@ -55,6 +55,7 @@ npm install @tanstack/react-query-devtools
 npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
 npm install date-fns
 npm install react-player
+npm install jwt-decode
 
 Chat gpt
 ⚠️ Intentionally NOT installed yet:

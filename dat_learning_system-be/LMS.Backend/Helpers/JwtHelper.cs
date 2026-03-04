@@ -9,7 +9,7 @@ namespace LMS.Backend.Helpers;
 public class JwtHelper
 {
     private readonly IConfiguration _config;
-    public JwtHelper(IConfiguration config) 
+    public JwtHelper(IConfiguration config)
     {
         _config = config;
     }
@@ -35,9 +35,10 @@ public class JwtHelper
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "default_secret_key_32_characters_long"
-        ));
+        var secretKey = _config["Jwt:Key"]
+                  ?? throw new InvalidOperationException("JWT Key is missing from configuration.");
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
