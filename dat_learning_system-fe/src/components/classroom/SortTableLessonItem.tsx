@@ -12,7 +12,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { Lesson } from '../../types/classroom';
+import type { Lesson } from '../../types_interfaces/classroom';
 
 type SortableItemProps = {
     item: Lesson;

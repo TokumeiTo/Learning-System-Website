@@ -1,7 +1,7 @@
 import React, { useState, memo } from 'react';
 import { Box, Button, TextField, Paper, Typography, Stack, IconButton, Divider } from '@mui/material';
 import { Delete as DeleteIcon, AddCircle as AddCircleIcon, Add as AddIcon, Settings } from '@mui/icons-material';
-import type { Test, Question } from '../../types/test';
+import type { Test, Question } from '../../types_interfaces/test';
 import MessagePopup from '../feedback/MessagePopup';
 
 interface TestBuilderProps {

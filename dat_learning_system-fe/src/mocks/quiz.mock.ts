@@ -1,4 +1,4 @@
-import type { Quiz, QuizProgress, Level } from "../types/quiz";
+import type { Quiz, QuizProgress, Level } from "../types_interfaces/quiz";
 
 export const kanjiQuizMock: Quiz = {
     id: "kanji-n5",

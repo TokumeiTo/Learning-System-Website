@@ -6,7 +6,7 @@ import type {
     LessonAttempt, 
     AdminLessonStats, 
     StudentPerformanceKPI 
-} from "../types/test";
+} from "../types_interfaces/test";
 
 /**
  * ADMIN: Save or update the test content block

@@ -14,7 +14,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
-import type { JLPTLevel } from "../../types/kanji";
+import type { JLPTLevel } from "../../types_interfaces/kanji";
 
 type Props = {
     open: boolean;

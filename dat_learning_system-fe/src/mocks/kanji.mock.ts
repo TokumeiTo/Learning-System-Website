@@ -1,4 +1,4 @@
-import { type Kanji } from "../types/kanji";
+import { type Kanji } from "../types_interfaces/kanji";
 
 export const kanjiMockData: Kanji[] = [
     {

@@ -1,6 +1,6 @@
 import api from '../hooks/useApi';
-import type { ApiResponse } from '../types/api';
-import type { UserListItem, UserUpdateFields, UserDeleteFields } from '../types/user';
+import type { ApiResponse } from '../types_interfaces/api';
+import type { UserListItem, UserUpdateFields, UserDeleteFields } from '../types_interfaces/user';
 import { POSITIONS } from '../utils/positions';
 
 /**

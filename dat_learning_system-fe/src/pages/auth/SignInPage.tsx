@@ -138,7 +138,7 @@ export default function SignIn() {
               <motion.div variants={itemVars}>
                 <TextField
                   fullWidth
-                  label="Company ID"
+                  label="User ID"
                   variant="filled"
                   value={companyCode}
                   onChange={(e) => setCompanyCode(e.target.value)}

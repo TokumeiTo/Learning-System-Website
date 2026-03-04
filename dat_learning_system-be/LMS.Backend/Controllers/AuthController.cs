@@ -21,7 +21,7 @@ public class AuthController : ControllerBase
         var response = await _authService.LoginAsync(dto);
         if (response is null)
         {
-            return Unauthorized(new { message = "Invalid Company Code or Password" });
+            return Unauthorized(new { message = "Invalid User ID or Password" });
         }
 
         return Ok(response);

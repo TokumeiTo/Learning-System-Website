@@ -1,7 +1,7 @@
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useState } from "react";
 import { kanjiMockData } from "../../mocks/kanji.mock";
-import type { Kanji, JLPTLevel } from "../../types/kanji";
+import type { Kanji, JLPTLevel } from "../../types_interfaces/kanji";
 import KanjiCard from "../../components/flashcards/KanjiCard";
 import KanjiDetailModal from "../../components/flashcards/KanjiDetailModal";
 import KanjiCreateModal from "../../components/flashcards/KanjiCreateModal";

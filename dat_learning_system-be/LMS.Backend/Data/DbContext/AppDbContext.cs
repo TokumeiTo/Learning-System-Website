@@ -26,9 +26,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Assignment> Assignments { get; set; }
     public DbSet<Submission> Submissions { get; set; }
     public DbSet<Enrollment> Enrollments { get; set; }
-    public DbSet<Notification> Notifications { get; set; }
     public DbSet<CourseRating> CourseRatings { get; set; }
     public DbSet<UserLessonProgress> UserLessonProgresses { get; set; }
+    // ---- NOTIFICATION SYSTEM TABLES ---
+    public DbSet<Announcement> Announcements => Set<Announcement>();
+    public DbSet<Notification> Notifications => Set<Notification>();
     
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Stack, Button, Chip, Card } from '@mui/material';
 import { MenuBook, ArrowForward, Timer } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import type { Course } from '../../types/course';
+import type { Course } from '../../types_interfaces/course';
 
 interface Props {
     course: Course;

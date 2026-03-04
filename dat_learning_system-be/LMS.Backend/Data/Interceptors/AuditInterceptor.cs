@@ -64,6 +64,7 @@ public class AuditInterceptor : SaveChangesInterceptor
             if (entry.Entity is AuditLog ||
                 entry.Entity is CourseRating ||
                 entry.Entity is UserLessonProgress ||
+                entry.Entity is Notification ||
                 entry.State == EntityState.Detached ||
                 entry.State == EntityState.Unchanged)
             {

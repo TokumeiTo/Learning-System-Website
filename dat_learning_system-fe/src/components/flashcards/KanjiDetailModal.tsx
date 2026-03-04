@@ -9,7 +9,7 @@ import {
     IconButton,
 } from "@mui/material";
 import { useState } from "react";
-import { type Kanji } from "../../types/kanji";
+import { type Kanji } from "../../types_interfaces/kanji";
 import KanjiStrokeAnimation from "./KanjiStrokeAnimation";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 

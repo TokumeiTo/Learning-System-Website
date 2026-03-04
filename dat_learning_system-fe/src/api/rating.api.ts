@@ -1,5 +1,5 @@
 import api from "../hooks/useApi";
-import type { RatingResponse, SubmitRatingDto } from "../types/rating";
+import type { RatingResponse, SubmitRatingDto } from "../types_interfaces/rating";
 
 export const submitCourseRating = async (
     courseId: string,

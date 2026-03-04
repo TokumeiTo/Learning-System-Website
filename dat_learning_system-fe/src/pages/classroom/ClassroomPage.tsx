@@ -5,7 +5,7 @@ import { Edit, Visibility } from '@mui/icons-material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 import { fetchClassroomData } from '../../api/classroom.api';
-import type { ClassroomView } from '../../types/classroom';
+import type { ClassroomView } from '../../types_interfaces/classroom';
 import { useAuth } from '../../hooks/useAuth';
 
 import LessonContentSection from '../../components/classroom/LessonContentSection';

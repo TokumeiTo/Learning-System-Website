@@ -9,8 +9,8 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { getEnrollmentStatus, requestEnrollment } from '../../api/enrollment.api';
-import type { Course } from '../../types/course';
-import type { EnrollmentStatusResponse } from '../../types/enrollment';
+import type { Course } from '../../types_interfaces/course';
+import type { EnrollmentStatusResponse } from '../../types_interfaces/enrollment';
 import CourseRatingAction from './CourseRatingAction';
 
 interface CourseDetailModalProps {

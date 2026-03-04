@@ -1,5 +1,5 @@
 import { Card, Chip, Typography, Stack } from "@mui/material";
-import type { ScheduleItem } from "../../types/schedule";
+import type { ScheduleItem } from "../../types_interfaces/schedule";
 
 type Props = {
   item: ScheduleItem;

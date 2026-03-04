@@ -1,7 +1,7 @@
 // utils/lessonToPlateInfo.ts
 
 import type { PlateInfo } from "../mocks/lessonSidebar.mock";
-import type { stepPlate } from "../types/stepPlate";
+import type { stepPlate } from "../types_interfaces/stepPlate";
 
 
 export function stepsToPlateInfo(lesson: stepPlate): PlateInfo {

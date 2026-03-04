@@ -11,16 +11,20 @@ public class EnrollmentService : IEnrollmentService
     private readonly IEnrollmentRepository _repo;
     private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    // Service to Service injections
+    private readonly INotificationService _notificationService;
 
     public EnrollmentService(
         IEnrollmentRepository repo,
         IMapper mapper,
-        IHttpContextAccessor httpContextAccessor
+        IHttpContextAccessor httpContextAccessor,
+        INotificationService notificationService
     )
     {
         _repo = repo;
         _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
+        _notificationService = notificationService;
     }
 
     // For Admin: Fetch all pending requests for the dashboard
@@ -104,6 +108,20 @@ public class EnrollmentService : IEnrollmentService
         // 4. Update the enrollment details
         enrollment.Status = newStatus;
         enrollment.ApprovedAt = approve ? DateTime.UtcNow : null;
+
+        // NOTIFICATION TRIGGER
+        string title = approve ? "Enrollment Approved!" : "Enrollment Update";
+        string message = approve
+            ? $"Great news! You have been approved for the course: {enrollment.Course.Title}." 
+            : $"Your request for {enrollment.Course.Title} was not approved. Reason: {reason ?? "No reason provided."}";
+
+        await _notificationService.SendSystemNotificationAsync(
+            enrollment.UserId,
+            title,
+            message,
+            enrollment.CourseId.ToString(),
+            "Course"
+        );
 
         // 5. Save everything. 
         // Because EF Core is tracking the 'enrollment' object AND its child 'Course' object,

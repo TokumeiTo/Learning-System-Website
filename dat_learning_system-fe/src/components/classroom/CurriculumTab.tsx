@@ -16,7 +16,7 @@ import {
 } from '@dnd-kit/sortable';
 
 import { createLesson, reorderLessons, updateLesson, deleteLesson } from '../../api/classroom.api';
-import type { ClassroomView } from '../../types/classroom';
+import type { ClassroomView } from '../../types_interfaces/classroom';
 import SortableLessonItem from './SortTableLessonItem';
 
 type CurriculumTabProps = {

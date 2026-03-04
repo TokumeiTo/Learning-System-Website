@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { Box, Typography, Stack, Paper, Button, CircularProgress } from '@mui/material';
 import { AutoStories, Lock } from '@mui/icons-material';
 import ReactPlayer from 'react-player';
-import type { LessonContent } from '../../types/classroom';
+import type { LessonContent } from '../../types_interfaces/classroom';
 import { sendHeartbeat, markLessonComplete } from '../../api/lessonProgress.api';
 import QuizViewer from '../quiz/QuizViewer';
 

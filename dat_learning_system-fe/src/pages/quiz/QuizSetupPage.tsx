@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProgressCircle from "../../components/chartAndProgress/ProgressCircle";
 import { progressByLevel } from "../../mocks/quiz.mock";
-import type { Level, QuizProgress } from "../../types/quiz";
+import type { Level, QuizProgress } from "../../types_interfaces/quiz";
 import PageLayout from "../../components/layout/PageLayout";
 
 type QuizType = keyof QuizProgress;

@@ -1,5 +1,5 @@
 import api from "../hooks/useApi";
-import type { TranslationRequest, TranslationResponse } from "../types/translation";
+import type { TranslationRequest, TranslationResponse } from "../types_interfaces/translation";
 
 /**
  * Sends text to the .NET backend for translation.

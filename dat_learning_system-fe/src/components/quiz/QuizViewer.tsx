@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Box, Paper, Typography, Button, Stack, Radio, RadioGroup, FormControlLabel, Alert, CircularProgress, Divider } from '@mui/material';
 import { Send, Refresh, Quiz, Visibility } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import type { Test } from '../../types/test';
+import type { Test } from '../../types_interfaces/test';
 import { submitLessonTest } from '../../api/test.api';
 
 interface Props {

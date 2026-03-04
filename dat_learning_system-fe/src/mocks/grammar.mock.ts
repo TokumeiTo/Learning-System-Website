@@ -1,4 +1,4 @@
-import type { JLPTLevel } from "../types/kanji";
+import type { JLPTLevel } from "../types_interfaces/kanji";
 
 export type GrammarExample = {
   jp: string;

@@ -1,5 +1,5 @@
 import api from "../hooks/useApi";
-import type { RegisterRequest, RegisterResponse, LoginRequest, LoginResponse } from "../types/auth";
+import type { RegisterRequest, RegisterResponse, LoginRequest, LoginResponse } from "../types_interfaces/auth";
 
 /**
  * Public endpoint: Log in to get a JWT token.

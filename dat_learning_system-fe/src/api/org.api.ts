@@ -1,5 +1,5 @@
 import api from "../hooks/useApi";
-import type { OrgUnit } from "../types/org";
+import type { OrgUnit } from "../types_interfaces/org";
 
 export interface OrgUnitSelect {
   id: number;

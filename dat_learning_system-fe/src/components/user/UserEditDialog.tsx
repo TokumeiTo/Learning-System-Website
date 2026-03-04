@@ -9,7 +9,7 @@ import * as yup from "yup";
 import { POSITIONS } from "../../utils/positions";
 import { getDepartments, getDivisions, getSections, getTeams } from "../../api/org.api";
 import { normalizeOrgData } from "../../utils/orgHelpers";
-import type { UserListItem, UserUpdateFields } from "../../types/user";
+import type { UserListItem, UserUpdateFields } from "../../types_interfaces/user";
 
 const schema = yup.object({
   fullName: yup.string().required("Full Name is required"),

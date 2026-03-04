@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, Stack, CircularProgress, Paper } from '@mui/material';
 import { fetchClassroomData } from '../../api/classroom.api';
-import type { ClassroomView, Lesson } from '../../types/classroom';
+import type { ClassroomView, Lesson } from '../../types_interfaces/classroom';
 
 const LessonPage = () => {
     const { id } = useParams<{ id: string }>();

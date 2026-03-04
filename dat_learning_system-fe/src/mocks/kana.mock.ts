@@ -1,4 +1,4 @@
-import type { KanaItem } from "../types/kana";
+import type { KanaItem } from "../types_interfaces/kana";
 
 export const hiraganaList: KanaItem[] = [
   // あ行

@@ -1,7 +1,7 @@
 import React from "react";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import type { UserListItem, UserDeleteFields } from "../../types/user";
+import type { UserListItem, UserDeleteFields } from "../../types_interfaces/user";
 
 interface Props {
   user: UserListItem | null;

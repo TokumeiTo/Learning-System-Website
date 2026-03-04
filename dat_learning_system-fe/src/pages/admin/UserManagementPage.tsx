@@ -16,8 +16,8 @@ import PageLayout from "../../components/layout/PageLayout";
 // APIs & Types
 import { register as registerApi } from '../../api/auth.api';
 import { getUsersList, updateUser, deleteUser } from "../../api/user.api";
-import type { UserListItem, UserUpdateFields, UserDeleteFields } from "../../types/user";
-import type { RegisterRequest } from "../../types/auth";
+import type { UserListItem, UserUpdateFields, UserDeleteFields } from "../../types_interfaces/user";
+import type { RegisterRequest } from "../../types_interfaces/auth";
 
 const UserManagementPage = () => {
   const theme = useTheme();

@@ -10,24 +10,18 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
     {
         builder.HasKey(n => n.Id);
 
-        builder.Property(n => n.Title).IsRequired().HasMaxLength(200);
-        builder.Property(n => n.Message).IsRequired();
-        builder.Property(n => n.Type).IsRequired().HasMaxLength(50);
+        builder.Property(n => n.Title).IsRequired().HasMaxLength(150);
+        builder.Property(n => n.Message).IsRequired().HasMaxLength(1000);
 
-        // Relationship: Notification -> Recipient (ApplicationUser)
-        builder.HasOne(n => n.Recipient)
-               .WithMany()
-               .HasForeignKey(n => n.RecipientId)
-               .OnDelete(DeleteBehavior.Cascade);
-
-        // Relationship: Notification -> Sender (ApplicationUser)
-        builder.HasOne(n => n.Sender)
-               .WithMany()
-               .HasForeignKey(n => n.SenderId)
-               .OnDelete(DeleteBehavior.SetNull);
-
-        // Index for performance when fetching a user's notification list
-        builder.HasIndex(n => n.RecipientId);
+        // Optimization: Index for the user's inbox query
+        builder.HasIndex(n => n.UserId);
+        
+        // Optimization: Index for the 30-day cleanup background job
         builder.HasIndex(n => n.CreatedAt);
+
+        builder.HasOne(n => n.User)
+               .WithMany() // Or add ICollection<Notification> to ApplicationUser if you want
+               .HasForeignKey(n => n.UserId)
+               .OnDelete(DeleteBehavior.Cascade); // If user is deleted, notifications go too
     }
 }

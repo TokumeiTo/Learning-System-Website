@@ -9,8 +9,9 @@ using LMS.Backend.DTOs.Lesson;
 using LMS.Backend.DTOs.Enrollment;
 using LMS.Backend.DTOs.Topic;
 using LMS.Backend.DTOs.Audit;
-using LMS.Backend.DTOs.Notification;
 using LMS.Backend.DTOs.Test_Quest;
+using LMS.Backend.DTOs.Announce_Noti;
+using LMS.Backend.Common;
 
 namespace LMS.Backend.Helpers;
 
@@ -111,15 +112,6 @@ public class MappingProfile : Profile
                 ? $"{src.AdminUser.Email}"
                 : src.PerformedBy));
 
-        // Notification
-        CreateMap<Notification, NotificationResponseDto>()
-            .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src =>
-                src.Sender != null ? src.Sender.FullName : "System"));
-        CreateMap<CreateNotificationDto, Notification>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
-            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
-            .ForMember(dest => dest.IsRead, opt => opt.MapFrom(_ => false));
-
         // --- TESTS AND QUESTIONS ---
         // Entity -> DTO (For Reading)
         CreateMap<Test, TestDto>();
@@ -156,5 +148,20 @@ public class MappingProfile : Profile
                 // 2. Default to null (Student view) if anything is missing or fails
                 return (bool?)null;
             }));
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        // --- ANNOUNCEMENTS ---
+        CreateMap<Announcement, AnnouncementResponseDto>()
+            .ForMember(dest => dest.TargetPosition, opt => opt.MapFrom(src => src.TargetPosition.ToString()))
+            .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.CreatedByUser.FullName));
+
+        CreateMap<UpsertAnnouncementDto, Announcement>()
+            .ForMember(dest => dest.TargetPosition, opt => opt.MapFrom(src => 
+                EnumMappingHelper.MapPosition(src.TargetPosition, Position.Employee))) // Using Mapping POSITIONs helper!
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // Don't let users set creation date
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id ?? Guid.NewGuid()));
+
+        // --- NOTIFICATIONS ---
+        CreateMap<Notification, NotificationResponseDto>();
     }
 }

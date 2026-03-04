@@ -1,5 +1,5 @@
 import api from "../hooks/useApi";
-import type { Course } from "../types/course";
+import type { Course } from "../types_interfaces/course";
 
 export const getCourses = async (): Promise<Course[]> => {
     const res = await api.get("/api/courses");

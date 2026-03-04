@@ -10,7 +10,7 @@ import {
     Visibility, VisibilityOff, Delete
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { CreateCourseInputs } from '../../types/course';
+import type { CreateCourseInputs } from '../../types_interfaces/course';
 
 interface CreateCourseCardProps {
     onSave: (course: FormData) => Promise<void> | void; // Changed to allow Promise

@@ -1,36 +1,44 @@
 using AutoMapper;
 using LMS.Backend.Data.Entities;
-using LMS.Backend.DTOs.Notification;
+using LMS.Backend.DTOs.Announce_Noti;
 using LMS.Backend.Repo.Interface;
 using LMS.Backend.Services.Interfaces;
 
 namespace LMS.Backend.Services.Implement;
 
-public class NotificationService : INotificationService
+public class NotificationService(
+    INotificationRepository repository, 
+    IMapper mapper) : INotificationService
 {
-    private readonly INotificationRepository _repo;
-    private readonly IMapper _mapper;
-
-    public NotificationService(INotificationRepository repo, IMapper mapper)
+    public async Task<IEnumerable<NotificationResponseDto>> GetUserInboxAsync(string userId)
     {
-        _repo = repo;
-        _mapper = mapper;
+        var notifications = await repository.GetByUserIdAsync(userId);
+        return mapper.Map<IEnumerable<NotificationResponseDto>>(notifications);
     }
 
-    public async Task CreateNotificationAsync(CreateNotificationDto dto)
+    public async Task SendSystemNotificationAsync(string userId, string title, string message, string? refId, string? refType)
     {
-        // Map DTO to Entity
-        var notification = _mapper.Map<Notification>(dto);
+        var notification = new Notification
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Title = title,
+            Message = message,
+            ReferenceId = refId,
+            ReferenceType = refType,
+            CreatedAt = DateTime.UtcNow
+        };
 
-        // Persist via Repository
-        await _repo.AddNotificationAsync(notification);
-
-        // TODO: In the next step, we will add SignalR push here!
+        await repository.AddAsync(notification);
     }
 
-    public async Task<IEnumerable<NotificationResponseDto>> GetMyNotificationsAsync(string userId)
+    public async Task MarkAsReadAsync(Guid id) => await repository.MarkAsReadAsync(id);
+
+    public async Task ClearAllAsync(string userId) => await repository.ClearAllAsync(userId);
+
+    public async Task RunCleanupJobAsync()
     {
-        var notifications = await _repo.GetUserNotificationsAsync(userId);
-        return _mapper.Map<IEnumerable<NotificationResponseDto>>(notifications);
+        var threshold = DateTime.UtcNow.AddMonths(-1);
+        await repository.HardDeleteExpiredAsync(threshold);
     }
 }

@@ -1,4 +1,4 @@
-import type { CalendarEvent } from "../types/calendar";
+import type { CalendarEvent } from "../types_interfaces/calendar";
 
 export const calendarMock: CalendarEvent[] = [
   {

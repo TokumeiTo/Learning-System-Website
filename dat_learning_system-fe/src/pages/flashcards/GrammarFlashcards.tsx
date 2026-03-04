@@ -1,7 +1,7 @@
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useState } from "react";
 import { grammarMockData, type Grammar } from "../../mocks/grammar.mock";
-import type { JLPTLevel } from "../../types/kanji";
+import type { JLPTLevel } from "../../types_interfaces/kanji";
 import GrammarCard from "../../components/flashcards/GrammarCard";
 import GrammarDetailModal from "../../components/flashcards/GrammarDetailModal";
 

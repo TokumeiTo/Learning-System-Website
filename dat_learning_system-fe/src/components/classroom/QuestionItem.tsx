@@ -7,7 +7,7 @@ import {
   Delete as DeleteIcon, AddCircle as AddCircleIcon,
   Add as AddIcon, RadioButtonChecked, RadioButtonUnchecked, Settings
 } from '@mui/icons-material';
-import type { Test, Question, Option } from '../../types/test';
+import type { Test, Question, Option } from '../../types_interfaces/test';
 import OptionItem from './OptionItem';
 
 

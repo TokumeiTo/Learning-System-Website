@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { CheckCircle, Cancel, Person, Autorenew } from '@mui/icons-material';
 import { getEnrollmentHistory, respondToEnrollment } from '../../api/enrollment.api';
-import type { EnrollmentRequest } from '../../types/enrollment';
+import type { EnrollmentRequest } from '../../types_interfaces/enrollment';
 import { format } from 'date-fns';
 import MessagePopup from '../feedback/MessagePopup';
 

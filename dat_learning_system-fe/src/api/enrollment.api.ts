@@ -1,10 +1,10 @@
 import api from '../hooks/useApi';
-import type { ApiResponse } from '../types/api';
+import type { ApiResponse } from '../types_interfaces/api';
 import type {
     EnrollmentRequest,
     SubmitEnrollment,
     EnrollmentStatusResponse
-} from '../types/enrollment';
+} from '../types_interfaces/enrollment';
 
 // Get current user's enrollment status for a specific course
 export const getEnrollmentStatus = async (courseId: string): Promise<EnrollmentStatusResponse> => {

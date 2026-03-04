@@ -3,7 +3,7 @@ import { Box, Stack, Typography, Paper, Button, Divider, CircularProgress, Dialo
 import { TextFormat, Image as ImageIcon, YouTube, Save, Quiz } from '@mui/icons-material';
 import { PointerSensor, useSensor, useSensors, DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
-import type { BulkSaveContentsRequest, Lesson } from '../../types/classroom';
+import type { BulkSaveContentsRequest, Lesson } from '../../types_interfaces/classroom';
 import DraftBlock from './LessonContentDraftBlock';
 import { bulkSaveLessonContents } from '../../api/classroom.api';
 import MessagePopup from '../feedback/MessagePopup';

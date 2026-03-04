@@ -4,7 +4,7 @@ import {
     ListItemText, Divider, IconButton, Stack, Button, ListItemButton 
 } from '@mui/material';
 import { Close, History as HistoryIcon, DeleteOutline } from '@mui/icons-material';
-import type { TranslationHistoryItem } from '../../types/translation';
+import type { TranslationHistoryItem } from '../../types_interfaces/translation';
 
 interface HistoryDrawerProps {
     open: boolean;

@@ -1,4 +1,4 @@
-import type { ScheduleItem } from "../types/schedule";
+import type { ScheduleItem } from "../types_interfaces/schedule";
 
 export const scheduleMock: ScheduleItem[] = [
   {

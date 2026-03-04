@@ -9,7 +9,7 @@ import {
 import { Search, Add, Terminal, Translate, Language, Dashboard, AutoAwesome } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLayout from '../../components/layout/PageLayout';
-import type { Course } from '../../types/course';
+import type { Course } from '../../types_interfaces/course';
 
 // Service layer
 import { getCourses, createCourse } from '../../api/course.api';

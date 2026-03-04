@@ -1,5 +1,5 @@
 import { Card, CardActionArea, Typography } from "@mui/material";
-import type { KanaItem } from "../../types/kana";
+import type { KanaItem } from "../../types_interfaces/kana";
 import { motion } from "framer-motion";
 
 type KanaCardProps = {

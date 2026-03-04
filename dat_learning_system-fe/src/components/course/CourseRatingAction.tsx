@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography, Stack, Rating, TextField, Button, CircularProgress } from '@mui/material';
 import { submitCourseRating } from '../../api/rating.api';
-import type { SubmitRatingDto } from '../../types/rating';
+import type { SubmitRatingDto } from '../../types_interfaces/rating';
 
 interface CourseRatingActionProps {
     courseId: string;

@@ -1,4 +1,4 @@
-import type { stepPlate } from "../types/stepPlate";
+import type { stepPlate } from "../types_interfaces/stepPlate";
 
 export type Positionedsteps = stepPlate & {
     x: number;

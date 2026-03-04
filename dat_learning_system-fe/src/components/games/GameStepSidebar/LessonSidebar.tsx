@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { lessonSidebarData } from "../../../mocks/lessonSidebar.mock";
-import type { LessonSidebarProps } from "../../../types/lessonSidebar";
+import type { LessonSidebarProps } from "../../../types_interfaces/lessonSidebar";
 import { useLessonSidebar } from "./useLessonSidebar";
 import LevelItem from "./LevelItem";
 import { useMemo } from "react";

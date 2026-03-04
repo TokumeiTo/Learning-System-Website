@@ -12,7 +12,7 @@ import * as yup from "yup";
 import { POSITIONS } from "../../utils/positions";
 import { getDepartments, getDivisions, getSections, getTeams } from "../../api/org.api";
 import { normalizeOrgData } from "../../utils/orgHelpers";
-import type { RegisterRequest } from "../../types/auth";
+import type { RegisterRequest } from "../../types_interfaces/auth";
 
 // Validation Schema
 const schema = yup.object({

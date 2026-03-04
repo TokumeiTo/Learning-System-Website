@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "pl4sil3K45T2rNraEC6xYnxIPahpvpjFsMUXQ0Ym1SY=",
+  "Hash": "frI7sXpdXco0PjxKgdfNwbROGmm0jYIdjyPObw4Xzgg=",
   "Source": "LMS.Backend",
   "BasePath": "_content/LMS.Backend",
   "Mode": "Default",
@@ -91,6 +91,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\uploads\\5a24bc1a-0142-47b4-8bea-9c2fc8880f00.jfif"
+    },
+    {
+      "Identity": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\68f0420c-0f69-40db-a7d5-0565b101b78c.jfif",
+      "SourceId": "LMS.Backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\",
+      "BasePath": "_content/LMS.Backend",
+      "RelativePath": "uploads/68f0420c-0f69-40db-a7d5-0565b101b78c.jfif",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\68f0420c-0f69-40db-a7d5-0565b101b78c.jfif"
     },
     {
       "Identity": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\77ce37df-5c4b-47c9-ab1b-db5849c6daf4.jfif",

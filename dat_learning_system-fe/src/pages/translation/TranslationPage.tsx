@@ -12,7 +12,7 @@ import { motion } from 'framer-motion';
 // Layout & API
 import PageLayout from '../../components/layout/PageLayout';
 import { translateText } from '../../api/translation.api';
-import type { TranslationHistoryItem, TranslationRequest } from '../../types/translation';
+import type { TranslationHistoryItem, TranslationRequest } from '../../types_interfaces/translation';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 // Your New Separated Components

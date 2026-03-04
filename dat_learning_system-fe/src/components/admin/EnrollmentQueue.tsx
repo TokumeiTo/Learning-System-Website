@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { CheckCircle, Cancel, Person, School } from '@mui/icons-material';
 import { getPendingRequests, respondToEnrollment } from '../../api/enrollment.api';
-import type { EnrollmentRequest } from '../../types/enrollment';
+import type { EnrollmentRequest } from '../../types_interfaces/enrollment';
 import { format } from 'date-fns';
 import RejectionModal from './EnrollrejectionModal';
 

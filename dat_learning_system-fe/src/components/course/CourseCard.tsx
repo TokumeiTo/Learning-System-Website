@@ -4,7 +4,7 @@ import {
     Chip, Button, Rating as MuiRating, Divider, useTheme, alpha
 } from '@mui/material';
 import { Timer, Group, MenuBook, FiberManualRecord } from '@mui/icons-material';
-import type { Course } from '../../types/course';
+import type { Course } from '../../types_interfaces/course';
 import CourseDetailModal from './CourseDetailModal';
 
 interface CourseCardProps {

@@ -1,27 +1,25 @@
-// Data/Entities/Notification.cs
 namespace LMS.Backend.Data.Entities;
 
 public class Notification
 {
     public Guid Id { get; set; }
     
-    // The user who receives the notification (Student or Admin)
-    public string RecipientId { get; set; } = string.Empty;
-    public ApplicationUser Recipient { get; set; } = null!;
+    // Recipient Link
+    public string UserId { get; set; } = null!;
+    public virtual ApplicationUser User { get; set; } = null!;
 
-    // The user who triggered the action
-    public string? SenderId { get; set; }
-    public ApplicationUser? Sender { get; set; }
-
-    public string Title { get; set; } = string.Empty;
-    public string Message { get; set; } = string.Empty;
+    public string Title { get; set; } = null!;
+    public string Message { get; set; } = null!;
     
-    // Notification types: "EnrollmentRequest", "EnrollmentAccepted", etc.
-    public string Type { get; set; } = string.Empty;
-
-    // ID of the Course or Enrollment this refers to
-    public string? TargetId { get; set; }
+    // Helpful for the UI to link to the specific Course/Request
+    public string? ReferenceId { get; set; } 
+    public string? ReferenceType { get; set; } 
 
     public bool IsRead { get; set; } = false;
+    
+    // For the "Clear All" functionality
+    public bool IsDeleted { get; set; } = false;
+    
+    // For the "1-month expiry" background cleanup
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

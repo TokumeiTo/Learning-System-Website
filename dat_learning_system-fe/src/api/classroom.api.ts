@@ -6,7 +6,7 @@ import type {
     Lesson, 
     ReOrderLessonsRequest,
     UpdateLessonRequest
-} from "../types/classroom";
+} from "../types_interfaces/classroom";
 
 export const fetchClassroomData = async (courseId: string): Promise<ClassroomView> => {
     const res = await api.get(`/api/classroom/${courseId}`);

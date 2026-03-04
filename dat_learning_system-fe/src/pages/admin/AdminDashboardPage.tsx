@@ -14,8 +14,8 @@ import DifficultQuestionsCard from '../../components/admin/DifficultQuestionInsi
 // API & Types
 import { fetchAdminLessonStats } from '../../api/test.api';
 import { fetchDepartmentKPI } from '../../api/test.api';
-import type { StudentPerformanceKPI } from '../../types/test';
-import type { AdminLessonStats } from '../../types/test';
+import type { StudentPerformanceKPI } from '../../types_interfaces/test';
+import type { AdminLessonStats } from '../../types_interfaces/test';
 
 /* --- Stat Card --- */
 const StatCard = ({ title, value, icon, color, delay, isMock }: any) => (

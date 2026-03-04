@@ -1,5 +1,5 @@
 import { Card, CardActionArea, Typography, Box } from "@mui/material";
-import { type Kanji } from "../../types/kanji";
+import { type Kanji } from "../../types_interfaces/kanji";
 import { motion } from "framer-motion";
 
 type Props = {

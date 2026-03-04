@@ -1,6 +1,6 @@
 import { memo, useCallback, useState } from 'react';
 import { Paper, Tabs, Tab, Box, Typography, Fade } from '@mui/material';
-import type { ClassroomView } from '../../types/classroom';
+import type { ClassroomView } from '../../types_interfaces/classroom';
 import CurriculumTab from './CurriculumTab';
 
 interface Props {

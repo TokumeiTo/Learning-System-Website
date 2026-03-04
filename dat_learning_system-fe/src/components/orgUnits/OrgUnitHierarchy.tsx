@@ -7,7 +7,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { MdChevronRight, MdExpandMore, MdBusiness, MdAccountTree, MdGroups, MdHub } from 'react-icons/md';
 import { fetchOrgHierarchy } from '../../api/org.api';
-import type { OrgUnit } from '../../types/org';
+import type { OrgUnit } from '../../types_interfaces/org';
 
 // --- Recursive Node ---
 const TreeNode: React.FC<{ node: OrgUnit }> = ({ node }) => {

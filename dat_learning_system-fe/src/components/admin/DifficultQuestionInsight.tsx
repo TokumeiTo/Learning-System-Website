@@ -1,5 +1,5 @@
 import { Card, CardContent, Stack, Typography,Box } from "@mui/material";
-import type { QuestionAnalytic } from "../../types/test";
+import type { QuestionAnalytic } from "../../types_interfaces/test";
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { motion } from 'framer-motion';
 

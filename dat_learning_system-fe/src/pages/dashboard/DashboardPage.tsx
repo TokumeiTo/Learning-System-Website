@@ -12,7 +12,7 @@ import RankingSidebar from '../../components/dashboard/RankingSidebar';
 
 // API & Types
 import { getCourses } from '../../api/course.api';
-import type { Course } from '../../types/course';
+import type { Course } from '../../types_interfaces/course';
 
 const Home: React.FC = () => {
     const [mandatoryCourses, setMandatoryCourses] = useState<Course[]>([]);
