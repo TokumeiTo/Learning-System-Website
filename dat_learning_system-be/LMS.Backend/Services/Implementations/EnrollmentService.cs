@@ -81,17 +81,16 @@ public class EnrollmentService : IEnrollmentService
         // Safety check for both the enrollment and the related course
         if (enrollment == null || enrollment.Course == null) return false;
 
-        string oldStatus = enrollment.Status;
         string newStatus = approve ? "Approved" : "Rejected";
 
         // 2. Only update the count if the status is actually transitioning in/out of 'Approved'
-        if (oldStatus != newStatus)
+        if (enrollment.Status != newStatus)
         {
             if (newStatus == "Approved")
             {
                 enrollment.Course.EnrolledCount++;
             }
-            else if (oldStatus == "Approved" && newStatus == "Rejected")
+            else if (enrollment.Status == "Approved" && newStatus == "Rejected")
             {
                 // Ensure we never drift into negative numbers
                 if (enrollment.Course.EnrolledCount > 0)
@@ -109,24 +108,30 @@ public class EnrollmentService : IEnrollmentService
         enrollment.Status = newStatus;
         enrollment.ApprovedAt = approve ? DateTime.UtcNow : null;
 
-        // NOTIFICATION TRIGGER
-        string title = approve ? "Enrollment Approved!" : "Enrollment Update";
-        string message = approve
-            ? $"Great news! You have been approved for the course: {enrollment.Course.Title}." 
-            : $"Your request for {enrollment.Course.Title} was not approved. Reason: {reason ?? "No reason provided."}";
+        // Saving result(Enrollment)
+        bool isSaved = await _repo.SaveChangesAsync();
 
-        await _notificationService.SendSystemNotificationAsync(
-            enrollment.UserId,
-            title,
-            message,
-            enrollment.CourseId.ToString(),
-            "Course"
-        );
+        // NOTIFICATION TRIGGER
+        if (isSaved)
+        {
+            string title = approve ? "Enrollment Approved!" : "Enrollment Update";
+            string message = approve
+                ? $"Great news! You have been approved for the course: {enrollment.Course.Title}."
+                : $"Your request for {enrollment.Course.Title} was not approved. Reason: {reason ?? "No reason provided."}";
+
+            await _notificationService.SendSystemNotificationAsync(
+                enrollment.UserId,
+                title,
+                message,
+                enrollment.CourseId.ToString(),
+                "Course"
+            );
+        }
 
         // 5. Save everything. 
         // Because EF Core is tracking the 'enrollment' object AND its child 'Course' object,
         // SaveChangesAsync will update both tables (Enrollments and Courses) in one transaction.
-        return await _repo.SaveChangesAsync();
+        return isSaved;
     }
     public async Task<IEnumerable<EnrollmentRequestDto>> GetHistoryAsync()
     {

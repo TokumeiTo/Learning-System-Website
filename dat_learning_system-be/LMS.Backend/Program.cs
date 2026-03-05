@@ -7,7 +7,9 @@ using LMS.Backend.Data.Entities;
 using LMS.Backend.Data.Interceptors;
 using LMS.Backend.Extensions;
 using LMS.Backend.Helpers;
+using LMS.Backend.Hubs;
 using LMS.Backend.Middlewares;
+using LMS.Backend.Services.Background;
 using LMS.Backend.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -33,6 +35,7 @@ builder.Services.AddControllers()
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+builder.Services.AddSignalR();
 
 /* Swagger */
 #region Swagger section
@@ -110,6 +113,7 @@ builder.Services.AddSingleton<AuditInterceptor>();
 // Helper Services
 builder.Services.AddApplicationServices();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddHostedService<NotificationCleanupWorker>();
 #endregion
 
 #region SECURITY & CORS
@@ -121,7 +125,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 // Auth/JWT Bearer
@@ -142,6 +147,20 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "default_secret_key_32_characters_long"))
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/notificationHub"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
     };
 });
 #endregion
@@ -175,6 +194,9 @@ app.UseCors("AllowReactApp");
 // Auth
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Signal R
+app.MapHub<NotificationHub>("/notificationHub");
 
 // Map endpoints
 app.MapControllers();

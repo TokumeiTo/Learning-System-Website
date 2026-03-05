@@ -56,6 +56,7 @@ npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
 npm install date-fns
 npm install react-player
 npm install jwt-decode
+npm install @microsoft/signalr
 
 Chat gpt
 ⚠️ Intentionally NOT installed yet:

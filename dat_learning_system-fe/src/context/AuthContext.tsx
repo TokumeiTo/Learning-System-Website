@@ -3,6 +3,7 @@ import { login as loginApi } from "../api/auth.api";
 import { setToken, getToken, clearToken, isTokenExpired } from "../utils/token";
 
 type AuthUser = {
+  id: string;
   fullName: string;
   position: string;
   email: string;
@@ -49,6 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const res = await loginApi({ companyCode, password });
 
     const userData: AuthUser = {
+      id: res.id,
       fullName: res.fullName,
       position: res.position,
       email: res.email

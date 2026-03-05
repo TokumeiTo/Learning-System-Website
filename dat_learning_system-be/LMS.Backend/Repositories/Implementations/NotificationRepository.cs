@@ -23,13 +23,13 @@ public class NotificationRepository : INotificationRepository
     {
         await _context.Notifications.AddAsync(notification);
         // We call SaveChanges here because notifications are often 'fire and forget'
-        await _context.SaveChangesAsync(); 
+        await _context.SaveChangesAsync();
     }
 
     public async Task MarkAsReadAsync(Guid notificationId)
     {
         var notification = await _context.Notifications.FindAsync(notificationId);
-        
+
         if (notification != null)
         {
             notification.IsRead = true;
@@ -55,11 +55,9 @@ public class NotificationRepository : INotificationRepository
 
     public async Task HardDeleteExpiredAsync(DateTime threshold)
     {
-        // Efficiency check: Use ExecuteDeleteAsync if you are on EF Core 7+ 
-        // to avoid loading thousands of rows into memory just to delete them.
-        var expired = _context.Notifications.Where(n => n.CreatedAt < threshold);
-        
-        _context.Notifications.RemoveRange(expired);
-        await _context.SaveChangesAsync();
+        // This executes a single SQL "DELETE FROM..." command
+        await _context.Notifications
+            .Where(n => n.CreatedAt < threshold)
+            .ExecuteDeleteAsync();
     }
 }

@@ -1,24 +1,21 @@
-import React from 'react';
-import { useContext } from "react";
+import React, { useContext } from 'react';
 import { CustomThemeContext } from '../../context/theme/ThemeProvider';
+import { useNotifications } from '../../context/NotificationContext'; // 1. Import the hook
 
 import MuiAppBar from '@mui/material/AppBar';
 import type { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import MenuIcon from '@mui/icons-material/Menu';
-import { styled } from '@mui/material/styles';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import {
+  Toolbar, IconButton, Typography, Badge, ButtonGroup,
+  styled, useTheme, useMediaQuery
+} from '@mui/material';
 
+import MenuIcon from '@mui/icons-material/Menu';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import Badge from '@mui/material/Badge';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import TranslateIcon from '@mui/icons-material/Translate';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import { useNavigate } from 'react-router-dom';
 
 interface NavbarProps {
   open: boolean;
@@ -47,20 +44,28 @@ const AppBar = styled(MuiAppBar, {
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
-})
-);
+}));
 
 const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
   const { mode, toggleColorMode } = useContext(CustomThemeContext);
+
+  const navigate = useNavigate();
+  const { unreadCount, resetCount } = useNotifications();
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  const handleBellClick = () => {
+    // Logic: Navigate to inbox OR just clear the badge
+    resetCount();
+    navigate('/notifications');
+  };
+
   return (
     <AppBar position="fixed" open={open} isMobile={isMobile}>
-      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', boxShadow: '5px 0 10px rgba(0, 132, 255, 1)' }}>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', boxShadow: '5px 0 10px rgba(0, 132, 255, 0.2)' }}>
         <IconButton
           color="inherit"
-          aria-label="open drawer"
           onClick={onToggle}
           edge="start"
           sx={{
@@ -71,35 +76,33 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
           <MenuIcon />
         </IconButton>
 
-        <Typography variant="h6" noWrap component="div" sx={{ userSelect: 'none' }}>
+        <Typography variant="h6" noWrap component="div" sx={{ userSelect: 'none', display: 'flex', alignItems: 'center' }}>
           <TipsAndUpdatesIcon sx={{ marginRight: 1 }} />
           HLMS
         </Typography>
 
         <ButtonGroup>
-          <IconButton
-            aria-label="translate page"
-            size="large"
-          >
+          <IconButton aria-label="translate page" size="large" color="inherit">
             <TranslateIcon />
           </IconButton>
 
-          {/* DARK / LIGHT MODE TOGGLE */}
           <IconButton
             color="inherit"
             aria-label="dark/light mode"
-            onClick={toggleColorMode}   // toggles light/dark theme
+            onClick={toggleColorMode}
             size="large"
           >
             {mode === "light" ? <DarkModeIcon /> : <LightModeIcon />}
           </IconButton>
 
+          {/* 3. ACTIVATED BELL ICON */}
           <IconButton
             size="large"
-            aria-label="show 17 new notifications"
+            aria-label={`show ${unreadCount} new notifications`}
             color="inherit"
+            onClick={handleBellClick}
           >
-            <Badge badgeContent={17} color="error">
+            <Badge badgeContent={unreadCount} color="error">
               <NotificationsIcon />
             </Badge>
           </IconButton>

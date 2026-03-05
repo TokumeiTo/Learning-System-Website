@@ -3,12 +3,15 @@ using LMS.Backend.Data.Entities;
 using LMS.Backend.DTOs.Announce_Noti;
 using LMS.Backend.Repo.Interface;
 using LMS.Backend.Services.Interfaces;
+using LMS.Backend.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace LMS.Backend.Services.Implement;
 
 public class NotificationService(
     INotificationRepository repository, 
-    IMapper mapper) : INotificationService
+    IMapper mapper,
+    IHubContext<NotificationHub> hubContext) : INotificationService
 {
     public async Task<IEnumerable<NotificationResponseDto>> GetUserInboxAsync(string userId)
     {
@@ -30,6 +33,9 @@ public class NotificationService(
         };
 
         await repository.AddAsync(notification);
+
+        await hubContext.Clients.Group(userId.ToString())
+                .SendAsync("ReceiveNotification", new { title, message });
     }
 
     public async Task MarkAsReadAsync(Guid id) => await repository.MarkAsReadAsync(id);

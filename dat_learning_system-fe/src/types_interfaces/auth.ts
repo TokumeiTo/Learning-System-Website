@@ -4,6 +4,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+    id: string;
     token: string;
     fullName: string;
     position: string;

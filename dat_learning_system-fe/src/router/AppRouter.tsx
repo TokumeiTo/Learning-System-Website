@@ -32,7 +32,7 @@ import OrgPage from "../pages/admin/OrgUnitPage";
 import AdminDashboard from "../pages/admin/AdminDashboardPage";
 import EnrollmentApprovalPage from "../pages/admin/EnrollManagementPage";
 import GlobalAuditLog from "../pages/admin/AuditLogsPage";
-import NotificationPage from "../pages/notification/NotiPageWithMocks";
+import NotificationPage from "../pages/notification/NotificationPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import EnrollmentGuard from "../components/auth/EnrollmentGuard";
 

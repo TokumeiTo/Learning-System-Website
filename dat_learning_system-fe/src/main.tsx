@@ -16,13 +16,14 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+import { NotificationProvider } from "./context/NotificationContext";
 
 // 2. Initialize the QueryClient
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // This prevents unnecessary background refetches while you're coding
-      refetchOnWindowFocus: false, 
+      refetchOnWindowFocus: false,
       retry: 1,
     },
   },
@@ -34,9 +35,11 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <AuthProvider>
-          <CustomThemeProvider>
-            <App />
-          </CustomThemeProvider>
+          <NotificationProvider>
+            <CustomThemeProvider>
+              <App />
+            </CustomThemeProvider>
+          </NotificationProvider>
         </AuthProvider>
       </LocalizationProvider>
     </QueryClientProvider>
