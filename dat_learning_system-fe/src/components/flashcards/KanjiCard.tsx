@@ -19,7 +19,8 @@ export default function KanjiCard({ kanji, onClick }: Props) {
       <Card elevation={3} sx={{ maxWidth: '200px', minWidth: '200px', height: '100%' }}>
         <CardActionArea onClick={onClick} sx={{height: '100%'}}>
           <Box sx={{ p: 3, textAlign: "center" }}>
-            <Typography variant="h3">{kanji.kanji}</Typography>
+            {/* Swapped kanji.kanji to kanji.character to match our DTO */}
+            <Typography variant="h3">{kanji.character}</Typography>
             <Typography variant="body2" color="text.secondary">
               {kanji.meaning}
             </Typography>
@@ -27,6 +28,5 @@ export default function KanjiCard({ kanji, onClick }: Props) {
         </CardActionArea>
       </Card>
     </motion.div>
-
   );
 }

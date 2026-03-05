@@ -12,6 +12,7 @@ using LMS.Backend.DTOs.Audit;
 using LMS.Backend.DTOs.Test_Quest;
 using LMS.Backend.DTOs.Announce_Noti;
 using LMS.Backend.Common;
+using LMS.Backend.DTOs.Flashcard;
 
 namespace LMS.Backend.Helpers;
 
@@ -149,19 +150,42 @@ public class MappingProfile : Profile
                 return (bool?)null;
             }));
         /////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         // --- ANNOUNCEMENTS ---
         CreateMap<Announcement, AnnouncementResponseDto>()
             .ForMember(dest => dest.TargetPosition, opt => opt.MapFrom(src => src.TargetPosition.ToString()))
             .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.CreatedByUser.FullName));
 
         CreateMap<UpsertAnnouncementDto, Announcement>()
-            .ForMember(dest => dest.TargetPosition, opt => opt.MapFrom(src => 
+            .ForMember(dest => dest.TargetPosition, opt => opt.MapFrom(src =>
                 EnumMappingHelper.MapPosition(src.TargetPosition, Position.Employee))) // Using Mapping POSITIONs helper!
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // Don't let users set creation date
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id ?? Guid.NewGuid()));
 
         // --- NOTIFICATIONS ---
         CreateMap<Notification, NotificationResponseDto>();
+
+        // --- KANJIFlashcard MAPPINGS ---
+
+        // Entity -> DTO (Read)
+        CreateMap<Kanji, KanjiDto>()
+            .ForMember(dest => dest.Onyomi, opt => opt.MapFrom(src =>
+                !string.IsNullOrEmpty(src.Onyomi) ? src.Onyomi.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList() : new List<string>()))
+            .ForMember(dest => dest.Kunyomi, opt => opt.MapFrom(src =>
+                !string.IsNullOrEmpty(src.Kunyomi) ? src.Kunyomi.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList() : new List<string>()));
+
+        CreateMap<KanjiExample, KanjiExampleDto>();
+
+        // DTO -> Entity (Create)
+        CreateMap<KanjiCreateUpdateDto, Kanji>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
+            .ForMember(dest => dest.Onyomi, opt => opt.MapFrom(src => string.Join(";", src.Onyomi)))
+            .ForMember(dest => dest.Kunyomi, opt => opt.MapFrom(src => string.Join(";", src.Kunyomi)))
+            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+            // We ignore Examples because we will handle children manually for safety
+            .ForMember(dest => dest.Examples, opt => opt.Ignore());
+
+        CreateMap<KanjiExampleDto, KanjiExample>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id == Guid.Empty ? Guid.NewGuid() : src.Id));
     }
 }

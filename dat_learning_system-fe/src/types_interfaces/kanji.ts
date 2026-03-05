@@ -1,6 +1,7 @@
 export type JLPTLevel = "N5" | "N4" | "N3" | "N2" | "N1";
 
 export type KanjiExample = {
+  id?: string;
   word: string;
   reading: string;
   meaning: string;
@@ -8,7 +9,7 @@ export type KanjiExample = {
 
 export type Kanji = {
   id: string;
-  kanji: string;
+  character: string;
   jlptLevel: JLPTLevel;
   onyomi?: string[];
   kunyomi?: string[];
@@ -18,3 +19,5 @@ export type Kanji = {
   examples: KanjiExample[];
   radicals?: string[];
 };
+
+export type UpsertKanjiRequest = Omit<Kanji, 'id'> & { id?: string };

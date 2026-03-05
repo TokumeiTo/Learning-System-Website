@@ -31,7 +31,10 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     // ---- NOTIFICATION SYSTEM TABLES ---
     public DbSet<Announcement> Announcements => Set<Announcement>();
     public DbSet<Notification> Notifications => Set<Notification>();
-    
+    // ---- FLASHCARDS TABLES ---
+    public DbSet<Kanji> Kanjis { get; set; }
+    public DbSet<KanjiExample> KanjiExamples { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         // Must call base for Identity tables to be created
