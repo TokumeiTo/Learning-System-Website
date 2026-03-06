@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserProgressRepository, UserProgressRepository>();
         services.AddScoped<ITestRepository, TestRepository>();
         services.AddScoped<IKanjiFlashcardRepository, KanjiFlashcardRepository>();
+        services.AddScoped<IGrammarFlashcardRepository, GrammarFlashcardRepository>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
@@ -42,6 +43,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserProgressService, UserProgressService>();
         services.AddScoped<ITestService, TestService>();
         services.AddScoped<IKanjiFlashcardService, KanjiFlashcardService>();
+        services.AddScoped<IGrammarFlashcardService, GrammarFlashcardService>();
 
         // Helpers
         services.AddSingleton<JwtHelper>();

@@ -5,12 +5,12 @@ import { useNotifications } from '../../context/NotificationContext'; // 1. Impo
 import MuiAppBar from '@mui/material/AppBar';
 import type { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import {
-  Toolbar, IconButton, Typography, Badge, ButtonGroup,
-  styled, useTheme, useMediaQuery
+  Toolbar, IconButton, Badge, ButtonGroup,
+  styled, useTheme, useMediaQuery,
+  Box
 } from '@mui/material';
 
 import MenuIcon from '@mui/icons-material/Menu';
-import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import TranslateIcon from '@mui/icons-material/Translate';
@@ -76,10 +76,9 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
           <MenuIcon />
         </IconButton>
 
-        <Typography variant="h6" noWrap component="div" sx={{ userSelect: 'none', display: 'flex', alignItems: 'center' }}>
-          <TipsAndUpdatesIcon sx={{ marginRight: 1 }} />
-          HLMS
-        </Typography>
+        <Box sx={{ width: '100%' }}>
+          <img src="/dat logo.png" width={60} alt="logo" />
+        </Box>
 
         <ButtonGroup>
           <IconButton aria-label="translate page" size="large" color="inherit">

@@ -15,6 +15,7 @@ import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
+import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 
 // Custom Components & Config
 import BasicSelect from "../common/Select";
@@ -135,12 +136,16 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
     >
       <DrawerHeader>
         {/* Pass the custom handler instead of just setCategory */}
-        {isDrawerOpen ? (
-          <BasicSelect value={category} onChange={handleCategoryChange} />
-        ) : (
-          <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-            <img src="/dat logo.png" width={30} alt="logo" />
+        {(user?.position == 'Employee' || user?.position == '') ? (
+          <Box sx={{width:'100%', display:'flex', justifyContent: 'center'}}>
+            <Typography variant="h6" noWrap component="div" sx={{ userSelect: 'none', display: 'flex', alignItems: 'center' }}>
+              <TipsAndUpdatesIcon sx={{ marginRight: 1 }} />
+              HLMS
+            </Typography>
           </Box>
+        ) : (
+
+          <BasicSelect value={category} onChange={handleCategoryChange} />
         )}
         <IconButton onClick={onClose} disabled={isMobile}>
           {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}
@@ -209,8 +214,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       <Box sx={{ p: 1 }}>
         <UserProfileMenu
           name={user?.fullName ?? "Guest User"}
-          email={user?.email ?? ""}
-          position={user?.position ?? "Student"}
+          email={user?.email ?? "Unknown email"}
+          position={user?.position ?? "N/A"}
           onLogout={handleLogout}
         />
       </Box>

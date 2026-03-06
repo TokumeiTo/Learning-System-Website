@@ -34,6 +34,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     // ---- FLASHCARDS TABLES ---
     public DbSet<Kanji> Kanjis { get; set; }
     public DbSet<KanjiExample> KanjiExamples { get; set; }
+    public DbSet<Grammar> Grammars { get; set; }
+    public DbSet<GrammarExample> GrammarExamples { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

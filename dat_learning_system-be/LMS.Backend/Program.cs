@@ -35,6 +35,8 @@ builder.Services.AddControllers()
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<SubmitEnrollmentValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<GrammarValidator>();
 builder.Services.AddSignalR();
 
 /* Swagger */

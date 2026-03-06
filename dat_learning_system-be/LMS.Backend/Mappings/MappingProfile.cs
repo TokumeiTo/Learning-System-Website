@@ -187,5 +187,27 @@ public class MappingProfile : Profile
 
         CreateMap<KanjiExampleDto, KanjiExample>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id == Guid.Empty ? Guid.NewGuid() : src.Id));
+
+        // GRAMMAR FLESHCARD MAPPING
+        // Inside your MappingProfile constructor
+
+        // 1. Grammar Mapping (Create/Update -> Entity)
+        CreateMap<GrammarCreateUpdateDto, Grammar>()
+            // Generate a new ID for new records
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
+            // 🛡️ VERY IMPORTANT: We ignore Examples here so the Service's 
+            // manual sync logic can handle the child collection safely.
+            .ForMember(dest => dest.Examples, opt => opt.Ignore());
+
+        // 2. Grammar Example Mapping
+        CreateMap<GrammarExampleDto, GrammarExample>()
+            // If the ID is null or empty (new row in React), generate a Guid.
+            // If it exists, keep it so EF knows it's an update, not an insert.
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src =>
+                (src.Id == null || src.Id == Guid.Empty) ? Guid.NewGuid() : src.Id));
+
+        // 3. Entity -> DTO Mapping (For sending data back to React)
+        CreateMap<Grammar, GrammarDto>();
+        CreateMap<GrammarExample, GrammarExampleDto>();
     }
 }

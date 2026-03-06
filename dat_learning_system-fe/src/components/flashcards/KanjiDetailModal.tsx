@@ -16,6 +16,7 @@ import KanjiStrokeAnimation from "./KanjiStrokeAnimation";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import GestureIcon from '@mui/icons-material/Gesture';
 import { deleteKanji } from "../../api/kanji.api";
 
 type Props = {
@@ -41,35 +42,22 @@ export default function KanjiDetailModal({ open, kanji, onClose, onRefresh, onEd
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{ textAlign: "center", pb: 3, pt: 3 }}>
-                <Box sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    lineHeight: 1 // Reduces gap between Romaji and Kanji
-                }}>
-                    {/* Romaji (The "Furigana" at the top) */}
-                    <Typography
-                        variant="caption"
-                        sx={{
-                            fontSize: 16,
-                            color: "text.secondary",
-                            textTransform: "lowercase",
-                            letterSpacing: 2,
-                            mb: -0.5 // Pulls the character closer
-                        }}
-                    >
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
+
+                    {/* Stroke Count Badge (Top Right of the header) */}
+                    <Chip
+                        icon={<GestureIcon sx={{ fontSize: '14px !important' }} />}
+                        label={`${kanji.strokes} strokes`}
+                        size="small"
+                        variant="outlined"
+                        sx={{ position: 'absolute', top: 0, right: 20, opacity: 0.8 }}
+                    />
+
+                    <Typography variant="caption" sx={{ fontSize: 16, color: "text.secondary", letterSpacing: 2, mb: -0.5 }}>
                         {kanji.romaji}
                     </Typography>
 
-                    {/* Large Kanji Character */}
-                    <Typography
-                        variant="h1"
-                        sx={{
-                            fontSize: 60,
-                            fontWeight: "bold",
-                            color: "text.primary"
-                        }}
-                    >
+                    <Typography variant="h1" sx={{ fontSize: 60, fontWeight: "bold", color: "text.primary" }}>
                         {kanji.character}
                     </Typography>
                 </Box>
@@ -82,7 +70,7 @@ export default function KanjiDetailModal({ open, kanji, onClose, onRefresh, onEd
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        bgcolor: "grey.50",
+                        bgcolor: "background.paper",
                         mb: 2,
                         borderRadius: 2,
                         position: "relative",
@@ -106,9 +94,27 @@ export default function KanjiDetailModal({ open, kanji, onClose, onRefresh, onEd
                     </IconButton>
                 </Box>
 
-                <Typography variant="subtitle1" gutterBottom>
-                    <strong>Meaning:</strong> {kanji.meaning}
-                </Typography>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                        p: 2.5,
+                        bgcolor: 'action.hover',
+                        borderRadius: 2,
+                        borderLeft: '5px solid',
+                        borderColor: 'error.main'
+                    }}
+                >
+                    <Box>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1 }}>
+                            Meaning
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: 'text.primary', lineHeight: 1.4 }}>
+                            {kanji.meaning}
+                        </Typography>
+                    </Box>
+                </Box>
 
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="body2" color="text.secondary">Onyomi</Typography>

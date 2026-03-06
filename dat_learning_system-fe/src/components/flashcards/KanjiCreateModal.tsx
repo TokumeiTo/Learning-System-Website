@@ -1,6 +1,6 @@
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
-    TextField, Button, Box, MenuItem, IconButton, Typography, Tooltip,
+    TextField, Button, Box, MenuItem, IconButton, Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";

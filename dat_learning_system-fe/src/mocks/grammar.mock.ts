@@ -1,20 +1,4 @@
-import type { JLPTLevel } from "../types_interfaces/kanji";
-
-export type GrammarExample = {
-  jp: string;
-  romaji: string;
-  en: string;
-};
-
-export type Grammar = {
-  id: string;
-  title: string;
-  jlptLevel: JLPTLevel;
-  meaning: string;
-  structure: string;
-  explanation: string;
-  examples: GrammarExample[];
-};
+import type { Grammar } from "../types_interfaces/grammar";
 
 export const grammarMockData: Grammar[] = [
   {

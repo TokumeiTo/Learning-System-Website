@@ -15,6 +15,7 @@ type Props = {
   placeholder?: string;
   options: SearchOption[];
   onSelect?: (value: string) => void;
+  onInputChange: (value: string) => void;
 };
 
 const SearchContainer = styled(Box)(() => ({
@@ -26,19 +27,24 @@ export default function SearchBar({
   placeholder = "Search…",
   options,
   onSelect,
+  onInputChange,
 }: Props) {
   return (
     <SearchContainer>
       <Autocomplete
         freeSolo
         options={options}
+        // This handles when a user clicks an option or presses Enter
         onChange={(_, value) => {
-          if (typeof value === "string") {
-            onSelect?.(value);
-          } else if (value) {
-            onSelect?.(value.label);
-          }
+          const val = typeof value === "string" ? value : value?.label || "";
+          onSelect?.(val);
+          onInputChange(val); // Keep search query in sync
         }}
+        // This handles every keystroke for real-time grid filtering
+        onInputChange={(_, newValue) => {
+          onInputChange(newValue);
+        }}
+
         renderInput={(params) => (
           <TextField
             {...params}
