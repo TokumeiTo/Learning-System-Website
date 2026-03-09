@@ -151,7 +151,7 @@ namespace LMS.Backend.Migrations
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
                             CompanyCode = "00-0000",
-                            ConcurrencyStamp = "1f820c51-ceca-4eba-8d47-9bf827300431",
+                            ConcurrencyStamp = "55d55f0f-d861-4008-929f-2c02dc3e2d0a",
                             Email = "admin@lms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin",
@@ -160,10 +160,10 @@ namespace LMS.Backend.Migrations
                             NormalizedEmail = "ADMIN@LMS.COM",
                             NormalizedUserName = "00-0000",
                             OrgUnitId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAEHmljNDEBASwE4JI5AjRn9UyfCLtzrUySpmKbsMcODLthHmTL+OPu/4DATGET6Rgyw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDuQPK4kStyktvtUg6+Eui7hTbizr8OU4oPHNgIhmo9+88EvxZw78YfRsD8zFVg7WQ==",
                             PhoneNumberConfirmed = false,
                             Position = 0,
-                            SecurityStamp = "80285ead-0d5d-4dba-b842-5df080070e17",
+                            SecurityStamp = "712b870b-8d7c-4f13-af58-ba714c48381c",
                             TwoFactorEnabled = false,
                             UserName = "00-0000"
                         });
@@ -654,6 +654,72 @@ namespace LMS.Backend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Onomatopoeia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Explanation")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Meaning")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phrase")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Romaji")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Onomatopoeias");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.OnomatopoeiaExample", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("English")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Japanese")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("OnomatopoeiaId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OnomatopoeiaId");
+
+                    b.ToTable("OnomatopoeiaExample");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.OrgUnit", b =>
@@ -1276,6 +1342,71 @@ namespace LMS.Backend.Migrations
                     b.ToTable("UserLessonProgresses");
                 });
 
+            modelBuilder.Entity("LMS.Backend.Data.Vocabulary", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Explanation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("JLPTLevel")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Meaning")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("PartOfSpeech")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Reading")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Word")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Vocabularies");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.VocabularyExample", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("English")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Japanese")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("VocabularyId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VocabularyId");
+
+                    b.ToTable("VocabularyExamples");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -1587,6 +1718,15 @@ namespace LMS.Backend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("LMS.Backend.Data.Entities.OnomatopoeiaExample", b =>
+                {
+                    b.HasOne("LMS.Backend.Data.Entities.Onomatopoeia", null)
+                        .WithMany("Examples")
+                        .HasForeignKey("OnomatopoeiaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("LMS.Backend.Data.Entities.OrgUnit", b =>
                 {
                     b.HasOne("LMS.Backend.Data.Entities.OrgUnit", "Parent")
@@ -1679,6 +1819,15 @@ namespace LMS.Backend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("LMS.Backend.Data.VocabularyExample", b =>
+                {
+                    b.HasOne("LMS.Backend.Data.Vocabulary", null)
+                        .WithMany("Examples")
+                        .HasForeignKey("VocabularyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1764,6 +1913,11 @@ namespace LMS.Backend.Migrations
                     b.Navigation("Tests");
                 });
 
+            modelBuilder.Entity("LMS.Backend.Data.Entities.Onomatopoeia", b =>
+                {
+                    b.Navigation("Examples");
+                });
+
             modelBuilder.Entity("LMS.Backend.Data.Entities.OrgUnit", b =>
                 {
                     b.Navigation("Children");
@@ -1784,6 +1938,11 @@ namespace LMS.Backend.Migrations
             modelBuilder.Entity("LMS.Backend.Data.Entities.Topic", b =>
                 {
                     b.Navigation("Assignments");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Vocabulary", b =>
+                {
+                    b.Navigation("Examples");
                 });
 #pragma warning restore 612, 618
         }

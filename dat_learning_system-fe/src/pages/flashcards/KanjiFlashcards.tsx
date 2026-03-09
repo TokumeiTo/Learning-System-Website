@@ -7,11 +7,15 @@ import KanjiDetailModal from "../../components/flashcards/KanjiDetailModal";
 import KanjiCreateModal from "../../components/flashcards/KanjiCreateModal";
 import SearchBar from "../../components/common/Search";
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import { useAuth } from "../../hooks/useAuth";
 
 export default function KanjiFlashcards() {
   const [kanjis, setKanjis] = useState<Kanji[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedKanji, setSelectedKanji] = useState<Kanji | null>(null);
+  const { user } = useAuth();
+  const canManageCourses = user?.position === "Admin" || user?.position === "SuperAdmin";
+
 
   // Filter States
   const [level, setLevel] = useState<JLPTLevel>("N5");
@@ -87,15 +91,17 @@ export default function KanjiFlashcards() {
           <SearchBar
             placeholder="Search kanji or meaning"
             options={kanjis.map(k => ({ label: `${k.character} – ${k.meaning}` }))}
-            onInputChange={(val) => setSearchQuery(val)} 
+            onInputChange={(val) => setSearchQuery(val)}
           />
         </Box>
 
-        <AddBoxIcon
-          sx={{ cursor: 'pointer', color: 'primary.main' }}
-          fontSize="large"
-          onClick={() => setOpenCreate(true)}
-        />
+        {canManageCourses && (
+          <AddBoxIcon
+            sx={{ cursor: 'pointer', color: 'primary.main' }}
+            fontSize="large"
+            onClick={() => setOpenCreate(true)}
+          />
+        )}
       </Box>
 
       {/* Kanji Grid - Map the FILTERED list, not the raw list */}

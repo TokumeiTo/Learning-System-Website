@@ -1,12 +1,15 @@
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
     TextField, Button, Box, MenuItem, IconButton, Typography,
+    Divider,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState, useEffect } from "react";
 import type { Kanji, JLPTLevel, KanjiExample } from "../../types_interfaces/kanji";
 import { saveKanji } from "../../api/kanji.api";
+import ConfirmModal from "../feedback/ComfirmModal";
 
 type Props = {
     open: boolean;
@@ -26,6 +29,8 @@ export default function KanjiCreateModal({ open, onClose, onSuccess, kanjiToEdit
     const [examples, setExamples] = useState<KanjiExample[]>([
         { word: "", reading: "", meaning: "" },
     ]);
+
+    const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
     // Populate fields if editing
     useEffect(() => {
@@ -51,7 +56,11 @@ export default function KanjiCreateModal({ open, onClose, onSuccess, kanjiToEdit
         }
     }, [kanjiToEdit, open]);
 
-    const handleSubmit = async () => {
+    const handlePreSubmit = () => {
+        // You can add validation here: if (word === "") return;
+        setShowSubmitConfirm(true);
+    };
+    const handleActualSubmit = async () => {
         const payload = {
             id: kanjiToEdit?.id, // If present, backend triggers PUT sync
             character,
@@ -67,6 +76,7 @@ export default function KanjiCreateModal({ open, onClose, onSuccess, kanjiToEdit
 
         try {
             await saveKanji(payload);
+            setShowSubmitConfirm(false);
             onSuccess();
             onClose();
         } catch (error) {
@@ -75,83 +85,100 @@ export default function KanjiCreateModal({ open, onClose, onSuccess, kanjiToEdit
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>{kanjiToEdit ? `Edit Kanji: ${kanjiToEdit.character}` : "Create New Kanji"}</DialogTitle>
+        <>
+            <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                        {kanjiToEdit ? `Edit Kanji: ${kanjiToEdit.character}` : "Create New Kanji"}
+                    </Typography>
+                    <IconButton onClick={onClose}><CloseIcon /></IconButton>
+                </DialogTitle>
 
-            <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-                <TextField label="Kanji Character" fullWidth value={character} onChange={(e) => setCharacter(e.target.value)} />
-                <TextField label="Meaning" fullWidth value={meaning} onChange={(e) => setMeaning(e.target.value)} />
-                <TextField label="Romaji" fullWidth value={romaji} onChange={(e) => setRomaji(e.target.value)} />
-                <TextField label="Strokes" type="number" fullWidth value={strokes} onChange={(e) => setStrokes(parseInt(e.target.value) || 0)} />
+                <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                    <TextField label="Kanji Character" sx={{ mt: 1 }} fullWidth value={character} onChange={(e) => setCharacter(e.target.value)} />
+                    <TextField label="Meaning" fullWidth value={meaning} onChange={(e) => setMeaning(e.target.value)} />
+                    <TextField label="Romaji" fullWidth value={romaji} onChange={(e) => setRomaji(e.target.value)} />
+                    <TextField label="Strokes" type="number" fullWidth value={strokes} onChange={(e) => setStrokes(parseInt(e.target.value) || 0)} />
 
-                <TextField select label="JLPT Level" value={jlptLevel} onChange={(e) => setJlptLevel(e.target.value as JLPTLevel)}>
-                    {["N5", "N4", "N3", "N2", "N1"].map(level => (
-                        <MenuItem key={level} value={level}>{level}</MenuItem>
+                    <TextField select label="JLPT Level" value={jlptLevel} onChange={(e) => setJlptLevel(e.target.value as JLPTLevel)}>
+                        {["N5", "N4", "N3", "N2", "N1"].map(level => (
+                            <MenuItem key={level} value={level}>{level}</MenuItem>
+                        ))}
+                    </TextField>
+
+                    <Typography fontWeight="bold">Onyomi</Typography>
+                    {onyomi.map((o, i) => (
+                        <Box key={i} sx={{ display: "flex", gap: 1 }}>
+                            <TextField fullWidth value={o} onChange={(e) => {
+                                const copy = [...onyomi];
+                                copy[i] = e.target.value;
+                                setOnyomi(copy);
+                            }} />
+                            <IconButton onClick={() => setOnyomi(onyomi.filter((_, idx) => idx !== i))}>
+                                <DeleteIcon />
+                            </IconButton>
+                        </Box>
                     ))}
-                </TextField>
+                    <Button startIcon={<AddIcon />} onClick={() => setOnyomi([...onyomi, ""])}>Add Onyomi</Button>
 
-                <Typography fontWeight="bold">Onyomi</Typography>
-                {onyomi.map((o, i) => (
-                    <Box key={i} sx={{ display: "flex", gap: 1 }}>
-                        <TextField fullWidth value={o} onChange={(e) => {
-                            const copy = [...onyomi];
-                            copy[i] = e.target.value;
-                            setOnyomi(copy);
-                        }} />
-                        <IconButton onClick={() => setOnyomi(onyomi.filter((_, idx) => idx !== i))}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Box>
-                ))}
-                <Button startIcon={<AddIcon />} onClick={() => setOnyomi([...onyomi, ""])}>Add Onyomi</Button>
+                    <Typography fontWeight="bold">Kunyomi</Typography>
+                    {kunyomi.map((k, i) => (
+                        <Box key={i} sx={{ display: "flex", gap: 1 }}>
+                            <TextField fullWidth value={k} onChange={(e) => {
+                                const copy = [...kunyomi];
+                                copy[i] = e.target.value;
+                                setKunyomi(copy);
+                            }} />
+                            <IconButton onClick={() => setKunyomi(kunyomi.filter((_, idx) => idx !== i))}>
+                                <DeleteIcon />
+                            </IconButton>
+                        </Box>
+                    ))}
+                    <Button startIcon={<AddIcon />} onClick={() => setKunyomi([...kunyomi, ""])}>Add Kunyomi</Button>
 
-                <Typography fontWeight="bold">Kunyomi</Typography>
-                {kunyomi.map((k, i) => (
-                    <Box key={i} sx={{ display: "flex", gap: 1 }}>
-                        <TextField fullWidth value={k} onChange={(e) => {
-                            const copy = [...kunyomi];
-                            copy[i] = e.target.value;
-                            setKunyomi(copy);
-                        }} />
-                        <IconButton onClick={() => setKunyomi(kunyomi.filter((_, idx) => idx !== i))}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Box>
-                ))}
-                <Button startIcon={<AddIcon />} onClick={() => setKunyomi([...kunyomi, ""])}>Add Kunyomi</Button>
+                    <Divider sx={{ my: 1 }}>Example Sentences</Divider>
 
-                <Typography fontWeight="bold">Examples</Typography>
-                {examples.map((ex, i) => (
-                    <Box key={i} sx={{ display: "flex", flexDirection: "column", gap: 1, p: 1, border: '1px dashed grey' }}>
-                        <TextField label="Word" value={ex.word} onChange={(e) => {
-                            const copy = [...examples];
-                            copy[i].word = e.target.value;
-                            setExamples(copy);
-                        }} />
-                        <TextField label="Reading" value={ex.reading} onChange={(e) => {
-                            const copy = [...examples];
-                            copy[i].reading = e.target.value;
-                            setExamples(copy);
-                        }} />
-                        <TextField label="Meaning" value={ex.meaning} onChange={(e) => {
-                            const copy = [...examples];
-                            copy[i].meaning = e.target.value;
-                            setExamples(copy);
-                        }} />
-                        <Button color="error" size="small" onClick={() => setExamples(examples.filter((_, idx) => idx !== i))}>Remove Example</Button>
-                    </Box>
-                ))}
-                <Button startIcon={<AddIcon />} onClick={() => setExamples([...examples, { word: "", reading: "", meaning: "" }])}>
-                    Add Example
-                </Button>
-            </DialogContent>
+                    {examples.map((ex, i) => (
+                        <Box key={i} sx={{ display: "flex", flexDirection: "column", gap: 1, p: 1, border: '1px dashed grey' }}>
+                            <TextField label="Sentence or word" value={ex.word} onChange={(e) => {
+                                const copy = [...examples];
+                                copy[i].word = e.target.value;
+                                setExamples(copy);
+                            }} />
+                            <TextField label="Reading" value={ex.reading} onChange={(e) => {
+                                const copy = [...examples];
+                                copy[i].reading = e.target.value;
+                                setExamples(copy);
+                            }} />
+                            <TextField label="Meaning" value={ex.meaning} onChange={(e) => {
+                                const copy = [...examples];
+                                copy[i].meaning = e.target.value;
+                                setExamples(copy);
+                            }} />
+                            <Button color="error" size="small" onClick={() => setExamples(examples.filter((_, idx) => idx !== i))}>Remove Example</Button>
+                        </Box>
+                    ))}
+                    <Button startIcon={<AddIcon />} onClick={() => setExamples([...examples, { word: "", reading: "", meaning: "" }])}>
+                        Add Example
+                    </Button>
+                </DialogContent>
 
-            <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button variant="contained" onClick={handleSubmit}>
-                    {kanjiToEdit ? "Update" : "Create"}
-                </Button>
-            </DialogActions>
-        </Dialog>
+                <DialogActions>
+                    <Button variant="contained" sx={{ width: '100%' }} onClick={handlePreSubmit}>
+                        {kanjiToEdit ? "Update Kanji" : "Create Kanji"}
+                    </Button>
+                </DialogActions>
+
+            </Dialog>
+
+            <ConfirmModal
+                open={showSubmitConfirm}
+                title={kanjiToEdit ? "Confirm Update" : "Confirm Save"}
+                message={`Are you sure you want to ${kanjiToEdit ? 'update' : 'save'}?`}
+                confirmColor="primary" // Since saving is a positive action
+                onClose={() => setShowSubmitConfirm(false)}
+                onConfirm={handleActualSubmit}
+            />
+        </>
     );
 }

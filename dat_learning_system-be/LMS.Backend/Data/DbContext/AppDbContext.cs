@@ -36,6 +36,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<KanjiExample> KanjiExamples { get; set; }
     public DbSet<Grammar> Grammars { get; set; }
     public DbSet<GrammarExample> GrammarExamples { get; set; }
+    public DbSet<Vocabulary> Vocabularies { get; set; }
+    public DbSet<VocabularyExample> VocabularyExamples { get; set; }
+    public DbSet<Onomatopoeia> Onomatopoeias { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

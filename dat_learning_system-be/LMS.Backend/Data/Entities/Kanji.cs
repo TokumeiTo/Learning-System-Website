@@ -9,10 +9,10 @@ public class Kanji
 
     [Required]
     [MaxLength(5)]
-    public string Character { get; set; } = string.Empty; // "日"
+    public string Character { get; set; } = "N/A"; // "日"
 
     [Required]
-    public string Meaning { get; set; } = string.Empty; // "day, sun"
+    public string Meaning { get; set; } = "N/A"; // "day, sun"
 
     public string? Romaji { get; set; }
 

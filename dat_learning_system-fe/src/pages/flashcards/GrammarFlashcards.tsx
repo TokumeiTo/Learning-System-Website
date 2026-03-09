@@ -9,12 +9,16 @@ import MessagePopup from "../../components/feedback/MessagePopup";
 import SearchBar from "../../components/common/Search"; // Import SearchBar
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { getGrammars, getGrammarById } from "../../api/grammar.api";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function GrammarFlashcards() {
   const [level, setLevel] = useState<JLPTLevel>("N5");
   const [grammars, setGrammars] = useState<Grammar[]>([]);
   const [loading, setLoading] = useState(true);
-  
+  const { user } = useAuth();
+  const canManageCourses = user?.position === "Admin" || user?.position === "SuperAdmin";
+
+
   // Filter State
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -80,7 +84,7 @@ export default function GrammarFlashcards() {
     <>
       {/* Header with JLPT filter, Search, and Add Button */}
       <Box sx={{ mb: 5, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 2 }}>
-        
+
         <FormControl size="small" sx={{ minWidth: 100 }}>
           <InputLabel>JLPT</InputLabel>
           <Select
@@ -89,7 +93,7 @@ export default function GrammarFlashcards() {
             onChange={(e) => setLevel(e.target.value as JLPTLevel)}
           >
             {["N5", "N4", "N3", "N2", "N1"].map(l => (
-               <MenuItem key={l} value={l}>{l}</MenuItem>
+              <MenuItem key={l} value={l}>{l}</MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -99,21 +103,24 @@ export default function GrammarFlashcards() {
           <SearchBar
             placeholder="Search grammar title or meaning..."
             options={grammars.map(g => ({ label: `${g.title} – ${g.meaning}` }))}
-            onInputChange={(val) => setSearchQuery(val)} 
+            onInputChange={(val) => setSearchQuery(val)}
           />
         </Box>
 
-        <AddBoxIcon
-          sx={{
-            cursor: 'pointer',
-            fontSize: 40,
-            color: 'primary.main',
-            transition: '0.2s',
-            "&:hover": { transform: 'scale(1.1)' },
-            "&:active": { transform: 'scale(0.9)' }
-          }}
-          onClick={() => setOpenCreate(true)}
-        />
+        {canManageCourses && (
+          <AddBoxIcon
+            sx={{
+              cursor: 'pointer',
+              fontSize: 40,
+              color: 'primary.main',
+              transition: '0.2s',
+              "&:hover": { transform: 'scale(1.1)' },
+              "&:active": { transform: 'scale(0.9)' }
+            }}
+            onClick={() => setOpenCreate(true)}
+          />
+        )}
+
       </Box>
 
       {/* Grid - Mapping filteredGrammars */}
@@ -132,6 +139,7 @@ export default function GrammarFlashcards() {
                 />
               </Box>
             ))
+
           ) : (
             <Typography sx={{ color: 'text.secondary', mt: 5 }}>
               No grammar found matching "{searchQuery}" for {level}

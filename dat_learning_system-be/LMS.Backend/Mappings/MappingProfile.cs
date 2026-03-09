@@ -13,6 +13,7 @@ using LMS.Backend.DTOs.Test_Quest;
 using LMS.Backend.DTOs.Announce_Noti;
 using LMS.Backend.Common;
 using LMS.Backend.DTOs.Flashcard;
+using LMS.Backend.Data;
 
 namespace LMS.Backend.Helpers;
 
@@ -209,5 +210,29 @@ public class MappingProfile : Profile
         // 3. Entity -> DTO Mapping (For sending data back to React)
         CreateMap<Grammar, GrammarDto>();
         CreateMap<GrammarExample, GrammarExampleDto>();
+
+        // VOCABULARY MAPPING
+        CreateMap<Vocabulary, VocabResponseDto>();
+        CreateMap<VocabularyExample, VocabExampleDto>();
+
+        // Request DTO -> Entity
+        // We ignore Id during Create/Update to handle it manually in our sync logic
+        CreateMap<VocabUpsertRequestDto, Vocabulary>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.Examples, opt => opt.MapFrom(src => src.Examples));
+
+        CreateMap<VocabExampleDto, VocabularyExample>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
+
+        // ONOMATOPOEIA
+        // Entity -> Response (For GET requests)
+        CreateMap<Onomatopoeia, OnomatoResponseDto>();
+        CreateMap<OnomatopoeiaExample, OnomatoExampleDto>();
+
+        // Request -> Entity (For POST/PUT requests)
+        CreateMap<OnomatoUpsertRequestDto, Onomatopoeia>()
+            .ForMember(dest => dest.Examples, opt => opt.MapFrom(src => src.Examples));
+            
+        CreateMap<OnomatoExampleDto, OnomatopoeiaExample>();
     }
 }

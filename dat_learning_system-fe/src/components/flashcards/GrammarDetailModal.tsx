@@ -13,6 +13,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import type { Grammar } from "../../types_interfaces/grammar";
 import { deleteGrammar } from "../../api/grammar.api";
+import { useAuth } from "../../hooks/useAuth";
 
 type Props = {
   open: boolean;
@@ -24,6 +25,8 @@ type Props = {
 
 export default function GrammarDetailModal({ open, grammar, onClose, onEdit, onRefresh }: Props) {
   if (!grammar) return null;
+  const { user } = useAuth();
+  const canManageCourses = user?.position === "Admin" || user?.position === "SuperAdmin";
 
   const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to delete "${grammar.title}"?`)) {
@@ -167,23 +170,28 @@ export default function GrammarDetailModal({ open, grammar, onClose, onEdit, onR
       <Divider />
 
       {/* Action Footer using Flexbox */}
-      <DialogActions sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
-        <Button
-          startIcon={<DeleteIcon />}
-          color="error"
-          onClick={handleDelete}
-        >
-          Delete
-        </Button>
+      {canManageCourses && (
+        <DialogActions sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
+          <Button
+            startIcon={<DeleteIcon />}
+            color="error"
+            onClick={handleDelete}
+          >
+            Delete
+          </Button>
 
-        <Button
-          variant="contained"
-          startIcon={<EditIcon />}
-          onClick={() => onEdit(grammar)}
-        >
-          Edit Grammar
-        </Button>
-      </DialogActions>
+          <Box>
+            <Button onClick={onClose}>Close</Button>
+            <Button
+              variant="contained"
+              startIcon={<EditIcon />}
+              onClick={() => onEdit(grammar)}
+            >
+              Edit
+            </Button>
+          </Box>
+        </DialogActions>
+      )}
     </Dialog>
   );
 }

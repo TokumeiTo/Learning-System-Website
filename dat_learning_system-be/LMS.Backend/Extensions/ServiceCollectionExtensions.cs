@@ -27,6 +27,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITestRepository, TestRepository>();
         services.AddScoped<IKanjiFlashcardRepository, KanjiFlashcardRepository>();
         services.AddScoped<IGrammarFlashcardRepository, GrammarFlashcardRepository>();
+        services.AddScoped<IVocabularyRepository, VocabularyRepository>();
+        services.AddScoped<IOnomatoRepository, OnomatoRepository>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
@@ -44,6 +46,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITestService, TestService>();
         services.AddScoped<IKanjiFlashcardService, KanjiFlashcardService>();
         services.AddScoped<IGrammarFlashcardService, GrammarFlashcardService>();
+        services.AddScoped<IVocabularyService, VocabularyService>();
+        services.AddScoped<IOnomatoService, OnomatoService>();
 
         // Helpers
         services.AddSingleton<JwtHelper>();

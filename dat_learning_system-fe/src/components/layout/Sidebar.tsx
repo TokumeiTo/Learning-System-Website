@@ -60,7 +60,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 const commonNavItems = [
   { label: "Home", path: "/home", icon: <HomeFilledIcon color="primary" /> },
-  { label: "Progress", path: "/progress", icon: <AnalyticsIcon color="primary" /> },
+  { label: "My Progress", path: "/progress", icon: <AnalyticsIcon color="primary" /> },
   { label: "Support", path: "/help", icon: <SupportAgentIcon color="primary" /> },
   { label: "Notifications", path: "/notifications", icon: <CircleNotificationsIcon color="primary" /> },
 ];

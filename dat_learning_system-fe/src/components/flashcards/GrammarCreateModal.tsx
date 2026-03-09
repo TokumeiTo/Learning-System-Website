@@ -1,12 +1,15 @@
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
     TextField, Button, Box, MenuItem, Typography,
+    IconButton,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 import { useState, useEffect } from "react";
 import type { JLPTLevel } from "../../types_interfaces/kanji";
 import type { Grammar, GrammarExample } from "../../types_interfaces/grammar";
 import { saveGrammar } from "../../api/grammar.api";
+import ConfirmModal from "../feedback/ComfirmModal";
 
 type Props = {
     open: boolean;
@@ -25,6 +28,8 @@ export default function GrammarCreateModal({ open, onClose, onSuccess, grammarTo
     const [examples, setExamples] = useState<GrammarExample[]>([
         { jp: "", romaji: "", en: "" },
     ]);
+
+    const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
     // 2. Populate fields if editing
     useEffect(() => {
@@ -45,7 +50,12 @@ export default function GrammarCreateModal({ open, onClose, onSuccess, grammarTo
         }
     }, [grammarToEdit, open]);
 
-    const handleSubmit = async () => {
+      const handlePreSubmit = () => {
+        // You can add validation here: if (word === "") return;
+        setShowSubmitConfirm(true);
+    };
+
+    const handleActualSubmit = async () => {
         const payload = {
             id: grammarToEdit?.id,
             title,
@@ -59,6 +69,7 @@ export default function GrammarCreateModal({ open, onClose, onSuccess, grammarTo
 
         try {
             await saveGrammar(payload);
+            setShowSubmitConfirm(false);
             onSuccess();
             onClose();
         } catch (error) {
@@ -67,68 +78,81 @@ export default function GrammarCreateModal({ open, onClose, onSuccess, grammarTo
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>
-                {grammarToEdit ? `Edit Grammar: ${grammarToEdit.title}` : "Create New Grammar Point"}
-            </DialogTitle>
+        <>
+            <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                        {grammarToEdit ? `Edit Grammar: ${grammarToEdit.title}` : "Create New Grammar Point"}
+                    </Typography>
+                    <IconButton onClick={onClose}><CloseIcon /></IconButton>
+                </DialogTitle>
 
-            <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 3 }}>
-                <TextField label="Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} />
+                <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 3 }}>
+                    <TextField label="Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} />
 
-                <TextField select label="JLPT Level" value={jlptLevel} onChange={(e) => setJlptLevel(e.target.value as JLPTLevel)}>
-                    {["N5", "N4", "N3", "N2", "N1"].map(level => (
-                        <MenuItem key={level} value={level}>{level}</MenuItem>
+                    <TextField select label="JLPT Level" value={jlptLevel} onChange={(e) => setJlptLevel(e.target.value as JLPTLevel)}>
+                        {["N5", "N4", "N3", "N2", "N1"].map(level => (
+                            <MenuItem key={level} value={level}>{level}</MenuItem>
+                        ))}
+                    </TextField>
+
+                    <TextField label="Meaning" fullWidth value={meaning} onChange={(e) => setMeaning(e.target.value)} />
+                    <TextField label="Structure" fullWidth value={structure} onChange={(e) => setStructure(e.target.value)} />
+                    <TextField label="Explanation" fullWidth multiline rows={3} value={explanation} onChange={(e) => setExplanation(e.target.value)} />
+
+                    <Typography fontWeight="bold">Examples</Typography>
+                    {examples.map((ex, i) => (
+                        <Box key={i} sx={{ display: "flex", flexDirection: "column", gap: 1, p: 1.5, border: '1px dashed grey', borderRadius: 1 }}>
+                            <TextField label="Japanese" size="small" value={ex.jp} onChange={(e) => {
+                                const copy = [...examples];
+                                copy[i].jp = e.target.value;
+                                setExamples(copy);
+                            }} />
+                            <TextField label="Romaji" size="small" value={ex.romaji} onChange={(e) => {
+                                const copy = [...examples];
+                                copy[i].romaji = e.target.value;
+                                setExamples(copy);
+                            }} />
+                            <TextField label="English" size="small" value={ex.en} onChange={(e) => {
+                                const copy = [...examples];
+                                copy[i].en = e.target.value;
+                                setExamples(copy);
+                            }} />
+                            <Button
+                                color="error"
+                                size="small"
+                                sx={{ alignSelf: 'flex-start', textAlign: 'center', width: '100%' }}
+                                onClick={() => setExamples(examples.filter((_, idx) => idx !== i))}
+                            >
+                                Remove Example
+                            </Button>
+                        </Box>
                     ))}
-                </TextField>
 
-                <TextField label="Meaning" fullWidth value={meaning} onChange={(e) => setMeaning(e.target.value)} />
-                <TextField label="Structure" fullWidth value={structure} onChange={(e) => setStructure(e.target.value)} />
-                <TextField label="Explanation" fullWidth multiline rows={3} value={explanation} onChange={(e) => setExplanation(e.target.value)} />
+                    <Button
+                        startIcon={<AddIcon />}
+                        sx={{ alignSelf: 'flex-start', textAlign: 'center', width: '100%' }}
+                        onClick={() => setExamples([...examples, { jp: "", romaji: "", en: "" }])}
+                    >
+                        Add Example
+                    </Button>
+                </DialogContent>
 
-                <Typography fontWeight="bold">Examples</Typography>
-                {examples.map((ex, i) => (
-                    <Box key={i} sx={{ display: "flex", flexDirection: "column", gap: 1, p: 1.5, border: '1px dashed grey', borderRadius: 1 }}>
-                        <TextField label="Japanese" size="small" value={ex.jp} onChange={(e) => {
-                            const copy = [...examples];
-                            copy[i].jp = e.target.value;
-                            setExamples(copy);
-                        }} />
-                        <TextField label="Romaji" size="small" value={ex.romaji} onChange={(e) => {
-                            const copy = [...examples];
-                            copy[i].romaji = e.target.value;
-                            setExamples(copy);
-                        }} />
-                        <TextField label="English" size="small" value={ex.en} onChange={(e) => {
-                            const copy = [...examples];
-                            copy[i].en = e.target.value;
-                            setExamples(copy);
-                        }} />
-                        <Button
-                            color="error"
-                            size="small"
-                            sx={{ alignSelf: 'flex-start', textAlign: 'center', width: '100%' }}
-                            onClick={() => setExamples(examples.filter((_, idx) => idx !== i))}
-                        >
-                            Remove Example
-                        </Button>
-                    </Box>
-                ))}
+                <DialogActions>
+                    <Button variant="contained" sx={{ width: '100%', py: 1.5, fontWeight: 'bold' }} onClick={handlePreSubmit}>
+                        {grammarToEdit ? "Update Grammar" : "Save Grammar"}
+                    </Button>
+                </DialogActions>
+            </Dialog >
 
-                <Button
-                    startIcon={<AddIcon />}
-                    sx={{ alignSelf: 'flex-start', textAlign: 'center', width: '100%' }}
-                    onClick={() => setExamples([...examples, { jp: "", romaji: "", en: "" }])}
-                >
-                    Add Example
-                </Button>
-            </DialogContent>
-
-            <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button variant="contained" onClick={handleSubmit}>
-                    {grammarToEdit ? "Update" : "Create"}
-                </Button>
-            </DialogActions>
-        </Dialog>
+            <ConfirmModal
+                open={showSubmitConfirm}
+                title={grammarToEdit ? "Confirm Update" : "Confirm Save"}
+                message={`Are you sure you want to ${grammarToEdit ? 'update' : 'save'}"?`}
+                confirmColor="primary" // Since saving is a positive action
+                onClose={() => setShowSubmitConfirm(false)}
+                onConfirm={handleActualSubmit}
+            />
+        </>
     );
 }

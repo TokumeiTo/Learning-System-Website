@@ -5,6 +5,8 @@ import KanjiFlashcards from "./KanjiFlashcards";
 import KanaFlashcards from "./KanaFlashcards";
 import TabLoader from "../../components/feedback/TabLoader";
 import GrammarFlashcards from "./GrammarFlashcards";
+import VocabularyLists from "./VocabularyLists";
+import OnomatoFlashcards from "./OnomatopoeiaFlashcards";
 
 export default function FlashcardsPage() {
   const [tab, setTab] = useState(0);        // currently selected tab
@@ -25,18 +27,20 @@ export default function FlashcardsPage() {
       <Box sx={{ p: '24px' }}>
         <Tabs value={tab} onChange={handleChange} sx={{position: 'sticky', top: '70px'}}>
           <Tab label="Kanji" />
-          <Tab label="Vocabulary" disabled />
+          <Tab label="Vocabulary"/>
           <Tab label="Grammar" />
           <Tab label="Kana" />
-          <Tab label="Onomatopoeia" disabled />
+          <Tab label="Onomatopoeia" />
         </Tabs>
 
         <Box sx={{ mt: 3 }}>
           {loading && <TabLoader />}
 
           {!loading && activeTab === 0 && <KanjiFlashcards />}
+          {!loading && activeTab === 1 && <VocabularyLists />}
           {!loading && activeTab === 2 && <GrammarFlashcards />}
           {!loading && activeTab === 3 && <KanaFlashcards />}
+          {!loading && activeTab === 4 && <OnomatoFlashcards />}
         </Box>
       </Box>
     </PageLayout>

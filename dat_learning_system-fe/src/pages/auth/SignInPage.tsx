@@ -39,7 +39,7 @@ export default function SignIn() {
     try {
       setIsLoading(true);
       await login(companyCode, password);
-      navigate('/home');
+      await navigate('/home');
     } catch (err: any) {
       // 1. Handle FluentValidation (400 Bad Request)
       if (err.response?.status === 400 && err.response?.data?.errors) {

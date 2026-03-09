@@ -13,7 +13,6 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import TranslateIcon from '@mui/icons-material/Translate';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import { useNavigate } from 'react-router-dom';
 
@@ -81,10 +80,6 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
         </Box>
 
         <ButtonGroup>
-          <IconButton aria-label="translate page" size="large" color="inherit">
-            <TranslateIcon />
-          </IconButton>
-
           <IconButton
             color="inherit"
             aria-label="dark/light mode"
