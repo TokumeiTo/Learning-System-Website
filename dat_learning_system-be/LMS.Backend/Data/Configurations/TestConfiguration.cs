@@ -14,12 +14,10 @@ public class TestConfiguration : IEntityTypeConfiguration<Test>
         builder.Property(t => t.Title).HasMaxLength(200).IsRequired();
         builder.Property(t => t.PassingGrade).HasDefaultValue(40);
 
-        // --- THE MISSING PIECE ---
-        // Explicitly link back to LessonContent. 
-        // This ensures the Guid TestId matches the LessonContentId logic.
         builder.HasOne(t => t.LessonContent)
                .WithMany(lc => lc.Tests)
                .HasForeignKey(t => t.LessonContentId)
+               .IsRequired(false)
                .OnDelete(DeleteBehavior.Cascade);
 
         // Test -> Questions (One-to-Many)
@@ -28,6 +26,13 @@ public class TestConfiguration : IEntityTypeConfiguration<Test>
                .HasForeignKey(q => q.TestId)
                .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasQueryFilter(t => t.LessonContent.Lesson.Course.Status != CourseStatus.Closed);
+        builder.HasMany(t => t.QuizItems)
+               .WithOne(qi => qi.Test)
+               .HasForeignKey(qi => qi.TestId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+        // UPDATED: Filter must check if LessonContent is null before checking Course status
+        builder.HasQueryFilter(t => t.LessonContentId == null || 
+               t.LessonContent!.Lesson.Course.Status != CourseStatus.Closed);
     }
 }

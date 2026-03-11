@@ -1,115 +1,69 @@
-import {
-    Box,
-    Card,
-    Tab,
-    Tabs,
-    Typography,
-    useTheme,
-} from "@mui/material";
-import { useState } from "react";
+import { Box, Card, Tab, Tabs, Typography, useTheme } from "@mui/material";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import ProgressCircle from "../../components/chartAndProgress/ProgressCircle";
-import { progressByLevel } from "../../mocks/quiz.mock";
-import type { Level, QuizProgress } from "../../types_interfaces/quiz";
 import PageLayout from "../../components/layout/PageLayout";
+import ProgressCircle from "../../components/chartAndProgress/ProgressCircle";
+import { fetchJlptHistory } from "../../api/jlpt_quiz.api";
 
-type QuizType = keyof QuizProgress;
+const LEVELS = ["N5", "N4", "N3", "N2", "N1"] as const;
+type Level = typeof LEVELS[number];
 
-const LEVELS: Level[] = ["N5", "N4", "N3", "N2", "N1"];
-
-const QUIZ_TYPE_ITEMS: { key: QuizType; label: string }[] = [
-    { key: "vocabulary", label: "Vocabulary" },
-    { key: "grammar", label: "Grammar" },
-    { key: "reading", label: "Reading" },
-    { key: "kanji", label: "Kanji" },
-];
+const QUIZ_TYPE_ITEMS = [
+    { key: "Vocabulary", label: "Vocabulary" },
+    { key: "Grammar", label: "Grammar" },
+    { key: "Onomatopoeia", label: "Onomatopoeia" },
+    { key: "Kanji", label: "Kanji" },
+] as const;
 
 export default function QuizSetupPage() {
     const [level, setLevel] = useState<Level>("N5");
+    const [stats, setStats] = useState<Record<string, number>>({});
     const navigate = useNavigate();
-
-    const progress = progressByLevel[level];
     const theme = useTheme();
 
-    const handleClick = (type: QuizType) => {
-        navigate("/quiz/list", {
-            state: { level, type },
-        });
+    // In a real app, you'd calculate progress based on history
+    useEffect(() => {
+        const loadProgress = async () => {
+            const history = await fetchJlptHistory();
+            // Logic to calculate % completed per category for the current level
+            // For now, using placeholder logic
+            setStats({ Vocabulary: 40, Grammar: 15, Kanji: 80, Onomatopoeia: 0 });
+        };
+        loadProgress();
+    }, [level]);
+
+    const handleClick = (category: string) => {
+        navigate("/quiz/list", { state: { level, category } });
     };
 
     return (
         <PageLayout>
-            {/* Quiz Type Cards */}
-            <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                flexDirection: 'column',
-                minHeight: '80vh',
-                position: 'relative', p: 6
-            }}>
-                <Box
-                    sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        flexWrap: "wrap",
-                        gap: 5,
-                    }}
-                >
+            <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', p: 6 }}>
+                <Box sx={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 5 }}>
                     {QUIZ_TYPE_ITEMS.map((item) => (
                         <Card
                             elevation={5}
                             key={item.key}
                             onClick={() => handleClick(item.key)}
-                            sx={{
-                                textAlign: "center",
-                                width: "40%",
-                                p: 3,
-                                cursor: "pointer",
-                                minWidth: '200px'
-                            }}
+                            sx={{ textAlign: "center", width: "40%", p: 3, cursor: "pointer", minWidth: '200px' }}
                         >
-                            <Typography variant="h5" color={theme.palette.text.tertiary} sx={{ fontWeight: 'bold' }}>
+                            <Typography variant="h5" color="text.primary" sx={{ fontWeight: 'bold' }}>
                                 {item.label}
                             </Typography>
                             <Box mt={2}>
-                                {/* Static ProgressCircle, no animation */}
-                                <ProgressCircle value={progress[item.key]} />
+                                <ProgressCircle value={stats[item.key] || 0} />
                             </Box>
                         </Card>
                     ))}
                 </Box>
 
-                {/* Level Tabs */}
-                <Box bgcolor="primary.main" sx={{ position: 'absolute', bottom: '-20px', borderRadius: '0px 20px 0 20px', boxShadow: 3 }}>
-                    <Tabs
-                        value={level}
-                        onChange={(_, v: Level) => setLevel(v)}
-                        centered
-                        sx={{
-                            "& .MuiTab-root": {
-                                color: "white",          // default tab color
-                                fontWeight: 500,
-                            },
-                            "& .Mui-selected": {
-                                bgcolor: "lightGreen",
-                                fontWeight: "bold",
-                                borderRadius: '0px 20px 0 20px',
-                            },
-                            "& .MuiTabs-indicator": {
-                                backgroundColor: "white",
-                                color: "primary.light",
-                                height: '5px',
-                                transition: 'all 0.1s ease',
-                            },
-                            outline: 'none',
-                        }}
-                    >
-                        {LEVELS.map((lvl) => (
-                            <Tab key={lvl} label={lvl} value={lvl} />
-                        ))}
+                {/* Level Tabs stick to bottom as per your design */}
+                <Box bgcolor="primary.main" sx={{ position: 'fixed', bottom: 20, borderRadius: '20px', boxShadow: 3 }}>
+                    <Tabs value={level} onChange={(_, v) => setLevel(v)} centered sx={{ "& .MuiTab-root": { color: "white" } }}>
+                        {LEVELS.map((lvl) => <Tab key={lvl} label={lvl} value={lvl} />)}
                     </Tabs>
                 </Box>
             </Box>
-        </PageLayout> // ✅ properly closed
+        </PageLayout>
     );
 }

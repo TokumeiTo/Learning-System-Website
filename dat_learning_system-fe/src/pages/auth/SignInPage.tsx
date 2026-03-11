@@ -121,7 +121,7 @@ export default function SignIn() {
         <Box component={motion.div} variants={containerVars} initial="hidden" animate="visible" sx={{ width: '100%', maxWidth: 400 }}>
           <Stack spacing={4}>
             <motion.div variants={itemVars}>
-              <img src="/dat logo.png" width={55} alt="Logo" />
+              <img src="/dat_logo.png" width={55} alt="Logo" />
               <Typography variant="h4" fontWeight={900} sx={{ mt: 2 }}>Portal Login</Typography>
               <Box sx={{ width: 40, height: 4, bgcolor: theme.palette.text.tertiary, mt: 1, borderRadius: 2 }} />
             </motion.div>

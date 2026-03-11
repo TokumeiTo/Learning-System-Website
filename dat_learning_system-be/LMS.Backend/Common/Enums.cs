@@ -29,3 +29,11 @@ public enum QuizSourceType
     Grammar, 
     Vocabulary 
 }
+public enum QuizDisplayMode 
+{ 
+    KanjiReading,   // Input: お「かね」 -> Correct Answer: 金 (Character)
+    MeaningMatch,   // Input: 「休みましょう」 -> Correct Answer: 休みましょう (Word)
+    GrammarStar,    // Input: ＿ ＿ ★ ＿ -> Correct Answer: parts[2]
+    ContextFill,    // Input: 私の部屋は（ ）です -> Correct Answer: アパート (Word)
+    SynonymMatch    // Input: 毎晩 -> Correct Answer: 夜はいつも (Meaning)
+}

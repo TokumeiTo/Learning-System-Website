@@ -1,172 +1,109 @@
-import { useState, useEffect } from "react";
-import {
-  Button,
-  Card,
-  Stack,
-  Typography,
-  Divider,
-  Box,
-} from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import TimerIcon from "@mui/icons-material/Timer";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-
-import { kanjiQuizMock } from "../../mocks/quiz.mock";
-import QuestionCard from "../../components/quiz/QuestionCard";
-import QuizProgress from "../../components/quiz/QuizProgress";
-import { useNavigate } from "react-router-dom";
-
-const QUIZ_TIME = 60 * 5; // 5 minutes
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Box, Typography, Button, LinearProgress, Paper } from "@mui/material";
+import { fetchJlptQuestions, submitJlptQuiz } from "../../api/jlpt_quiz.api";
+import type { QuizQuestionDto, QuizAnswerDto } from "../../types_interfaces/jlptquiz";
 
 export default function QuizPage() {
-  const quiz = kanjiQuizMock;
-  const navigate = useNavigate();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { testId, sessionId, title } = location.state || {};
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [timeLeft, setTimeLeft] = useState(QUIZ_TIME);
+    const [questions, setQuestions] = useState<QuizQuestionDto[]>([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [answers, setAnswers] = useState<QuizAnswerDto[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  const currentQuestion = quiz.questions[currentIndex];
+    useEffect(() => {
+        if (!testId) {
+            navigate("/quiz"); // Safety redirect
+            return;
+        }
 
-  /* ---------------- Timer ---------------- */
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      navigate("/quiz/result", { state: { answers } });
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setTimeLeft((t) => t - 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [timeLeft]);
-
-  /* -------- Prevent tab close -------- */
-  useEffect(() => {
-    const handler = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
-    window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  }, []);
-
-  /* -------- Keyboard shortcuts -------- */
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") handleNext();
-      if (e.key === "ArrowLeft") handlePrev();
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  });
-
-  const handleAnswer = (optionId: string) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [currentQuestion.id]: optionId,
-    }));
-  };
-
-  const handleNext = () => {
-    if (currentIndex < quiz.questions.length - 1) {
-      setCurrentIndex((i) => i + 1);
-    } else {
-      navigate("/quiz/result", { state: { answers } });
-    }
-  };
-
-  const handlePrev = () => {
-    if (currentIndex === 0) {
-      const confirmLeave = window.confirm(
-        "Leave quiz? Your progress will be lost."
-      );
-      if (confirmLeave) navigate("/quiz");
-    } else {
-      setCurrentIndex((i) => i - 1);
-    }
-  };
-
-  return (
-    <Box sx={{height:'100vh', display:'flex', justifyContent:'center', alignItems:'center'}}>
-      <Card
-        sx={{
-          p: 4,
-          maxWidth: 720,
-          minWidth: 520,
-          borderRadius: 3,
-        }}
-      >
-        {/* Header */}
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
-        >
-          <Stack direction="row" spacing={1} alignItems="center">
-            <HelpOutlineIcon color="primary" />
-            <Typography variant="h6">Kanji Quiz</Typography>
-          </Stack>
-
-          <Stack direction="row" spacing={1} alignItems="center">
-            <TimerIcon fontSize="small" />
-            <Typography variant="body2">
-              {Math.floor(timeLeft / 60)}:
-              {String(timeLeft % 60).padStart(2, "0")}
-            </Typography>
-          </Stack>
-        </Stack>
-
-        <QuizProgress
-          current={currentIndex + 1}
-          total={quiz.questions.length}
-        />
-
-        <Divider sx={{ my: 2 }} />
-
-        <QuestionCard
-          question={currentQuestion}
-          selectedOption={answers[currentQuestion.id]}
-          onAnswer={handleAnswer}
-          onNext={handleNext}
-        />
-
-        {/* Action Bar */}
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          mt={3}
-          spacing={2}
-        >
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBackIcon />}
-            onClick={handlePrev}
-          >
-            {currentIndex === 0 ? "Exit" : "Previous"}
-          </Button>
-
-          <Button
-            variant="contained"
-            endIcon={
-              currentIndex === quiz.questions.length - 1 ? (
-                <CheckCircleIcon />
-              ) : (
-                <ArrowForwardIcon />
-              )
+        const loadQuestions = async () => {
+            try {
+                const data = await fetchJlptQuestions(testId);
+                setQuestions(data);
+            } catch (err) {
+                console.error("Load failed", err);
+            } finally {
+                setLoading(false);
             }
-            onClick={handleNext}
-          >
-            {currentIndex === quiz.questions.length - 1
-              ? "Submit Quiz"
-              : "Next"}
-          </Button>
-        </Stack>
-      </Card>
-    </Box>
-  );
+        };
+        loadQuestions();
+    }, [testId]);
+
+    const handleAnswerSelect = (answer: string) => {
+        const newAnswer: QuizAnswerDto = {
+            quizItemId: questions[currentIndex].quizItemId,
+            selectedAnswer: answer
+        };
+
+        // Update answers array (replace if exists)
+        setAnswers(prev => {
+            const existing = prev.filter(a => a.quizItemId !== newAnswer.quizItemId);
+            return [...existing, newAnswer];
+        });
+
+        // Move to next question automatically if not the last one
+        if (currentIndex < questions.length - 1) {
+            setCurrentIndex(currentIndex + 1);
+        }
+    };
+
+    const handleSubmit = async () => {
+        const result = await submitJlptQuiz({
+            sessionId: sessionId,
+            answers: answers
+        });
+        navigate("/quiz/result", { state: { result } });
+    };
+
+    if (loading) return <LinearProgress />;
+
+    const currentQuestion = questions[currentIndex];
+    const progress = ((currentIndex + 1) / questions.length) * 100;
+
+    return (
+        <Box sx={{ p: 4, maxWidth: 800, mx: 'auto' }}>
+            <Typography variant="h5" mb={2}>{title}</Typography>
+            
+            <Box mb={4}>
+                <LinearProgress variant="determinate" value={progress} />
+                <Typography variant="caption">Question {currentIndex + 1} of {questions.length}</Typography>
+            </Box>
+
+            <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+                <Typography variant="h6" mb={4}>{currentQuestion?.prompt}</Typography>
+                
+                {/* We will build specific UI for GrammarStar here soon */}
+                <Box sx={{ display: 'grid', gap: 2 }}>
+                    {currentQuestion?.options.map((opt, idx) => (
+                        <Button 
+                            key={idx} 
+                            variant="outlined" 
+                            fullWidth
+                            onClick={() => handleAnswerSelect(opt)}
+                        >
+                            {opt}
+                        </Button>
+                    ))}
+                </Box>
+            </Paper>
+
+            <Box mt={4} display="flex" justifyContent="space-between">
+                <Button 
+                    disabled={currentIndex === 0} 
+                    onClick={() => setCurrentIndex(currentIndex - 1)}
+                >
+                    Back
+                </Button>
+                {currentIndex === questions.length - 1 && (
+                    <Button variant="contained" color="success" onClick={handleSubmit}>
+                        Submit Quiz
+                    </Button>
+                )}
+            </Box>
+        </Box>
+    );
 }

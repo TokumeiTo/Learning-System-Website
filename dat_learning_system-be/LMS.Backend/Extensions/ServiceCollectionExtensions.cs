@@ -1,6 +1,7 @@
 using LMS.Backend.Helpers;
 using LMS.Backend.Repo.Implement;
 using LMS.Backend.Repo.Interface;
+using LMS.Backend.Services;
 using LMS.Backend.Services.Implement;
 using LMS.Backend.Services.Interfaces;
 
@@ -29,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IGrammarFlashcardRepository, GrammarFlashcardRepository>();
         services.AddScoped<IVocabularyRepository, VocabularyRepository>();
         services.AddScoped<IOnomatoRepository, OnomatoRepository>();
+        services.AddScoped<IJlptQuizRepository, JlptQuizRepository>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
@@ -48,6 +50,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IGrammarFlashcardService, GrammarFlashcardService>();
         services.AddScoped<IVocabularyService, VocabularyService>();
         services.AddScoped<IOnomatoService, OnomatoService>();
+        services.AddScoped<IJlptQuizService, JlptQuizService>();
 
         // Helpers
         services.AddSingleton<JwtHelper>();

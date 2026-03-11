@@ -3,6 +3,7 @@ using System;
 using LMS.Backend.Data.Dbcontext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LMS.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260310023030_AddQuizs_Pratice_Tables")]
+    partial class AddQuizs_Pratice_Tables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,7 +154,7 @@ namespace LMS.Backend.Migrations
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
                             CompanyCode = "00-0000",
-                            ConcurrencyStamp = "c3515c98-1723-4081-a437-41c611659d25",
+                            ConcurrencyStamp = "b257d9b5-7f10-450a-9dac-261e90f5c228",
                             Email = "admin@lms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin",
@@ -160,10 +163,10 @@ namespace LMS.Backend.Migrations
                             NormalizedEmail = "ADMIN@LMS.COM",
                             NormalizedUserName = "00-0000",
                             OrgUnitId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAECM955yrzNKZJ8Mww1SS559QUlcQbfKjRXriuv5wOhkmCNw4jZe9V12f2H3c2ij8xw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBW3Cisv/DzE6X5Ok0NBp2+pSd2blLyqDV5DHM7dRlWOjfkbyjxuLCdy+Iub4q55kg==",
                             PhoneNumberConfirmed = false,
                             Position = 0,
-                            SecurityStamp = "f5e6e3db-faa7-4a18-9f48-6c06786181e6",
+                            SecurityStamp = "6f2269f6-a639-4f8f-88b9-0f8377d485f6",
                             TwoFactorEnabled = false,
                             UserName = "00-0000"
                         });
@@ -1221,41 +1224,6 @@ namespace LMS.Backend.Migrations
                     b.ToTable("QuestionOptions");
                 });
 
-            modelBuilder.Entity("LMS.Backend.Data.Entities.QuizItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("CustomPrompt")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<string>("DisplayMode")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Points")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SourceId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<Guid>("TestId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TestId");
-
-                    b.ToTable("QuizItems");
-                });
-
             modelBuilder.Entity("LMS.Backend.Data.Entities.QuizSession", b =>
                 {
                     b.Property<int>("Id")
@@ -1273,11 +1241,11 @@ namespace LMS.Backend.Migrations
                     b.Property<bool>("IsPassed")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("QuizTemplateId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("StartedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("TestId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -1285,7 +1253,7 @@ namespace LMS.Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TestId");
+                    b.HasIndex("QuizTemplateId");
 
                     b.ToTable("QuizSessions");
                 });
@@ -1301,10 +1269,10 @@ namespace LMS.Backend.Migrations
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("QuizItemId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("QuizSessionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SourceId")
                         .HasColumnType("integer");
 
                     b.Property<string>("UserAnswer")
@@ -1313,11 +1281,50 @@ namespace LMS.Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("QuizItemId");
-
                     b.HasIndex("QuizSessionId");
 
+                    b.HasIndex("SourceId");
+
                     b.ToTable("QuizSessionAnswers");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.QuizTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("PassScorePercentage")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuestionCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SourceType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TimeLimitSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("QuizTemplates");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.Submission", b =>
@@ -1359,16 +1366,10 @@ namespace LMS.Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Category")
-                        .HasColumnType("text");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("JlptLevel")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("LessonContentId")
+                    b.Property<Guid>("LessonContentId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("PassingGrade")
@@ -1864,43 +1865,24 @@ namespace LMS.Backend.Migrations
                     b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("LMS.Backend.Data.Entities.QuizItem", b =>
-                {
-                    b.HasOne("LMS.Backend.Data.Entities.Test", "Test")
-                        .WithMany("QuizItems")
-                        .HasForeignKey("TestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Test");
-                });
-
             modelBuilder.Entity("LMS.Backend.Data.Entities.QuizSession", b =>
                 {
-                    b.HasOne("LMS.Backend.Data.Entities.Test", "Test")
+                    b.HasOne("LMS.Backend.Data.Entities.QuizTemplate", "Template")
                         .WithMany("Sessions")
-                        .HasForeignKey("TestId")
+                        .HasForeignKey("QuizTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Test");
+                    b.Navigation("Template");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.QuizSessionAnswer", b =>
                 {
-                    b.HasOne("LMS.Backend.Data.Entities.QuizItem", "QuizItem")
-                        .WithMany()
-                        .HasForeignKey("QuizItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("LMS.Backend.Data.Entities.QuizSession", "Session")
                         .WithMany("Answers")
                         .HasForeignKey("QuizSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("QuizItem");
 
                     b.Navigation("Session");
                 });
@@ -1929,7 +1911,8 @@ namespace LMS.Backend.Migrations
                     b.HasOne("LMS.Backend.Data.Entities.LessonContent", "LessonContent")
                         .WithMany("Tests")
                         .HasForeignKey("LessonContentId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("LessonContent");
                 });
@@ -2080,13 +2063,14 @@ namespace LMS.Backend.Migrations
                     b.Navigation("Answers");
                 });
 
+            modelBuilder.Entity("LMS.Backend.Data.Entities.QuizTemplate", b =>
+                {
+                    b.Navigation("Sessions");
+                });
+
             modelBuilder.Entity("LMS.Backend.Data.Entities.Test", b =>
                 {
                     b.Navigation("Questions");
-
-                    b.Navigation("QuizItems");
-
-                    b.Navigation("Sessions");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.Topic", b =>

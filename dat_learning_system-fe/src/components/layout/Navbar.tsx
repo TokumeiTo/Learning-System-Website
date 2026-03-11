@@ -76,7 +76,7 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
         </IconButton>
 
         <Box sx={{ width: '100%' }}>
-          <img src="/dat logo.png" width={60} alt="logo" />
+          <img src="/dat_logo.png" width={60} alt="logo" />
         </Box>
 
         <ButtonGroup>

@@ -59,6 +59,16 @@ public class AdminLessonStatsDto
     public List<QuestionAnalyticDto> DifficultQuestions { get; set; } = new();
 }
 
+public class AdminQuestionDto
+{
+    public int DisplayMode { get; set; }
+    public string Prompt { get; set; } = string.Empty;
+    public string CorrectAnswer { get; set; } = string.Empty;
+    public string Explanation { get; set; } = string.Empty;
+    public int Points { get; set; }
+    public List<string> Options { get; set; } = new();
+}
+
 public class QuestionAnalyticDto
 {
     public Guid QuestionId { get; set; }
