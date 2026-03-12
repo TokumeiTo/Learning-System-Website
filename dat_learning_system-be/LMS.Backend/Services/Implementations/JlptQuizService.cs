@@ -31,7 +31,7 @@ public class JlptQuizService : IJlptQuizService
         foreach (var item in test.QuizItems.OrderBy(i => i.SortOrder))
         {
             var source = await _repo.GetSourceEntityAsync(item.SourceId, item.DisplayMode);
-            if (source == null) continue;
+            if (source == null && item.DisplayMode != QuizDisplayMode.GrammarStar) continue;
 
             var dto = new QuizQuestionDto
             {
@@ -39,77 +39,23 @@ public class JlptQuizService : IJlptQuizService
                 DisplayMode = item.DisplayMode,
                 Points = item.Points,
                 SortOrder = item.SortOrder,
-                Prompt = item.CustomPrompt ?? "Missing Prompt"
+                Prompt = item.DisplayMode == QuizDisplayMode.GrammarStar ? "＿ ＿ ★ ＿" : (item.CustomPrompt ?? "")
             };
 
-            await ProcessByMode(dto, source, test.JlptLevel);
+            // Setup Options based on Mode
+            if (item.DisplayMode == QuizDisplayMode.GrammarStar)
+            {
+                // CustomPrompt format: "Part1|Part2|CorrectPart|Part4"
+                dto.Options = item.CustomPrompt?.Split('|').OrderBy(_ => Guid.NewGuid()).ToList() ?? new();
+            }
+            else
+            {
+                await ApplyOptions(dto, source!, test.JlptLevel);
+            }
+            
             dtos.Add(dto);
         }
-
         return dtos;
-    }
-
-    private async Task ProcessByMode(QuizQuestionDto dto, object source, string? level)
-    {
-        switch (dto.DisplayMode)
-        {
-            case QuizDisplayMode.GrammarStar:
-                // CustomPrompt format: "Part1|Part2|Part3|Part4"
-                var parts = dto.Prompt.Split('|').ToList();
-                dto.Prompt = "＿ ＿ ★ ＿";
-                dto.Options = parts.OrderBy(_ => Guid.NewGuid()).ToList();
-                break;
-
-            case QuizDisplayMode.KanjiReading:
-                // Question: Reading -> Answer: Character (金)
-                await ApplyOptions(dto, source, level, useCharacter: true);
-                break;
-
-            case QuizDisplayMode.SynonymMatch:
-                // Question: Word -> Answer: Meaning (夜はいつも)
-                await ApplyOptions(dto, source, level, useMeaning: true);
-                break;
-
-            case QuizDisplayMode.MeaningMatch:
-            case QuizDisplayMode.ContextFill:
-                // Question: Context -> Answer: Word (アパート)
-                await ApplyOptions(dto, source, level, useWord: true);
-                break;
-        }
-    }
-
-    private async Task ApplyOptions(QuizQuestionDto dto, object source, string? level,
-        bool useCharacter = false, bool useMeaning = false, bool useWord = false)
-    {
-        // 1. Identify the Correct Answer based on the mode
-        string correct = "";
-        if (useCharacter && source is Kanji k) correct = k.Character;
-        else if (useMeaning) correct = source is Vocabulary v ? v.Meaning : ((Kanji)source).Meaning;
-        else correct = source is Vocabulary voc ? voc.Word : (source is Onomatopoeia o ? o.Phrase : "");
-
-        var options = new List<string> { correct };
-
-        // 2. Fetch 3 random distractors from the same JLPT level
-        if (source is Kanji)
-        {
-            var distractors = await _context.Kanjis
-                .Where(x => x.JlptLevel == level && x.Character != correct && x.Meaning != correct)
-                .OrderBy(_ => Guid.NewGuid()).Take(3)
-                .Select(x => useCharacter ? x.Character : x.Meaning)
-                .ToListAsync();
-            options.AddRange(distractors);
-        }
-        else
-        {
-            var distractors = await _context.Vocabularies
-                .Where(x => x.JLPTLevel == level && x.Word != correct && x.Meaning != correct)
-                .OrderBy(_ => Guid.NewGuid()).Take(3)
-                .Select(x => useMeaning ? x.Meaning : x.Word)
-                .ToListAsync();
-            options.AddRange(distractors);
-        }
-
-        dto.Options = options.OrderBy(_ => Guid.NewGuid()).ToList();
     }
 
     public async Task<QuizResultDto> SubmitQuizAsync(QuizSubmissionDto submission)
@@ -117,7 +63,7 @@ public class JlptQuizService : IJlptQuizService
         var session = await _repo.GetSessionWithTestAsync(submission.SessionId);
         if (session == null) throw new Exception("Session not found");
 
-        var result = new QuizResultDto();
+        var result = new QuizResultDto { TotalPoints = 0, Score = 0 };
         var answersToSave = new List<QuizSessionAnswer>();
 
         foreach (var userAns in submission.Answers)
@@ -129,14 +75,17 @@ public class JlptQuizService : IJlptQuizService
             string correct = GetTargetAnswer(source, item);
 
             bool isCorrect = string.Equals(userAns.SelectedAnswer.Trim(), correct.Trim(), StringComparison.OrdinalIgnoreCase);
+            
             if (isCorrect) result.Score += item.Points;
             result.TotalPoints += item.Points;
 
-            result.Feedback.Add(new AnswerFeedbackDto
+            // Aligning with the Details DTO for frontend summary
+            result.Details.Add(new ResultDetailDto
             {
-                QuizItemId = item.Id,
-                IsCorrect = isCorrect,
-                CorrectAnswer = correct
+                QuestionPrompt = item.DisplayMode == QuizDisplayMode.GrammarStar ? "Star Puzzle" : item.CustomPrompt ?? "",
+                UserAnswer = userAns.SelectedAnswer,
+                CorrectAnswer = correct,
+                IsCorrect = isCorrect
             });
 
             answersToSave.Add(new QuizSessionAnswer
@@ -149,16 +98,50 @@ public class JlptQuizService : IJlptQuizService
         }
 
         session.FinalScore = result.Score;
-        session.IsPassed = result.Score >= session.Test.PassingGrade;
+        session.FinishedAt = DateTime.UtcNow;
+        session.IsPassed = result.Score >= (result.TotalPoints * (session.Test.PassingGrade / 100.0));
+        
         await _repo.SaveSessionResultsAsync(session, answersToSave);
-
-        result.IsPassed = session.IsPassed;
         return result;
     }
+
+    private string GetTargetAnswer(object? source, QuizItem item)
+    {
+        if (item.DisplayMode == QuizDisplayMode.GrammarStar)
+            return item.CustomPrompt?.Split('|')[2] ?? ""; // The 3rd element is the ★ position
+
+        return item.DisplayMode switch
+        {
+            QuizDisplayMode.KanjiReading => (source as Kanji)?.Character ?? "",
+            QuizDisplayMode.SynonymMatch => (source as Vocabulary)?.Meaning ?? (source as Kanji)?.Meaning ?? "",
+            _ => (source as Vocabulary)?.Word ?? (source as Onomatopoeia)?.Phrase ?? ""
+        };
+    }
+
+    private async Task ApplyOptions(QuizQuestionDto dto, object source, string? level)
+    {
+        // Simplifies distractor logic by using the Correct Answer as a base
+        string correct = GetTargetAnswer(source, new QuizItem { DisplayMode = dto.DisplayMode });
+        var options = new List<string> { correct };
+
+        if (source is Kanji)
+        {
+            options.AddRange(await _context.Kanjis
+                .Where(x => x.JlptLevel == level && x.Character != correct)
+                .OrderBy(_ => Guid.NewGuid()).Take(3).Select(x => dto.DisplayMode == QuizDisplayMode.KanjiReading ? x.Character : x.Meaning).ToListAsync());
+        }
+        else
+        {
+            options.AddRange(await _context.Vocabularies
+                .Where(x => x.JLPTLevel == level && x.Word != correct)
+                .OrderBy(_ => Guid.NewGuid()).Take(3).Select(x => dto.DisplayMode == QuizDisplayMode.SynonymMatch ? x.Meaning : x.Word).ToListAsync());
+        }
+        dto.Options = options.OrderBy(_ => Guid.NewGuid()).ToList();
+    }
+
     public async Task<List<JlptTestDto>> GetAvailableTestsAsync(string level, string category)
     {
         var tests = await _repo.GetTestsByJlptAsync(level, category);
-
         return tests.Select(t => new JlptTestDto
         {
             Id = t.Id,
@@ -168,17 +151,5 @@ public class JlptQuizService : IJlptQuizService
             PassingGrade = t.PassingGrade,
             QuestionCount = t.QuizItems?.Count ?? 0
         }).ToList();
-    }
-    private string GetTargetAnswer(object? source, QuizItem item)
-    {
-        if (item.DisplayMode == QuizDisplayMode.GrammarStar)
-            return item.CustomPrompt?.Split('|')[2] ?? "";
-
-        return item.DisplayMode switch
-        {
-            QuizDisplayMode.KanjiReading => ((Kanji)source!).Character,
-            QuizDisplayMode.SynonymMatch => source is Vocabulary v ? v.Meaning : ((Kanji)source!).Meaning,
-            _ => source is Vocabulary voc ? voc.Word : (source is Onomatopoeia o ? o.Phrase : "")
-        };
     }
 }

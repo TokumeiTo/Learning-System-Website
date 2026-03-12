@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IFileService, LocalFileService>();
         services.AddScoped<IOrgUnitService, OrgUnitService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICourseService, CourseService>();

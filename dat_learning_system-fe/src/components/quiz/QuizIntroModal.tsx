@@ -1,182 +1,111 @@
-import { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  IconButton,
-  Stack,
-  Typography,
-  Divider,
-  CircularProgress,
+import { 
+    Dialog, 
+    DialogContent, 
+    Box, 
+    Typography, 
+    Button, 
+    Stack, 
+    Divider 
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import QuizIcon from "@mui/icons-material/Quiz";
-import TimerIcon from "@mui/icons-material/Timer";
-import TipsAndUpdatesIcon from "@mui/icons-material/TipsAndUpdates";
-import QuizTwoToneIcon from '@mui/icons-material/QuizTwoTone';
-import SettingsIcon from '@mui/icons-material/Settings';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import TimerIcon from '@mui/icons-material/Timer';
+import StarIcon from '@mui/icons-material/Star';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
-import { useNavigate } from "react-router-dom";
-import { startJlptQuizSession } from "../../api/jlpt_quiz.api";
 import type { JlptTestDto } from "../../types_interfaces/jlptquiz";
-import { useAuth } from "../../hooks/useAuth";
-import AdminAddQuestion from "./AdminAddQuestion";
 
 interface QuizIntroModalProps {
-  test: JlptTestDto;
-  onClose: () => void;
+    test: JlptTestDto;
+    onClose: () => void;
+    onStart: (testId: string) => void; // This will trigger the API call in the parent
 }
 
-// Reusable styles
-const modalOverlayStyle = {
-  position: "fixed",
-  inset: 0,
-  bgcolor: "rgba(0,0,0,0.7)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 1300,
-  backdropFilter: "blur(6px)",
-};
-
-const modalCardStyle = {
-  width: { xs: "95%", sm: 600, md: 700 },
-  p: 4,
-  position: "relative",
-  borderRadius: 4,
-  boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
-  bgcolor: "background.paper",
-  maxHeight: '90vh',
-  overflowY: 'auto',
-};
-
-export default function QuizIntroModal({ test, onClose }: QuizIntroModalProps) {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [isStarting, setIsStarting] = useState(false);
-  const [isAdminMode, setIsAdminMode] = useState(false);
-
-  const canManageCourses = user?.position === "Admin" || user?.position === "SuperAdmin";
-
-  // VIEW 1: ADMIN QUESTION CREATOR
-  if (isAdminMode && canManageCourses) {
+export default function QuizIntroModal({ test, onClose, onStart }: QuizIntroModalProps) {
     return (
-      <Box sx={modalOverlayStyle}>
-        <Card sx={modalCardStyle}>
-          <Button 
-            startIcon={<span>←</span>} 
-            onClick={() => setIsAdminMode(false)} 
-            sx={{ mb: 2, fontWeight: 'bold' }}
-          >
-            Back to Quiz Intro
-          </Button>
-          <Divider sx={{ mb: 3 }} />
-          
-          {/* This is where the magic happens */}
-          <AdminAddQuestion testId={test.id} />
-        </Card>
-      </Box>
-    );
-  }
-
-  // VIEW 2: STANDARD STUDENT INTRO
-  const handleStart = async () => {
-    if (test.questionCount === 0) return; // Don't start empty tests
-    setIsStarting(true);
-    try {
-      const sessionId = await startJlptQuizSession(test.id);
-      navigate("/quiz/start", {
-        state: {
-          testId: test.id,
-          sessionId: sessionId,
-          title: test.title,
-          level: test.jlptLevel,
-          category: test.category
-        },
-      });
-      onClose();
-    } catch (error) {
-      console.error("Failed to start session:", error);
-    } finally {
-      setIsStarting(false);
-    }
-  };
-
-  return (
-    <Box sx={modalOverlayStyle}>
-      <Card sx={modalCardStyle}>
-        <IconButton
-          onClick={onClose}
-          sx={{ position: "absolute", top: 12, right: 12 }}
-          disabled={isStarting}
+        <Dialog 
+            open={true} 
+            onClose={onClose}
+            PaperProps={{
+                sx: { borderRadius: 5, p: 2, maxWidth: 450 }
+            }}
         >
-          <CloseIcon />
-        </IconButton>
+            <DialogContent>
+                <Stack spacing={3} alignItems="center">
+                    {/* HEADER */}
+                    <Box textAlign="center">
+                        <Typography variant="overline" color="primary" fontWeight="bold">
+                            {test.jlptLevel} • {test.category}
+                        </Typography>
+                        <Typography variant="h5" fontWeight="800">
+                            {test.title}
+                        </Typography>
+                    </Box>
 
-        <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-          <QuizIcon color="primary" sx={{ fontSize: 40 }} />
-          <Box>
-            <Typography variant="h5" fontWeight={700}>{test.title}</Typography>
-            <Typography variant="caption" color="text.secondary">
-              {test.jlptLevel} • {test.category}
-            </Typography>
-          </Box>
-        </Stack>
+                    <Divider sx={{ width: '100%' }} />
 
-        <Divider sx={{ my: 2 }} />
+                    {/* QUIZ DETAILS BOX */}
+                    <Box sx={{ 
+                        width: '100%', 
+                        bgcolor: 'grey.50', 
+                        borderRadius: 3, 
+                        p: 2,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2
+                    }}>
+                        <Box display="flex" alignItems="center" gap={2}>
+                            <ListAltIcon color="action" />
+                            <Typography variant="body1">
+                                <b>{test.questionCount}</b> Questions
+                            </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" gap={2}>
+                            <TimerIcon color="action" />
+                            <Typography variant="body1">
+                                Passing Score: <b>{test.passingGrade}%</b>
+                            </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" gap={2}>
+                            <StarIcon sx={{ color: '#FFD700' }} />
+                            <Typography variant="body2" color="text.secondary">
+                                Includes <b>Star Puzzle</b> (Sentence Scramble)
+                            </Typography>
+                        </Box>
+                    </Box>
 
-        <Stack spacing={2.5}>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <QuizTwoToneIcon color={test.questionCount > 0 ? "success" : "error"} />
-            <Typography variant="body1">
-              <strong>{test.questionCount}</strong> Questions
-            </Typography>
-          </Stack>
+                    {/* INSTRUCTIONS */}
+                    <Typography variant="body2" color="text.secondary" textAlign="center">
+                        Once you click start, the session will be recorded. 
+                        Make sure you have a stable connection.
+                    </Typography>
 
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <TimerIcon color="warning" />
-            <Typography variant="body1">
-              Estimated Time: <strong>~{Math.ceil(test.questionCount * 1.5)}</strong> minutes
-            </Typography>
-          </Stack>
-
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <TipsAndUpdatesIcon color="info" />
-            <Typography variant="body1">
-              Passing Grade: <strong>{test.passingGrade}%</strong>
-            </Typography>
-          </Stack>
-        </Stack>
-
-        <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
-          <Button fullWidth variant="outlined" onClick={onClose} disabled={isStarting}>
-            Cancel
-          </Button>
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={handleStart}
-            disabled={isStarting || test.questionCount === 0}
-            startIcon={isStarting ? <CircularProgress size={20} color="inherit" /> : null}
-          >
-            {test.questionCount === 0 ? "Empty Test" : isStarting ? "Initializing..." : "Begin Test"}
-          </Button>
-        </Box>
-
-        {/* ADMIN ACTION */}
-        {canManageCourses && (
-          <Button
-            fullWidth
-            variant="text"
-            color="secondary"
-            startIcon={<SettingsIcon />}
-            sx={{ mt: 2 }}
-            onClick={() => setIsAdminMode(true)}
-          >
-            Manage Quiz Questions
-          </Button>
-        )}
-      </Card>
-    </Box>
-  );
+                    {/* ACTIONS */}
+                    <Box sx={{ 
+                        display: 'flex', 
+                        gap: 2, 
+                        width: '100%', 
+                        mt: 1 
+                    }}>
+                        <Button 
+                            fullWidth 
+                            variant="outlined" 
+                            onClick={onClose}
+                            sx={{ borderRadius: 10, py: 1.5 }}
+                        >
+                            Back
+                        </Button>
+                        <Button 
+                            fullWidth 
+                            variant="contained" 
+                            startIcon={<PlayCircleOutlineIcon />}
+                            onClick={() => onStart(test.id)}
+                            sx={{ borderRadius: 10, py: 1.5 }}
+                        >
+                            Start Quiz
+                        </Button>
+                    </Box>
+                </Stack>
+            </DialogContent>
+        </Dialog>
+    );
 }

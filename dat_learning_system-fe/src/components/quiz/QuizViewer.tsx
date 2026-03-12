@@ -117,7 +117,7 @@ const QuizViewer = ({ data, testId, onFinish, isLocked, lessonId, existingScore,
 
     // --- RENDER 2: ACTIVE QUIZ / REVIEW MODE ---
     return (
-        <Paper sx={{ bgcolor: '#1e293b', p: 3, borderRadius: 3, border: '1px solid #334155' }}>
+        <>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
                 <Typography variant="h6" sx={{ color: '#818cf8', fontWeight: 700 }}>
                     {data.title || 'Knowledge Check'}
@@ -194,7 +194,7 @@ const QuizViewer = ({ data, testId, onFinish, isLocked, lessonId, existingScore,
                     </Alert>
                 )}
             </Box>
-        </Paper>
+        </>
     );
 };
 

@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import 'react-quill-new/dist/quill.snow.css';
 
 import { AuthProvider } from "./context/AuthContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";

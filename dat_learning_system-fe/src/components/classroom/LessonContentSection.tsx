@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Box, Stack, Typography, Paper, Button, Divider, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { TextFormat, Image as ImageIcon, YouTube, Save, Quiz } from '@mui/icons-material';
+import FilePresentIcon from '@mui/icons-material/FilePresent';
 import { PointerSensor, useSensor, useSensors, DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import type { BulkSaveContentsRequest, Lesson } from '../../types_interfaces/classroom';
 import DraftBlock from './LessonContentDraftBlock';
 import { bulkSaveLessonContents } from '../../api/classroom.api';
+import TableChartIcon from '@mui/icons-material/TableChart';
 import MessagePopup from '../feedback/MessagePopup';
 
 // --- Main Section ---
@@ -36,15 +38,20 @@ const LessonContentSection = ({
     }
   }, [currentLesson]);
 
-  const addDraft = (type: 'text' | 'image' | 'video' | 'test') => {
+  const addDraft = (type: 'text' | 'image' | 'video' | 'file' | 'chart' | 'test') => {
+    let initialBody = '';
+    if (type === 'chart') {
+      initialBody = JSON.stringify([['Header 1', 'Header 2'], ['Data 1', 'Data 2']]);
+    }
+
     const newBlock: any = {
       tempId: Math.random().toString(),
       contentType: type,
-      body: '',
+      body: initialBody,
       lessonId: currentLesson?.id,
-      // Initialize the relational structure
       test: type === 'test' ? { questions: [], passingScore: 70 } : null
     };
+
     setDrafts([...drafts, newBlock]);
   };
 
@@ -70,32 +77,36 @@ const LessonContentSection = ({
     const payload: BulkSaveContentsRequest = {
       lessonId: currentLesson.id,
       contents: drafts.map((d, index) => {
-        const contentBlock: any = {
-          // Manual Sync Logic: 
-          // If id is a real string/number from DB, keep it. 
-          // If it was newly added in UI, it won't have 'id', so it's a 'Create'.
+        let finalBody = d.body;
+
+        // Optional: Prevent saving empty text blocks
+        if (d.contentType === 'text' && (finalBody === '<p><br></p>' || !finalBody)) {
+          finalBody = "";
+        }
+
+        if (['image', 'video', 'file'].includes(d.contentType) && d.body.startsWith('data:')) {
+          finalBody = JSON.stringify({
+            data: d.body,
+            name: d.fileName
+          });
+        }
+
+        return {
           id: d.id || undefined,
           contentType: d.contentType,
-          body: d.body,
+          body: finalBody,
           sortOrder: index,
+          test: d.contentType === 'test' ? d.test : null
         };
-
-        if (d.contentType === 'test' && d.test) {
-          contentBlock.test = {
-            ...d.test,
-            id: d.test.id || undefined
-          };
-        }
-        return contentBlock;
       })
     };
 
     try {
       await bulkSaveLessonContents(payload);
       setShowSuccessModal(true);
-      onSaveSuccess(); // Trigger the parent refresh logic
+      onSaveSuccess();
     } catch (e) {
-      setErrorPopup({ open: true, message: "Save failed. Check your connection." });
+      setErrorPopup({ open: true, message: "Save failed." });
     } finally {
       setIsSaving(false);
     }
@@ -104,7 +115,7 @@ const LessonContentSection = ({
   if (!currentLesson) return <Box p={4} sx={{ color: 'gray' }}>Select a lesson to edit content</Box>;
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
+    <Box sx={{ maxWidth: 1000, mx: 'auto', p: 3 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
         <Typography variant="h5" fontWeight={800} sx={{ color: 'white' }}>
           {currentLesson?.title}
@@ -122,15 +133,31 @@ const LessonContentSection = ({
       </Stack>
 
       {/* Toolbar */}
-      <Paper sx={{ p: 1, mb: 4, bgcolor: '#1e293b', display: 'inline-flex', gap: 1, border: '1px solid rgba(255,255,255,0.1)' }}>
-        <Button size="small" startIcon={<TextFormat />} onClick={() => addDraft('text')} sx={{ color: 'white' }}>Text</Button>
+      <Paper sx={{ p: 1, mb: 4, bgcolor: '#1e293b', display: 'inline-flex', gap: 1, flexWrap: 'wrap', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <Button size="small" startIcon={<TextFormat />} onClick={() => addDraft('text')} sx={{ color: 'white' }}>Text Field</Button>
         <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
         <Button size="small" startIcon={<ImageIcon />} onClick={() => addDraft('image')} sx={{ color: 'white' }}>Image</Button>
         <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
         <Button size="small" startIcon={<YouTube />} onClick={() => addDraft('video')} sx={{ color: 'white' }}>Video</Button>
         <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
-
-        {/* NEW: Test Button */}
+        <Button
+          size="small"
+          startIcon={<FilePresentIcon />}
+          onClick={() => addDraft('file')} // Add 'file' type to your content logic
+          sx={{ color: 'white' }}
+        >
+          Document
+        </Button>
+        <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+        <Button
+          size="small"
+          startIcon={<TableChartIcon />}
+          onClick={() => addDraft('chart')}
+          sx={{ color: '#fbbf24' }} // Amber color for charts
+        >
+          Chart
+        </Button>
+        <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
         <Button
           size="small"
           startIcon={<Quiz />}
@@ -149,6 +176,17 @@ const LessonContentSection = ({
       >
         <SortableContext items={drafts.map(d => d.tempId)} strategy={verticalListSortingStrategy}>
           <Stack spacing={2}> {/* Stack adds nice spacing between blocks */}
+            {drafts.length === 0 && (
+              <Box sx={{
+                textAlign: 'center',
+                py: 10,
+                border: '2px dashed #334155',
+                borderRadius: 4,
+                color: '#94a3b8'
+              }}>
+                <Typography>No content yet. Click a tool above to start building your lesson.</Typography>
+              </Box>
+            )}
             {drafts.map((block) => (
               <DraftBlock
                 key={block.tempId}

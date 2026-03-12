@@ -138,6 +138,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRefresh}) => {
                             overflowY: 'hidden',
                             lineHeight: 1.6,
                             fontWeight: 500,
+                            textIndent: '10px',
                             '&:hover': {
                                 overflowY: 'auto',
                                 '&::-webkit-scrollbar': { width: '4px' },

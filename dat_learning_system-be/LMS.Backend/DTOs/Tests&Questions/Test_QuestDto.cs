@@ -3,10 +3,10 @@ namespace LMS.Backend.DTOs.Test_Quest;
 public class TestDto
 {
     public Guid Id { get; set; }
-    public string? title {get;set;}
+    public string? title { get; set; }
     public List<QuestionDto> Questions { get; set; } = new();
     public int PassingGrade { get; set; }
-    public bool IsActive {get; set;} = true;
+    public bool IsActive { get; set; } = true;
 }
 
 public class QuestionDto
@@ -102,4 +102,28 @@ public class LessonAttemptDto
 
     // Optional: Useful for KPIs to see if students are rushing or taking their time
     public int? TimeTakenSeconds { get; set; }
+}
+
+public class LinkQuestionDto
+{
+    public Guid TestId { get; set; }
+    // The Guid of the Kanji, Vocabulary, or Grammar record from your existing tables
+    public string SourceId { get; set; } = string.Empty;
+
+    // Mapping to your QuizDisplayMode Enum (0: KanjiReading, 2: GrammarStar, etc.)
+    public int DisplayMode { get; set; }
+
+    public int Points { get; set; } = 10;
+
+    // Optional: Used specifically for Grammar Star to store the sentence structure 
+    // or for a Custom Prompt that overrides the default Flashcard display.
+    public string? CustomPrompt { get; set; }
+}
+
+public class GlobalSearchResultDto
+{
+    public string Id { get; set; } = string.Empty;
+    public string DisplayText { get; set; } = string.Empty; // e.g., "私 (I, me)"
+    public string Type { get; set; } = string.Empty; // "Kanji", "Vocabulary", or "Grammar"
+    public string JlptLevel { get; set; } = string.Empty;
 }

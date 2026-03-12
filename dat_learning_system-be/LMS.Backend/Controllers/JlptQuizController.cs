@@ -13,126 +13,116 @@ namespace LMS.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize] // Requires login for all quiz actions
+[Authorize]
 public class JlptQuizController : ControllerBase
 {
     private readonly IJlptQuizService _quizService;
-    private readonly IJlptQuizRepository _repo;
     private readonly AppDbContext _context;
 
-    public JlptQuizController(IJlptQuizService quizService, IJlptQuizRepository repo, AppDbContext context)
+    public JlptQuizController(IJlptQuizService quizService, AppDbContext context)
     {
         _quizService = quizService;
-        _repo = repo;
         _context = context;
     }
 
-    [HttpGet("list/{level}/{category}")]
-    public async Task<ActionResult<List<JlptTestDto>>> GetAvailableTests(string level, string category)
-    {
-        var tests = await _quizService.GetAvailableTestsAsync(level, category);
-        return Ok(tests);
-    }
-
-    [HttpPost("start/{testId}")]
-    public async Task<ActionResult<int>> StartQuiz(Guid testId)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId == null) return Unauthorized();
-
-        var session = new QuizSession
-        {
-            TestId = testId,
-            UserId = userId,
-            StartedAt = DateTime.UtcNow
-        };
-
-        var createdSession = await _repo.StartSessionAsync(session);
-        return Ok(createdSession.Id);
-    }
-
-    [HttpGet("questions/{testId}")]
-    public async Task<ActionResult<List<QuizQuestionDto>>> GetQuestions(Guid testId)
-    {
-        var questions = await _quizService.GetQuestionsForTestAsync(testId);
-        if (questions == null || !questions.Any()) return NotFound("No questions found for this test.");
-
-        return Ok(questions);
-    }
+    [HttpGet("tests")]
+    public async Task<ActionResult<List<JlptTestDto>>> GetTests([FromQuery] string level, [FromQuery] string category)
+        => Ok(await _quizService.GetAvailableTestsAsync(level, category));
 
     [HttpPost("submit")]
     public async Task<ActionResult<QuizResultDto>> SubmitQuiz([FromBody] QuizSubmissionDto submission)
     {
-        try
-        {
-            var result = await _quizService.SubmitQuizAsync(submission);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        // Service handles the score calculation and history logging
+        var result = await _quizService.SubmitQuizAsync(submission);
+        return Ok(result);
     }
 
-    [HttpGet("history")]
-    public async Task<ActionResult<List<QuizSession>>> GetMyHistory([FromQuery] string? category)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId == null) return Unauthorized();
+    // --- ADMIN SECTION ---
 
-        var history = await _repo.GetUserHistoryAsync(userId, category);
-        return Ok(history);
-    }
-
-    [Authorize(Roles = "Admin,SuperAdmin")]
-    [HttpPost("create-jlpt-test")]
-    public async Task<IActionResult> CreateJlptTest([FromBody] JlptTestDto dto)
+    [Authorize(Roles = "Admin")]
+    [HttpPost("admin/create-test")]
+    public async Task<IActionResult> CreateTest([FromBody] JlptTestDto dto)
     {
-        var test = new Test // Using your actual Entity class
+        var test = new Test
         {
             Id = Guid.NewGuid(),
             Title = dto.Title,
             JlptLevel = dto.JlptLevel,
             Category = dto.Category,
             PassingGrade = dto.PassingGrade,
-            IsActive = true,
-            // LessonContentId remains null for standalone JLPT quizzes
+            IsActive = true
         };
 
         _context.Tests.Add(test);
         await _context.SaveChangesAsync();
         return Ok(test.Id);
     }
+
     [Authorize(Roles = "Admin,SuperAdmin")]
-    [HttpPost("admin/add-question/{testId}")]
-    public async Task<IActionResult> AddQuestionToTest(Guid testId, [FromBody] AdminQuestionDto dto)
+    [HttpPost("admin/add-item")]
+    public async Task<IActionResult> AddQuizItem([FromBody] LinkQuestionDto dto)
     {
-        var test = await _context.Tests.Include(t => t.QuizItems).FirstOrDefaultAsync(t => t.Id == testId);
-        if (test == null) return NotFound("Test container not found.");
+        // 1. Fetch the test with existing items to check for duplicates
+        var test = await _context.Tests
+            .Include(t => t.QuizItems)
+            .FirstOrDefaultAsync(t => t.Id == dto.TestId);
 
-        // 1. For GrammarStar/Custom questions, we save the prompt/options directly into QuizItem
-        // because they don't always point to a single 'Vocabulary' ID.
-        var newItem = new QuizItem
+        if (test == null) return NotFound("Target test not found.");
+
+        // 2. Manual Sync: Check if this source (Kanji/Vocab/Grammar) is already in this test
+        var existingItem = test.QuizItems?
+            .FirstOrDefault(x => x.SourceId == dto.SourceId);
+
+        if (existingItem != null)
         {
-            Id = Guid.NewGuid(),
-            TestId = testId,
-            DisplayMode = (QuizDisplayMode)dto.DisplayMode,
-            Points = dto.Points,
-            SortOrder = (test.QuizItems?.Count ?? 0) + 1,
+            // UPDATE existing record
+            existingItem.DisplayMode = (QuizDisplayMode)dto.DisplayMode;
+            existingItem.CustomPrompt = dto.CustomPrompt;
+            existingItem.Points = dto.Points;
 
-            // We store the Star Puzzle parts or Custom Prompt here
-            CustomPrompt = dto.DisplayMode == (int)QuizDisplayMode.GrammarStar
-                ? string.Join("|", dto.Options) // Store parts as "A|B|C|D"
-                : dto.Prompt,
+            _context.QuizItems.Update(existingItem);
+        }
+        else
+        {
+            // ADD new record
+            var newItem = new QuizItem
+            {
+                Id = Guid.NewGuid(),
+                TestId = dto.TestId,
+                SourceId = dto.SourceId,
+                DisplayMode = (QuizDisplayMode)dto.DisplayMode,
+                CustomPrompt = dto.CustomPrompt,
+                Points = dto.Points,
+                SortOrder = (test.QuizItems?.Count ?? 0) + 1
+            };
 
-            // If this were a simple Kanji match, we'd find a SourceId. 
-            // For now, we'll keep SourceId as a dummy Guid or Null if your DB allows.
-            SourceId = Guid.NewGuid().ToString()
-        };
+            _context.QuizItems.Add(newItem);
+        }
 
-        _context.QuizItems.Add(newItem);
         await _context.SaveChangesAsync();
-
-        return Ok(new { Message = "Question added", ItemId = newItem.Id });
+        return Ok(new { Message = existingItem != null ? "Updated" : "Added" });
     }
+
+    [HttpPost("start/{testId}")]
+    [HttpPost("start/{testId}")]
+public async Task<ActionResult<int>> StartQuiz(Guid testId)
+{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+    var session = new QuizSession
+    {
+        TestId = testId,
+        UserId = userId,
+        StartedAt = DateTime.UtcNow,
+        FinalScore = 0,
+        IsPassed = false
+    };
+
+    _context.QuizSessions.Add(session);
+    await _context.SaveChangesAsync();
+
+    // session.Id is now populated with the auto-incremented int
+    return Ok(session.Id); 
+}
 }

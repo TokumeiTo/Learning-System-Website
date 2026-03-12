@@ -18,13 +18,11 @@ export const createLesson = async (payload: CreateLessonRequest): Promise<Lesson
     return response.data;
 };
 
-// --- NEW: Update Lesson ---
 export const updateLesson = async (lessonId: string, payload: UpdateLessonRequest): Promise<Lesson> => {
     const response = await api.put(`/api/classroom/lessons/${lessonId}`, payload);
     return response.data;
 };
 
-// --- NEW: Delete Lesson ---
 export const deleteLesson = async (lessonId: string): Promise<void> => {
     await api.delete(`/api/classroom/lessons/${lessonId}`);
 };

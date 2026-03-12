@@ -136,17 +136,17 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
     >
       <DrawerHeader>
         {/* Pass the custom handler instead of just setCategory */}
-        {(user?.position == 'Employee' || user?.position == '') ? (
+        {/* {(user?.position == 'Employee' || user?.position == '') ? (
           <Box sx={{width:'100%', display:'flex', justifyContent: 'center'}}>
             <Typography variant="h6" noWrap component="div" sx={{ userSelect: 'none', display: 'flex', alignItems: 'center' }}>
               <TipsAndUpdatesIcon sx={{ marginRight: 1 }} />
               HLMS
             </Typography>
           </Box>
-        ) : (
+        ) : ( */}
 
           <BasicSelect value={category} onChange={handleCategoryChange} />
-        )}
+        {/* )} */}
         <IconButton onClick={onClose} disabled={isMobile}>
           {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </IconButton>

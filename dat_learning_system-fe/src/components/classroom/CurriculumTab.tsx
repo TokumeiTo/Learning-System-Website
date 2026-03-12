@@ -165,7 +165,7 @@ const CurriculumTab = ({ data, setData, currentLessonId, onLessonSelect, isEditM
                         <Paper elevation={0} sx={{ p: 2, bgcolor: 'rgba(99, 102, 241, 0.05)', borderRadius: 3, border: '1px solid #6366f1' }}>
                             <Stack spacing={2}>
                                 <TextField
-                                    autoFocus fullWidth size="small" placeholder="Lesson Title..."
+                                    autoFocus fullWidth size="small" placeholder="Title..."
                                     value={title} onChange={(e) => setTitle(e.target.value)} variant="standard"
                                     InputProps={{ disableUnderline: true, sx: { color: 'white', fontSize: '0.95rem', fontWeight: 600 } }}
                                 />
@@ -194,7 +194,7 @@ const CurriculumTab = ({ data, setData, currentLessonId, onLessonSelect, isEditM
                                 '&:hover': { border: '1px dashed #6366f1', color: '#6366f1', bgcolor: 'rgba(99, 102, 241, 0.05)' }
                             }}
                         >
-                            Add New Lesson
+                            ADD NEW CURRICULUM
                         </Button>
                     )}
                 </Box>

@@ -1,10 +1,10 @@
+using System.Text.Json;
 using AutoMapper;
 using LMS.Backend.Data.Entities;
 using LMS.Backend.DTOs.Classroom;
 using LMS.Backend.DTOs.Lesson;
 using LMS.Backend.Repo.Interface;
 using LMS.Backend.Services.Interfaces;
-using System.Text.Json;
 
 namespace LMS.Backend.Services.Implement;
 
@@ -12,6 +12,7 @@ public class LessonService(
     ILessonRepository repo,
     ITestService testService,
     IUserProgressRepository progressRepo,
+    IFileService fileService,
     IMapper mapper) : ILessonService
 {
     public async Task<ClassroomLessonDto> CreateLessonAsync(CreateLessonDto dto)
@@ -99,6 +100,17 @@ public class LessonService(
 
     public async Task BulkSaveContentsAsync(SaveLessonContentsDto dto)
     {
+        foreach (var itemDto in dto.Contents)
+        {
+            if (itemDto.ContentType == "image" || itemDto.ContentType == "video" || itemDto.ContentType == "file")
+            {
+                if (!string.IsNullOrEmpty(itemDto.Body))
+                {
+                    // The handler will check if it's JSON, Base64, or already a URL
+                    itemDto.Body = await HandleBase64MediaAsync(itemDto.Body, itemDto.ContentType);
+                }
+            }
+        }
         // 1. Map everything
         var contents = mapper.Map<List<LessonContent>>(dto.Contents);
 
@@ -140,5 +152,100 @@ public class LessonService(
 
         await repo.DeleteLessonAsync(id);
         return true;
+    }
+
+
+    // Helper services
+    private async Task<string> HandleBase64MediaAsync(string body, string contentType)
+    {
+        // 1. If it's already a URL, don't process it, just return as is.
+        if (string.IsNullOrEmpty(body) || body.StartsWith("/uploads/")) return body;
+
+        string base64Data = string.Empty;
+        string fileName = string.Empty;
+
+        try
+        {
+            // 2. Determine if the body is a JSON object or raw Base64
+            if (body.Trim().StartsWith("{"))
+            {
+                var mediaData = JsonSerializer.Deserialize<MediaUploadJson>(body, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                base64Data = mediaData?.Data ?? string.Empty;
+                fileName = mediaData?.Name ?? "upload";
+            }
+            else
+            {
+                base64Data = body;
+                fileName = $"upload_{Guid.NewGuid()}"; // Fallback for raw Base64
+            }
+
+            // 3. Validate that we actually have Base64 data
+            if (!base64Data.StartsWith("data:"))
+            {
+                return body; // Not Base64, return original string to avoid data loss
+            }
+
+            // 4. Extract metadata and bytes
+            // Format: data:image/png;base64,iVBOR...
+            var parts = base64Data.Split(',');
+            if (parts.Length < 2) return body;
+
+            string metadata = parts[0];
+            string base64Content = parts[1];
+            byte[] bytes = Convert.FromBase64String(base64Content);
+
+            // 5. Extract MimeType and Extension
+            // e.g., "data:image/png;base64" -> "image/png" -> "png"
+            string mimeType = metadata.Split(':')[1].Split(';')[0];
+            string extension = mimeType switch
+            {
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => "xlsx",
+                "application/vnd.ms-excel" => "xls",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => "docx",
+                "application/msword" => "doc",
+                "application/pdf" => "pdf",
+                "text/csv" => "csv",
+                _ => mimeType.Contains("/") ? mimeType.Split('/')[1] : "bin"
+            };
+
+            if (!Path.HasExtension(fileName))
+            {
+                fileName = $"{fileName}.{extension}";
+            }
+
+            // 2. Dynamic Folder Routing
+            string folderName = contentType switch
+            {
+                "image" => "images",
+                "video" => "videos",
+                "file" => "documents", // New folder for PDFs/Excel/Word
+                _ => "others"
+            };
+
+            // 7. Wrap in FormFile and save via LocalFileService
+            using var stream = new MemoryStream(bytes);
+            var formFile = new FormFile(stream, 0, bytes.Length, "file", fileName)
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = mimeType
+            };
+
+            // This returns the final path: /uploads/images/filename(1).png
+            return await fileService.UploadFileAsync(formFile, folderName);
+        }
+        catch (Exception)
+        {
+            // If parsing fails, return the original body so the DB doesn't end up null
+            return body;
+        }
+    }
+    private class MediaUploadJson
+    {
+        public string Data { get; set; } = string.Empty;
+        public string? Name { get; set; }
     }
 }

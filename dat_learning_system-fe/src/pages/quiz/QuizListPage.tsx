@@ -1,139 +1,199 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { Box, Card, Typography, CircularProgress, Dialog } from "@mui/material";
-import CheckIcon from "@mui/icons-material/Check";
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import HistoryIcon from "@mui/icons-material/History";
-import FiberNewIcon from "@mui/icons-material/FiberNew";
+import { useLocation, useNavigate } from "react-router-dom";
+import { 
+    Box, Card, Typography, LinearProgress, Button, 
+    Stack, Paper, Dialog, Divider, IconButton 
+} from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import SettingsIcon from '@mui/icons-material/Settings';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 
-import { fetchJlptTests, fetchJlptHistory } from "../../api/jlpt_quiz.api";
+import { fetchJlptTests, fetchJlptHistory, startQuizSession } from "../../api/jlpt_quiz.api";
 import type { JlptTestDto, QuizSession } from "../../types_interfaces/jlptquiz";
 import QuizIntroModal from "../../components/quiz/QuizIntroModal";
-import AdminQuizCreator from "../../components/quiz/AdminQuizCreator";
 import PageLayout from "../../components/layout/PageLayout";
 
+// Your Admin Components
+import AdminQuizCreator from "../../components/admin/AdminQuizCreator";
+import AdminAddQuestion from "../../components/admin/AdminAddQuestion";
+
 export default function QuizListPage() {
+    const navigate = useNavigate();
     const location = useLocation();
-    const { level, category } = location.state || { level: "N5", category: "Kanji" };
+    const { level, category } = location.state || { level: "N3", category: "Grammar" };
 
     const [tests, setTests] = useState<JlptTestDto[]>([]);
     const [history, setHistory] = useState<QuizSession[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTest, setSelectedTest] = useState<JlptTestDto | null>(null);
-    const [openAdminModal, setOpenAdminModal] = useState(false);
+
+    // Admin States
+    const [isAdminMode, setIsAdminMode] = useState(false);
+    const [showCreator, setShowCreator] = useState(false);
+    const [editingTestId, setEditingTestId] = useState<string | null>(null);
 
     const loadData = async () => {
         setLoading(true);
-        const [testData, historyData] = await Promise.all([
-            fetchJlptTests(level, category),
-            fetchJlptHistory(category)
-        ]);
-        setTests(testData);
-        setHistory(historyData);
-        setLoading(false);
+        try {
+            const [testData, historyData] = await Promise.all([
+                fetchJlptTests(level, category),
+                fetchJlptHistory(category)
+            ]);
+            setTests(testData);
+            setHistory(historyData);
+        } catch (err) {
+            console.error("Error loading quiz data", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    useEffect(() => {
-        loadData();
-    }, [level, category]);
+    useEffect(() => { loadData(); }, [level, category]);
 
-    const getTestStatus = (testId: string) => {
-        const session = history.find(h => h.testId === testId);
-        if (!session) return { condition: "untested" };
-        if (session.finishedAt) return {
-            condition: "tested",
-            score: session.finalScore,
-            isPassed: session.isPassed
-        };
-        return { condition: "testing" };
+    const handleStartQuiz = async (testId: string) => {
+        try {
+            const sessionId = await startQuizSession(testId);
+            // SessionId is a number from your backend
+            navigate(`/quiz/run/${testId}`, { state: { sessionId, level, category } });
+        } catch (err) {
+            console.error("Failed to initiate session", err);
+        }
     };
-
-    
 
     return (
         <PageLayout>
-            <Box sx={{ p: 4 }}>
-                <Typography variant="h4" mb={4} textAlign="center">{level} {category} Tests</Typography>
+            <Box sx={{ p: 4, maxWidth: 1200, mx: 'auto' }}>
+                
+                {/* Header Section */}
+                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
+                    <Box>
+                        <Typography variant="h4" fontWeight="800">{level} Assessment</Typography>
+                        <Typography variant="subtitle1" color="text.secondary">{category}</Typography>
+                    </Box>
 
-                <Box sx={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 3 }}>
-
-                    {/* ADMIN: CREATE NEW TEST CARD */}
-                    <Card
-                        onClick={() => setOpenAdminModal(true)}
-                        elevation={2}
-                        sx={{
-                            width: 220, minHeight: 180,
-                            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                            border: '2px dashed', borderColor: 'primary.main', bgcolor: 'action.hover',
-                            cursor: "pointer", transition: "0.3s", "&:hover": { transform: "scale(1.02)", bgcolor: 'white' }
-                        }}
+                    <Button 
+                        startIcon={<SettingsIcon />} 
+                        variant={isAdminMode ? "contained" : "outlined"}
+                        color={isAdminMode ? "secondary" : "inherit"}
+                        onClick={() => setIsAdminMode(!isAdminMode)}
+                        sx={{ borderRadius: 10 }}
                     >
-                        <AddCircleOutlineIcon color="primary" sx={{ fontSize: 50 }} />
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mt={1}>
-                            Create New Test
-                        </Typography>
-                    </Card>
-                    {tests.map((test) => {
-                        const status = getTestStatus(test.id);
-                        return (
-                            <Card
-                                key={test.id}
-                                onClick={() => setSelectedTest(test)}
-                                elevation={5}
-                                sx={{
-                                    cursor: "pointer", width: 220, minHeight: 180,
-                                    display: "flex", flexDirection: "column",
-                                    transition: "0.3s", "&:hover": { transform: "scale(1.05)" }
-                                }}
+                        {isAdminMode ? "Exit Management" : "Manage Quizzes"}
+                    </Button>
+                </Stack>
+
+                {/* Admin Creator Panel */}
+                {isAdminMode && (
+                    <Box sx={{ mb: 4 }}>
+                        {!showCreator ? (
+                            <Button 
+                                fullWidth 
+                                variant="outlined" 
+                                startIcon={<AddIcon />}
+                                onClick={() => setShowCreator(true)}
+                                sx={{ py: 2, borderStyle: 'dashed', borderRadius: 4 }}
                             >
-                                {/* Status Header */}
-                                <Box sx={{
-                                    flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-                                    bgcolor: status.condition === "tested" ? "success.main" :
-                                        status.condition === "testing" ? "primary.main" : "grey.400",
-                                    color: "white", width: '100%'
-                                }}>
-                                    {status.condition === "tested" ? <CheckIcon /> :
-                                        status.condition === "testing" ? <HistoryIcon /> : <FiberNewIcon />}
-                                    <Typography ml={1} variant="subtitle2">
-                                        {status.condition.toUpperCase()}
-                                    </Typography>
+                                Create New {level} {category} Test Container
+                            </Button>
+                        ) : (
+                            <Paper sx={{ p: 1, borderRadius: 4, border: '2px solid', borderColor: 'secondary.main' }}>
+                                <AdminQuizCreator 
+                                    initialLevel={level} 
+                                    initialCategory={category} 
+                                    onSuccess={() => {
+                                        setShowCreator(false);
+                                        loadData();
+                                    }} 
+                                />
+                                <Box sx={{ px: 4, pb: 3 }}>
+                                    <Button color="inherit" onClick={() => setShowCreator(false)}>Cancel</Button>
                                 </Box>
+                            </Paper>
+                        )}
+                    </Box>
+                )}
 
-                                {/* Test Info */}
-                                <Box sx={{ p: 2, textAlign: 'center', flex: 1 }}>
-                                    <Typography variant="subtitle1" fontWeight="bold">
-                                        {test.title}
+                {loading ? <LinearProgress sx={{ mt: 4, borderRadius: 5 }} /> : (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mt: 2 }}>
+                        {tests.map((test) => {
+                            const passed = history.some(h => h.testId === test.id && h.isPassed);
+                            return (
+                                <Card key={test.id} sx={{ p: 3, width: { xs: '100%', sm: 340 }, borderRadius: 5, boxShadow: 2 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                        <Typography variant="h6" fontWeight="700">{test.title}</Typography>
+                                        {passed && <CheckCircleIcon color="success" />}
+                                    </Box>
+                                    
+                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                                        {test.questionCount || 0} Questions Linked
                                     </Typography>
-                                    {status.condition === "tested" && (
-                                        <Typography variant="caption" color="text.secondary">
-                                            Last Score: {status.score}%
-                                        </Typography>
-                                    )}
-                                </Box>
-                            </Card>
-                        );
-                    })}
-                </Box>
 
-                <Dialog
-                    open={openAdminModal}
-                    onClose={() => setOpenAdminModal(false)}
-                    maxWidth="sm"
+                                    <Stack spacing={1}>
+                                        <Button 
+                                            fullWidth 
+                                            variant="contained" 
+                                            onClick={() => setSelectedTest(test)}
+                                            startIcon={<PlayArrowIcon />}
+                                            sx={{ borderRadius: 10, py: 1 }}
+                                        >
+                                            Start Quiz
+                                        </Button>
+
+                                        {isAdminMode && (
+                                            <Button 
+                                                fullWidth 
+                                                variant="outlined" 
+                                                color="secondary"
+                                                onClick={() => setEditingTestId(test.id)}
+                                                sx={{ borderRadius: 10 }}
+                                            >
+                                                Edit / Link Questions
+                                            </Button>
+                                        )}
+                                    </Stack>
+                                </Card>
+                            );
+                        })}
+                    </Box>
+                )}
+
+                {/* Content Linker Dialog */}
+                <Dialog 
+                    open={!!editingTestId} 
+                    onClose={() => setEditingTestId(null)} 
+                    maxWidth="sm" 
                     fullWidth
+                    PaperProps={{ sx: { borderRadius: 5 } }}
                 >
-                    <AdminQuizCreator
-                        initialLevel={level}
-                        initialCategory={category}
-                        onSuccess={() => {
-                            setOpenAdminModal(false);
-                            loadData(); // Refresh list to see new test
-                        }}
-                    />
+                    <Box sx={{ p: 1 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
+                            <IconButton onClick={() => { setEditingTestId(null); loadData(); }}>
+                                <CloseIcon />
+                            </IconButton>
+                        </Box>
+                        {editingTestId && <AdminAddQuestion testId={editingTestId} />}
+                        <Box sx={{ p: 3 }}>
+                            <Button 
+                                fullWidth 
+                                variant="contained" 
+                                onClick={() => { setEditingTestId(null); loadData(); }}
+                                sx={{ borderRadius: 10 }}
+                            >
+                                Finished Editing
+                            </Button>
+                        </Box>
+                    </Box>
                 </Dialog>
 
+                {/* Student Intro Modal */}
                 {selectedTest && (
-                    <QuizIntroModal test={selectedTest} onClose={() => setSelectedTest(null)} />
+                    <QuizIntroModal 
+                        test={selectedTest} 
+                        onClose={() => setSelectedTest(null)} 
+                        onStart={handleStartQuiz} 
+                    />
                 )}
             </Box>
         </PageLayout>
