@@ -32,6 +32,7 @@ const FastOption = memo(({
         name={radioName}
         defaultChecked={isCorrect}
         onChange={onToggle}
+        style={{ cursor: 'pointer' }}
       />
       <TextField
         fullWidth
@@ -84,6 +85,24 @@ const FastQuestion = memo(({
           defaultValue={question.questionText}
           onChange={(e) => { question.questionText = e.target.value }}
           sx={{ "& .MuiInputBase-input": { color: 'white' } }}
+        />
+        <TextField
+          label="Pts"
+          type="number"
+          size="small"
+          defaultValue={question.points || 10}
+          inputProps={{ min: 1, max: 50 }}
+          onChange={(e) => {
+            let val = parseInt(e.target.value);
+            if (val > 50) val = 50;
+            if (val < 1) val = 1;
+            question.points = val;
+          }}
+          sx={{
+            width: '100px',
+            "& .MuiInputBase-input": { color: '#818cf8', fontWeight: 700, textAlign: 'center' },
+            "& .MuiInputLabel-root": { color: 'rgba(255,255,255,0.3)', fontSize: '0.75rem' }
+          }}
         />
         <IconButton color="error" onClick={onRemove}><DeleteIcon /></IconButton>
       </Stack>
@@ -179,14 +198,14 @@ const TestBuilder: React.FC<TestBuilderProps> = ({ initialData, onSave }) => {
         <Stack direction="row" alignItems="center" spacing={1} mb={2}>
           <Settings sx={{ color: '#818cf8', fontSize: 20 }} />
           <Typography variant="subtitle2" sx={{ color: '#818cf8', fontWeight: 700 }}>
-            QUIZ SETTINGS
+            TEST SETTINGS
           </Typography>
         </Stack>
         <Stack direction="row" spacing={2}>
           <TextField
             fullWidth
             size="small"
-            label="Quiz Title"
+            label="Test Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             sx={{ "& .MuiInputBase-input": { color: 'white' }, "& .MuiInputLabel-root": { color: 'gray' } }}
@@ -194,7 +213,7 @@ const TestBuilder: React.FC<TestBuilderProps> = ({ initialData, onSave }) => {
           <TextField
             type="number"
             size="small"
-            label="Passing %"
+            label="Pass %"
             sx={{ width: 120, "& .MuiInputBase-input": { color: 'white' }, "& .MuiInputLabel-root": { color: 'gray' } }}
             value={passingGrade}
             onChange={(e) => setPassingGrade(parseInt(e.target.value) || 0)}

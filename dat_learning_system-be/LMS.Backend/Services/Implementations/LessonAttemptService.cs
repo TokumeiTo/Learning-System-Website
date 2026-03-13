@@ -11,18 +11,44 @@ public class LessonAttemptService(
     ILessonAttemptRepository attemptRepo,
     IUserProgressRepository progressRepo,
     ILessonRepository lessonRepo,
+    ITestRepository testRepo,
     IMapper mapper,
     AppDbContext context) : ILessonAttemptService
 {
     // --- Student Logic ---
     public async Task<List<LessonResultDto>> GetMyAttemptsAsync(string userId, Guid lessonId)
     {
-        // USE progressRepo: Verify user has actually accessed this lesson before showing results
+        // 1. Verify progress/access
         var progress = await progressRepo.GetProgressAsync(userId, lessonId);
         if (progress == null) return new List<LessonResultDto>();
 
+        // 2. Get raw attempts
         var attempts = await attemptRepo.GetUserAttemptsForLessonAsync(userId, lessonId);
-        return mapper.Map<List<LessonResultDto>>(attempts);
+        if (!attempts.Any()) return new List<LessonResultDto>();
+
+        // 3. Get the Test structure to build the Correct Answer Key
+        // We take the TestId from the latest attempt
+        var testId = attempts.First().TestId;
+        var test = await testRepo.GetTestByIdWithAnswersAsync(testId);
+
+        // Create a dictionary of QuestionId -> CorrectOptionId
+        var correctKey = test?.Questions.ToDictionary(
+            q => q.Id,
+            q => q.Options.FirstOrDefault(o => o.IsCorrect)?.Id ?? Guid.Empty
+        ) ?? new Dictionary<Guid, Guid>();
+
+        // 4. Map to DTO and deserialize the saved answers
+        return attempts.Select(a => new LessonResultDto
+        {
+            Percentage = a.Percentage,
+            IsPassed = a.IsPassed,
+            AttemptedAt = a.AttemptedAt,
+            // DESERIALIZE: Convert the DB string back to a Dictionary for the React frontend
+            UserAnswers = string.IsNullOrEmpty(a.AnswerJson)
+                ? new Dictionary<Guid, Guid>()
+                : System.Text.Json.JsonSerializer.Deserialize<Dictionary<Guid, Guid>>(a.AnswerJson),
+            CorrectAnswers = correctKey
+        }).ToList();
     }
 
     // --- Admin KPI Logic ---

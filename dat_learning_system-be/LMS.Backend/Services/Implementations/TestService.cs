@@ -36,6 +36,11 @@ public class TestService : ITestService
         var test = await _testRepo.GetTestByIdWithAnswersAsync(submission.TestId);
         if (test == null) throw new KeyNotFoundException("Specified test not found.");
 
+        var correctMapping = test.Questions.ToDictionary(
+            q => q.Id,
+            q => q.Options.FirstOrDefault(o => o.IsCorrect)?.Id ?? Guid.Empty
+        );
+
         // 2. Calculate weighted score
         int earnedPoints = 0;
         foreach (var question in test.Questions)
@@ -91,7 +96,9 @@ public class TestService : ITestService
             MaxScore = totalPoints,
             Percentage = attempt.Percentage,
             IsPassed = isPassed,
-            AttemptedAt = attempt.AttemptedAt
+            AttemptedAt = attempt.AttemptedAt,
+            UserAnswers = submission.Answers,
+            CorrectAnswers = correctMapping
         };
     }
 }

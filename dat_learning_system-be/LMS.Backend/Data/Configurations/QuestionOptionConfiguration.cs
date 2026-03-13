@@ -9,6 +9,8 @@ public class QuestionOptionConfiguration : IEntityTypeConfiguration<QuestionOpti
     public void Configure(EntityTypeBuilder<QuestionOption> builder)
     {
         builder.HasKey(o => o.Id);
+
+        builder.Property(o=> o.Id).ValueGeneratedNever();
         
         builder.Property(o => o.OptionText)
                .IsRequired()

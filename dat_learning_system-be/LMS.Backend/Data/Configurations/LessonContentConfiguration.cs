@@ -14,8 +14,6 @@ public class LessonContentConfiguration : IEntityTypeConfiguration<LessonContent
 
         builder.Property(c => c.ContentType).IsRequired().HasMaxLength(50);
 
-        // Use nvarchar(max) or text depending on your DB provider (SQL Server vs PostgreSQL)
-        // For SQL Server, nvarchar(max) is usually preferred over 'text'
         builder.Property(c => c.Body).IsRequired(false);
 
         // Relationship: Content -> Lesson

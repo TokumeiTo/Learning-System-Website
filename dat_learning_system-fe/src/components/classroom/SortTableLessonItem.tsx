@@ -9,6 +9,7 @@ import {
     Lock as LockIcon,
     LockOpen as LockOpenIcon,
 } from '@mui/icons-material';
+import QuizIcon from '@mui/icons-material/Quiz';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -98,6 +99,7 @@ const SortableLessonItem = ({
                 onClick={() => !isEditing && onSelect()}
                 sx={{
                     borderRadius: 2,
+                    minHeight: '70px',
                     px: 1,
                     transition: '0.2s',
                     '&.Mui-disabled': { opacity: 0.5, cursor: 'not-allowed' },
@@ -140,14 +142,13 @@ const SortableLessonItem = ({
                                 <CheckCircle fontSize="small" />
                             </motion.div>
                         ) : isTestLesson ? (
-                            // SHOW THIS FOR "TEST" TITLES
                             <motion.div
                                 key="test-icon"
                                 initial={{ opacity: 0, rotate: -20 }}
                                 animate={{ opacity: 1, rotate: 0 }}
                             >
                                 {/* Assignment or Quiz icon works well for "Tests" */}
-                                <EditIcon fontSize="small" sx={{ color: testColor }} />
+                                <QuizIcon fontSize="small" sx={{ color: 'cyan' }} />
                             </motion.div>
                         ) : (
                             // DEFAULT PLAY CIRCLE
@@ -172,7 +173,10 @@ const SortableLessonItem = ({
                                 InputProps={{ disableUnderline: true, sx: { color: 'white', fontSize: '0.875rem', fontWeight: 600 } }}
                             />
                         ) : (
-                            <Typography variant="body2" sx={{ color: 'white', fontWeight: currentLessonId === item.id ? 900 : 500 }}>
+                            <Typography variant="body2" sx={{
+                                color: (isTestLesson && !item.isLocked) ? 'cyan' : 'white',
+                                fontWeight: currentLessonId === item.id ? 900 : 500
+                            }}>
                                 {item.title}
                             </Typography>
                         )

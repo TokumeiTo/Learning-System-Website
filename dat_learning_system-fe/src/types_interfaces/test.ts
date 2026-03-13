@@ -33,6 +33,8 @@ export interface LessonResult {
   isPassed: boolean;
   attemptedAt: string;
   correctOptionIds?: string[];
+  userAnswers?: Record<string, string>;
+  correctAnswers?: Record<string, string>;
 }
 
 // Attempts handling

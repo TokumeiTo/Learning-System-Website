@@ -26,8 +26,8 @@ export const submitLessonTest = async (submission: LessonSubmission): Promise<Le
 /**
  * STUDENT: Fetch personal attempt history for a specific lesson
  */
-export const fetchMyAttemptHistory = async (lessonId: string): Promise<LessonAttempt[]> => {
-    const res = await api.get(`/api/Test/my-attempts/${lessonId}`);
+export const fetchMyAttemptHistory = async (lessonId: string): Promise<LessonResult[]> => {
+    const res = await api.get<LessonResult[]>(`/api/Test/my-attempts/${lessonId}`);
     return res.data;
 };
 

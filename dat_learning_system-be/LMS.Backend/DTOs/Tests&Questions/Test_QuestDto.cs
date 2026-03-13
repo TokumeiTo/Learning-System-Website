@@ -3,7 +3,7 @@ namespace LMS.Backend.DTOs.Test_Quest;
 public class TestDto
 {
     public Guid Id { get; set; }
-    public string? title { get; set; }
+    public string? Title { get; set; }
     public List<QuestionDto> Questions { get; set; } = new();
     public int PassingGrade { get; set; }
     public bool IsActive { get; set; } = true;
@@ -43,6 +43,9 @@ public class LessonResultDto
     public decimal Percentage { get; set; }    // (Score / MaxScore) * 100
     public bool IsPassed { get; set; }       // Based on Lesson.PassingScore
     public DateTime AttemptedAt { get; set; }
+
+    public Dictionary<Guid, Guid>? UserAnswers { get; set; }
+    public Dictionary<Guid, Guid>? CorrectAnswers { get; set; }
 }
 
 

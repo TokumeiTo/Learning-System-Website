@@ -12,7 +12,7 @@ export const ButtonClickLoader = ({ message = "処理中...", kanji = "識" }) =
     <Box
       sx={{
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        bgcolor: 'rgba(255, 255, 255, 0.8)',
+        bgcolor: 'rgba(197, 232, 255, 0.8)',
         backdropFilter: 'blur(2px)',
         zIndex: 10,
         display: 'flex', flexDirection: 'column',

@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Box, Paper, Typography, Button, Stack, Radio, RadioGroup, FormControlLabel, Alert, CircularProgress, Divider } from '@mui/material';
+import { useState, useEffect, useCallback } from 'react';
+import { Box, Paper, Typography, Button, Stack, Alert, CircularProgress } from '@mui/material';
 import { Send, Refresh, Quiz, Visibility } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import type { Test } from '../../types_interfaces/test';
-import { submitLessonTest } from '../../api/test.api';
+import { fetchMyAttemptHistory, submitLessonTest } from '../../api/test.api';
+import QuizQuestion from './QuizQuestion';
 
 interface Props {
     data: Test;
@@ -17,10 +18,13 @@ interface Props {
 
 const QuizViewer = ({ data, testId, onFinish, isLocked, lessonId, existingScore, isCompleted }: Props) => {
     const [answers, setAnswers] = useState<Record<string, string>>({});
+    const [correctMapping, setCorrectMapping] = useState<Record<string, string>>({});
     const [submitted, setSubmitted] = useState(isCompleted || false);
     const [score, setScore] = useState(existingScore || 0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showQuestions, setShowQuestions] = useState(false);
+
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
     const passingThreshold = data.passingGrade || 70;
     const isPassed = score >= passingThreshold;
@@ -47,11 +51,37 @@ const QuizViewer = ({ data, testId, onFinish, isLocked, lessonId, existingScore,
         // This prevents the "flash to 0%" when the parent re-renders after completion.
     }, [lessonId, testId]);
 
+    useEffect(() => {
+        const loadAttemptHistory = async () => {
+            // Only fetch if the lesson is completed and we have a lessonId
+            if (showQuestions && isCompleted && lessonId && Object.keys(answers).length === 0) {
+                setIsLoadingHistory(true);
+                try {
+                    const history = await fetchMyAttemptHistory(lessonId);
+                    if (history && history.length > 0) {
+                        const latest = history[0];
+                        if (latest.correctAnswers) setCorrectMapping(latest.correctAnswers);
+                        if (latest.userAnswers) setAnswers(latest.userAnswers);
+                    }
+                } catch (err) {
+                    console.error("Could not load quiz review data:", err);
+                } finally {
+                    setIsLoadingHistory(false);
+                }
+            }
+        };
+
+        loadAttemptHistory();
+    }, [showQuestions, isCompleted, lessonId, answers]);
+
     const handleSubmit = async () => {
         if (isLocked || !lessonId || isSubmitting) return;
         setIsSubmitting(true);
         try {
             const result = await submitLessonTest({ lessonId: lessonId!, testId: testId, answers });
+            if (result.correctAnswers) {
+                setCorrectMapping(result.correctAnswers);
+            }
             const newPercentage = result.percentage;
             const passed = result.isPassed;
             setScore(newPercentage);
@@ -63,6 +93,14 @@ const QuizViewer = ({ data, testId, onFinish, isLocked, lessonId, existingScore,
             setIsSubmitting(false);
         }
     };
+
+    const handleAnswer = useCallback((questionId: string, value: string) => {
+        if (submitted) return;
+        setAnswers(prev => {
+            if (prev[questionId] === value) return prev;
+            return { ...prev, [questionId]: value };
+        });
+    }, [submitted]);
 
     // --- RENDER 1: COMPLETED SUMMARY ---
     if (submitted && !showQuestions) {
@@ -90,11 +128,12 @@ const QuizViewer = ({ data, testId, onFinish, isLocked, lessonId, existingScore,
                 <Stack direction="row" spacing={2} justifyContent="center">
                     <Button
                         variant="outlined"
-                        startIcon={<Visibility />}
+                        startIcon={isLoadingHistory ? <CircularProgress size={20} color="inherit" /> : <Visibility />}
                         onClick={() => setShowQuestions(true)}
+                        disabled={isLoadingHistory}
                         sx={{ color: 'white', borderColor: '#334155' }}
                     >
-                        Review Answers
+                        {isLoadingHistory ? 'Loading Results...' : 'Review Answers'}
                     </Button>
                     {!isLocked && (
                         <Button
@@ -102,8 +141,10 @@ const QuizViewer = ({ data, testId, onFinish, isLocked, lessonId, existingScore,
                             startIcon={<Refresh />}
                             onClick={() => {
                                 setSubmitted(false);
-                                setAnswers({});
-                                setScore(0); // Clear the local state so they start fresh
+                                setShowQuestions(false); // Go back to the main view
+                                setAnswers({});          // Clear choices
+                                setCorrectMapping({});   // CLEAR the answer key so they can't see the answers
+                                setScore(0);
                             }}
                             sx={{ bgcolor: '#6366f1' }}
                         >
@@ -131,48 +172,18 @@ const QuizViewer = ({ data, testId, onFinish, isLocked, lessonId, existingScore,
 
             <Stack spacing={4}>
                 {data.questions.map((q, index) => {
-                    const questionId = q.id || `q-${index}`;
+                    const qId = q.id || `temp-${index}`;
                     return (
-                        <Box key={questionId} sx={{ p: 2, borderRadius: 2, bgcolor: 'rgba(255,255,255,0.03)' }}>
-                            <Typography sx={{ color: 'white', mb: 2, fontWeight: 500 }}>
-                                {index + 1}. {q.questionText}
-                            </Typography>
-
-                            <RadioGroup
-                                value={answers[questionId] || ''}
-                                onChange={(e) => !submitted && setAnswers(prev => ({ ...prev, [questionId]: e.target.value }))}
-                            >
-                                {q.options.map((opt) => {
-                                    const isCorrect = opt.isCorrect;
-                                    const isSelected = answers[questionId] === opt.id;
-                                    let labelColor = 'rgba(255,255,255,0.7)';
-                                    if (submitted) {
-                                        if (isCorrect) labelColor = '#10b981';
-                                        else if (isSelected) labelColor = '#f43f5e';
-                                    }
-
-                                    return (
-                                        <FormControlLabel
-                                            key={opt.id}
-                                            value={opt.id}
-                                            disabled={submitted || isLocked}
-                                            control={<Radio size="small" sx={{ color: 'rgba(255,255,255,0.3)', '&.Mui-checked': { color: '#818cf8' } }} />}
-                                            sx={{ color: labelColor }}
-                                            label={
-                                                <Stack direction="row" spacing={1} alignItems="center">
-                                                    <Typography variant="body2">{opt.optionText}</Typography>
-                                                    {submitted && isCorrect && (
-                                                        <Typography variant="caption" sx={{ color: '#10b981', bgcolor: 'rgba(16, 185, 129, 0.1)', px: 0.5, borderRadius: 0.5, fontWeight: 700, fontSize: '0.65rem' }}>
-                                                            CORRECT
-                                                        </Typography>
-                                                    )}
-                                                </Stack>
-                                            }
-                                        />
-                                    );
-                                })}
-                            </RadioGroup>
-                        </Box>
+                        <QuizQuestion
+                            key={qId}
+                            q={q}
+                            index={index}
+                            currentAnswer={answers[qId] || ''}
+                            correctAnswerId={correctMapping[qId]}
+                            submitted={submitted}
+                            isLocked={isLocked || false}
+                            onAnswer={handleAnswer}
+                        />
                     );
                 })}
             </Stack>
