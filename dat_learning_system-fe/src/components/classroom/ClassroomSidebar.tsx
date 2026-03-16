@@ -2,6 +2,7 @@ import { memo, useCallback, useState } from 'react';
 import { Paper, Tabs, Tab, Box, Typography, Fade } from '@mui/material';
 import type { ClassroomView } from '../../types_interfaces/classroom';
 import CurriculumTab from './CurriculumTab';
+import ClassworkTab from './ClassworkTab';
 
 interface Props {
   data: ClassroomView;
@@ -97,10 +98,11 @@ const ClassroomSidebar = memo(({
         {/* Tab Panel: Classwork */}
         {activeTab === 1 && (
           <Fade in={activeTab === 1}>
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)' }}>
-                Assignments and resources will appear here.
-              </Typography>
+            <Box>
+              <ClassworkTab
+                courseId={data.courseId} // Assuming your data prop has the course ID
+                isEditMode={isEditMode}
+              />
             </Box>
           </Fade>
         )}
@@ -119,7 +121,5 @@ const ClassroomSidebar = memo(({
     </Paper>
   );
 });
-
-ClassroomSidebar.displayName = 'ClassroomSidebar';
 
 export default ClassroomSidebar;

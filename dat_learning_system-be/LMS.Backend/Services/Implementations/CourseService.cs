@@ -1,72 +1,58 @@
 using AutoMapper;
-using LMS.Backend.Common;
 using LMS.Backend.Data.Entities;
 using LMS.Backend.DTOs.Course;
 using LMS.Backend.Repo.Interface;
 using LMS.Backend.Services.Interfaces;
+using LMS.Backend.Common;
 
 namespace LMS.Backend.Services.Implement;
 
 public class CourseService : ICourseService
 {
     private readonly ICourseRepository _courseRepo;
-    private readonly ITopicRepository _topicRepo;
+    private readonly IClassworkRepository _classworkRepo; // Updated from ITopicRepository
     private readonly IMapper _mapper;
-    private readonly IWebHostEnvironment _environment;
+    private readonly IFileService _fileService; // Using your LocalFileService
 
     public CourseService(
         ICourseRepository courseRepo,
-        ITopicRepository topicRepo,
+        IClassworkRepository classworkRepo,
         IMapper mapper,
-        IWebHostEnvironment environment
+        IFileService fileService
     )
     {
         _courseRepo = courseRepo;
-        _topicRepo = topicRepo;
+        _classworkRepo = classworkRepo;
         _mapper = mapper;
-        _environment = environment;
+        _fileService = fileService;
     }
 
     public async Task<CourseDetailDto?> GetCourseByIdAsync(Guid id)
     {
-        // Use your repo method with .Include() logic
         var course = await _courseRepo.GetFullClassroomDetailsAsync(id);
-
         if (course == null) return null;
 
         return _mapper.Map<CourseDetailDto>(course);
     }
+
     public async Task<Course> CreateCourseAsync(CreateCourseDto dto, string creatorId)
     {
         // 1. Map basic fields
         var course = _mapper.Map<Course>(dto);
 
-        // 2. Parse Enums (Crucial: if these fail, the record won't save correctly)
+        // 2. Parse Enums & Badge
         course.Status = Enum.TryParse<CourseStatus>(dto.Status, true, out var status)
                         ? status : CourseStatus.Draft;
 
-        // Replace the old Badge parsing logic with this:
         course.Badge = string.IsNullOrWhiteSpace(dto.Badge)
-               ? "GENERAL"
-               : dto.Badge.Trim().ToUpper();
+                       ? "GENERAL"
+                       : dto.Badge.Trim().ToUpper();
 
-        // 3. File Upload Logic
+        // 3. File Upload using LocalFileService
         if (dto.ThumbnailFile != null && dto.ThumbnailFile.Length > 0)
         {
-            string baseRoot = _environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-            string uploadsFolder = Path.Combine(baseRoot, "uploads");
-
-            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-
-            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(dto.ThumbnailFile.FileName);
-            string fullFilePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var fileStream = new FileStream(fullFilePath, FileMode.Create))
-            {
-                await dto.ThumbnailFile.CopyToAsync(fileStream);
-            }
-
-            course.Thumbnail = $"/uploads/{fileName}";
+            // Reusing your logic: uploads/thumbnails/filename
+            course.Thumbnail = await _fileService.UploadFileAsync(dto.ThumbnailFile, "thumbnails");
         }
         else
         {
@@ -75,22 +61,21 @@ public class CourseService : ICourseService
 
         // 4. Add Course to Repo
         await _courseRepo.AddAsync(course);
-
-        // IMPORTANT: Save changes here first to generate the Course ID in the DB
         await _courseRepo.SaveChangesAsync();
 
-        // 5. Create Default Topic
-        var defaultTopic = new Topic
+        // 5. Create Default Topic (Using new ClassworkTopic entity)
+        var defaultTopic = new ClassworkTopic
         {
             Id = Guid.NewGuid(),
             Title = "General Announcements & Introduction",
-            CourseId = course.Id // Now we are sure this ID exists in the DB
+            CourseId = course.Id,
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = creatorId,
+            Items = new() // Keep compiler happy (no null warnings)
         };
 
-        await _topicRepo.AddAsync(defaultTopic);
-
-        // 6. Final Save for the Topic
-        await _courseRepo.SaveChangesAsync();
+        // Use the new repository method we just built
+        await _classworkRepo.CreateTopicAsync(defaultTopic);
 
         return course;
     }

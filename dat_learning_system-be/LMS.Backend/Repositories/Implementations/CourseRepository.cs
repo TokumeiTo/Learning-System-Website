@@ -13,11 +13,17 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
     {
         return await _context.Courses
             .Include(c => c.Lessons)
-                .ThenInclude(l => l.Contents) // The "Free Will" blocks
-            .Include(c => c.Topics)
-                .ThenInclude(t => t.Assignments) // The "Google Classroom" part
+                .ThenInclude(l => l.Contents) // The "Curriculum" part
+            .Include(c => c.ClassworkTopics)  // Updated from .Topics
+                .ThenInclude(t => t.Items)     // Updated from .Assignments
+                    .ThenInclude(i => i.Resources)
+            .Include(c => c.ClassworkTopics)
+                .ThenInclude(t => t.Items)
+                    .ThenInclude(i => i.Submissions)
+            .AsNoTracking() // Recommended for "Get" details to improve performance
             .FirstOrDefaultAsync(c => c.Id == courseId);
     }
+
     public async Task UpdateRatingCacheAsync(Guid courseId, double newAverage, int newCount)
     {
         var course = await _dbSet.FindAsync(courseId);
@@ -25,9 +31,8 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
         {
             course.Rating = newAverage;
             course.ReviewCount = newCount;
-            // No need to call _dbSet.Update(course) because FindAsync 
-            // attaches it to the tracker automatically. 
-            // It will be saved when SaveChangesAsync is called in the service.
+            // No need for SaveChangesAsync here as it should be handled 
+            // by the Service/Unit of Work pattern.
         }
     }
 }

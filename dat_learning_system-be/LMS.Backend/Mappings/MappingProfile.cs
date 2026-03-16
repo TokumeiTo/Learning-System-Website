@@ -7,13 +7,13 @@ using LMS.Backend.DTOs.User;
 using LMS.Backend.DTOs.Classroom;
 using LMS.Backend.DTOs.Lesson;
 using LMS.Backend.DTOs.Enrollment;
-using LMS.Backend.DTOs.Topic;
 using LMS.Backend.DTOs.Audit;
 using LMS.Backend.DTOs.Test_Quest;
 using LMS.Backend.DTOs.Announce_Noti;
 using LMS.Backend.Common;
 using LMS.Backend.DTOs.Flashcard;
 using LMS.Backend.Data;
+using LMS.Backend.DTOs.Classwork;
 
 namespace LMS.Backend.Helpers;
 
@@ -64,9 +64,6 @@ public class MappingProfile : Profile
         .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src.Badge.ToString()))
         .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
-        CreateMap<Topic, TopicDto>();
-        CreateMap<Lesson, LessonDto>();
-
         // --- LESSON MAPPING ---
         // Consolidate into one mapping for creation
         CreateMap<CreateLessonDto, Lesson>()
@@ -94,6 +91,29 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.CourseTitle, opt => opt.MapFrom(src => src.Title))
             .ForMember(dest => dest.Lessons, opt => opt.MapFrom(src => src.Lessons));
+
+        // --- CLASSWORK MAPPING ---
+        CreateMap<ClassworkTopic, ClassworkTopicDto>();
+        
+        CreateMap<ClassworkItem, ClassworkItemDto>()
+            .ForMember(dest => dest.MySubmission, opt => opt.MapFrom((src, dest, destMember, context) =>
+            {
+                // Look for the current user's ID in the mapping context
+                if (context.Items.TryGetValue("CurrentUserId", out var userIdObj) && userIdObj is string currentUserId)
+                {
+                    var submission = src.Submissions.FirstOrDefault(s => s.UserId == currentUserId);
+                    return context.Mapper.Map<ClassworkSubmissionDto>(submission);
+                }
+                return null;
+            }));
+        
+        CreateMap<ClassworkResource, ClassworkResourceDto>();
+
+        CreateMap<ClassworkSubmission, ClassworkSubmissionDto>()
+            .ForMember(dest => dest.Feedback, opt => opt.MapFrom(src => src.Feedback ?? string.Empty));
+            
+        CreateMap<CreateClassworkItemDto, ClassworkItem>()
+            .ForMember(dest => dest.Resources, opt => opt.Ignore());
 
         // --- PROGRESS MAPPING ---
         CreateMap<UserLessonProgress, LessonProgressDto>();

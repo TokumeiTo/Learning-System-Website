@@ -1,5 +1,5 @@
 using LMS.Backend.DTOs.Lesson;
-using LMS.Backend.DTOs.Topic;
+using LMS.Backend.DTOs.Classwork;
 
 namespace LMS.Backend.DTOs.Course;
 public class CourseDetailDto
@@ -16,6 +16,6 @@ public class CourseDetailDto
     public string Status { get; set; } = string.Empty;
 
     // Collections for the Modal Syllabus
-    public List<TopicDto> Topics { get; set; } = new();
+    public List<ClassworkTopicDto> Topics { get; set; } = new();
     public List<LessonDto> Lessons { get; set; } = new();
 }

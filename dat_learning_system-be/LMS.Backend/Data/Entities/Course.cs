@@ -25,6 +25,6 @@ public class Course
     // Soft delete logic: Use 'Closed' to hide courses without deleting them from DB
     public CourseStatus Status { get; set; } = CourseStatus.Draft;
 
-    public List<Topic> Topics { get; set; } = new();
+    public List<ClassworkTopic> ClassworkTopics { get; set; } = new();
     public List<Lesson> Lessons { get; set; } = new();
 }

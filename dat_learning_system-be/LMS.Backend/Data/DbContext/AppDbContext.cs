@@ -22,9 +22,10 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<LessonAttempt> LessonAttempts { get; set; }
     // ------------------------------
     public DbSet<AuditLog> AuditLogs { get; set; }
-    public DbSet<Topic> Topics { get; set; }
-    public DbSet<Assignment> Assignments { get; set; }
-    public DbSet<Submission> Submissions { get; set; }
+    public DbSet<ClassworkTopic> ClassworkTopic { get; set; }
+    public DbSet<ClassworkItem> ClassworkItem { get; set; }
+    public DbSet<ClassworkSubmission> ClassworkSubmission { get; set; }
+    public DbSet<ClassworkResource> ClassworkResource { get; set; }
     public DbSet<Enrollment> Enrollments { get; set; }
     public DbSet<CourseRating> CourseRatings { get; set; }
     public DbSet<UserLessonProgress> UserLessonProgresses { get; set; }
@@ -62,7 +63,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
                 .OnDelete(DeleteBehavior.Restrict); // Prevent accidental cascading deletes
         });
 
-        // 2. Configure ApplicationUser mapping to OrgUnit
+        // 2. Configure ApplicationUser mapping to Configuratins
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         // 3. Seed initial management data

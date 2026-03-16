@@ -165,4 +165,13 @@ public class UserService : IUserService
         // 4. Execute Deletion
         return await _userRepo.DeleteAsync(targetUser);
     }
+
+    public async Task<UserResponseDto?> GetUserByIdAsync(string id)
+    {
+        var user = await _userRepo.GetByIdAsync(id);
+        if (user == null) return null;
+
+        // Use your existing mapping logic to return UserResponseDto
+        return _mapper.Map<UserResponseDto>(user);
+    }
 }
