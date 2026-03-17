@@ -61,8 +61,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Badge, opt => opt.Ignore())
             .ForMember(dest => dest.Thumbnail, opt => opt.Ignore());
         CreateMap<Course, CourseDetailDto>()
-        .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src.Badge.ToString()))
-        .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+            .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src.Badge.ToString()))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+        
 
         // --- LESSON MAPPING ---
         // Consolidate into one mapping for creation
@@ -94,7 +95,7 @@ public class MappingProfile : Profile
 
         // --- CLASSWORK MAPPING ---
         CreateMap<ClassworkTopic, ClassworkTopicDto>();
-        
+
         CreateMap<ClassworkItem, ClassworkItemDto>()
             .ForMember(dest => dest.MySubmission, opt => opt.MapFrom((src, dest, destMember, context) =>
             {
@@ -106,12 +107,17 @@ public class MappingProfile : Profile
                 }
                 return null;
             }));
-        
+
         CreateMap<ClassworkResource, ClassworkResourceDto>();
 
         CreateMap<ClassworkSubmission, ClassworkSubmissionDto>()
             .ForMember(dest => dest.Feedback, opt => opt.MapFrom(src => src.Feedback ?? string.Empty));
-            
+
+        CreateMap<ClassworkSubmission, AdminSubmissionViewDto>()
+            .ForMember(dest => dest.StudentId, opt => opt.MapFrom(src => src.UserId))
+            // StudentName will be populated manually in the service to avoid complex DB joins in the profile
+            .ForMember(dest => dest.StudentName, opt => opt.Ignore());
+
         CreateMap<CreateClassworkItemDto, ClassworkItem>()
             .ForMember(dest => dest.Resources, opt => opt.Ignore());
 
@@ -252,7 +258,7 @@ public class MappingProfile : Profile
         // Request -> Entity (For POST/PUT requests)
         CreateMap<OnomatoUpsertRequestDto, Onomatopoeia>()
             .ForMember(dest => dest.Examples, opt => opt.MapFrom(src => src.Examples));
-            
+
         CreateMap<OnomatoExampleDto, OnomatopoeiaExample>();
     }
 }

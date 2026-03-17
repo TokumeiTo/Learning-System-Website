@@ -27,11 +27,19 @@ export default function AppLoader({
   fullscreen = true,
   kanji = "学",
 }: Props) {
-  const [tipIndex, setTipIndex] = useState(0);
+  // 1. Start with a random index so every load feels different
+  const [tipIndex, setTipIndex] = useState(() => Math.floor(Math.random() * TIPS.length));
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTipIndex((i) => (i + 1) % TIPS.length);
+      // 2. Pick a random index that isn't the current one for the next cycle
+      setTipIndex((prevIndex) => {
+        let nextIndex;
+        do {
+          nextIndex = Math.floor(Math.random() * TIPS.length);
+        } while (nextIndex === prevIndex);
+        return nextIndex;
+      });
     }, 3500);
 
     return () => clearInterval(interval);
@@ -40,8 +48,8 @@ export default function AppLoader({
   return (
     <Box
       sx={{
-        minHeight: "calc(100vh - 165px)",
-        mt: '-100px',
+        height: fullscreen ? "calc(100vh - 165px)" : "400px",
+        mt: fullscreen ? '-100px' : 0,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

@@ -85,7 +85,7 @@ export default function ProfessionalLMSSchedule() {
                                 <Typography variant="h6" fontWeight={700} gutterBottom>Up Next</Typography>
                                 <Typography variant="body2" sx={{ opacity: 0.8, mb: 2 }}>You have a deadline for CS502 in 4 hours.</Typography>
                                 <Button fullWidth sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.2)', borderRadius: 2 }} variant="outlined">
-                                    View Assignment
+                                    Attach your Assignment
                                 </Button>
                             </Box>
                         </Box>

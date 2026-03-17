@@ -70,7 +70,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
                 transition={{ duration: 0.2 }}
                 style={{ width: "100%" }}
               >
-                <AppLoader fullscreen={false} />
+                <AppLoader fullscreen={true} />
               </motion.div>
             ) : (
               <Box

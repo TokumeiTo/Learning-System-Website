@@ -1,5 +1,5 @@
 import type { Lesson } from "./classroom";
-import type { Topic } from "./topic";
+import type { ClassworkTopic } from "./classwork";
 
 export interface Course {
     id: string; // Guid from .NET
@@ -14,7 +14,7 @@ export interface Course {
     badge: 'Beginner' | 'Intermediate' | 'Advanced' | string;
     enrolledCount: number;
     status: 'Published' | 'Draft' | 'Closed' | string;
-    topics?: Topic[];
+    classworkTopics?: ClassworkTopic[];
     lessons?: Lesson[];
 }
 

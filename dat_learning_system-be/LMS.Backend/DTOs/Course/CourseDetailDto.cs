@@ -16,6 +16,6 @@ public class CourseDetailDto
     public string Status { get; set; } = string.Empty;
 
     // Collections for the Modal Syllabus
-    public List<ClassworkTopicDto> Topics { get; set; } = new();
+    public List<ClassworkTopicDto> ClassworkTopics { get; set; } = new();
     public List<LessonDto> Lessons { get; set; } = new();
 }

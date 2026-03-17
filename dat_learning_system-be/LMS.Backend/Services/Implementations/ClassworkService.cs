@@ -120,7 +120,7 @@ public class ClassworkService(
         return mapper.Map<ClassworkSubmissionDto>(submission);
     }
 
-    public async Task<List<ClassworkTopicDto>> GetCourseClassworkAsync(Guid courseId, string? userId = null)
+    public async Task<List<ClassworkTopicDto>> GetCourseClassworkAsync(Guid courseId, string? userId = null, bool isEditMode = false)
     {
         var data = await repo.GetFullClassworkByCourseAsync(courseId);
         var dtos = mapper.Map<List<ClassworkTopicDto>>(data, opt =>
@@ -128,11 +128,68 @@ public class ClassworkService(
             if (!string.IsNullOrEmpty(userId)) opt.Items["CurrentUserId"] = userId;
         });
 
-        // Populate Creator Names (Optional: optimization would be doing this in SQL join)
-        foreach (var item in dtos.SelectMany(t => t.Items))
+        var now = DateTime.UtcNow;
+        var allItems = dtos.SelectMany(t => t.Items).ToList();
+
+        // 1. Collect all Unique User IDs (Creators + Students if Admin)
+        var userIdsToFetch = allItems.Select(i => i.CreatedBy).Distinct().ToList();
+
+        if (isEditMode)
         {
-            var user = await userRepository.GetByIdAsync(item.CreatedBy);
-            item.CreatedByName = user?.FullName ?? "Unknown User";
+            // Add student IDs from submissions to the fetch list
+            var allSubmissionsForItems = new Dictionary<Guid, List<ClassworkSubmission>>();
+            foreach (var itemDto in allItems)
+            {
+                var subs = await repo.GetSubmissionsByItemAsync(itemDto.Id);
+                allSubmissionsForItems[itemDto.Id] = subs;
+                userIdsToFetch.AddRange(subs.Select(s => s.UserId));
+            }
+            userIdsToFetch = userIdsToFetch.Distinct().ToList();
+
+            // 2. Bulk Fetch Users from DB (1 Query instead of N queries)
+            var usersMap = (await userRepository.GetUsersByIdsAsync(userIdsToFetch))
+                            .ToDictionary(u => u.Id, u => u.FullName);
+
+            // 3. Assign Names from the Map
+            foreach (var itemDto in allItems)
+            {
+                itemDto.CreatedByName = usersMap.GetValueOrDefault(itemDto.CreatedBy) ?? "Unknown User";
+
+                if (isEditMode && allSubmissionsForItems.TryGetValue(itemDto.Id, out var submissions))
+                {
+                    itemDto.AllSubmissions = submissions.Select(sub =>
+                    {
+                        var subDto = mapper.Map<AdminSubmissionViewDto>(sub);
+                        subDto.StudentName = usersMap.GetValueOrDefault(sub.UserId) ?? "Unknown Student";
+
+                        return subDto;
+                    }).ToList();
+                }
+            }
+        }
+        else
+        {
+            // Simple path for students
+            foreach (var itemDto in allItems)
+            {
+                var creator = await userRepository.GetByIdAsync(itemDto.CreatedBy);
+                itemDto.CreatedByName = creator?.FullName ?? "Unknown User";
+
+                // Student Auto-Fail Logic
+                if (!string.IsNullOrEmpty(userId) && itemDto.ItemType == "Assignment")
+                {
+                    if (itemDto.DueDate.HasValue && now > itemDto.DueDate.Value && itemDto.MySubmission == null)
+                    {
+                        itemDto.MySubmission = new ClassworkSubmissionDto
+                        {
+                            Grade = 0,
+                            Feedback = "System: Failed to submit before deadline. Automatic F grade assigned.",
+                            FileName = "N/A",
+                            SubmittedAt = itemDto.DueDate.Value
+                        };
+                    }
+                }
+            }
         }
 
         return dtos;
@@ -182,5 +239,20 @@ public class ClassworkService(
         {
             fileService.DeleteFile(sub.FileUrl);
         }
+    }
+
+    private string MapScoreToLetterGrade(double? score)
+    {
+        if (score == null) return "N/A";
+        return score switch
+        {
+            >= 90 => "A",
+            >= 80 => "B",
+            >= 70 => "C",
+            >= 60 => "D",
+            >= 50 => "E",
+            >= 40 => "E-",
+            _ => "F" // Anything below 60 is a Fail
+        };
     }
 }

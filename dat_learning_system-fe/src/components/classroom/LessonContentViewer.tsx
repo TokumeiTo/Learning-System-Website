@@ -9,6 +9,7 @@ import type { LessonContent } from '../../types_interfaces/classroom';
 import { sendHeartbeat, markLessonComplete } from '../../api/lessonProgress.api';
 import QuizViewer from '../quiz/QuizViewer';
 import ImageLightbox from '../mediaRelated/ImageLightBox';
+import AppLoader from '../feedback/AppLoader';
 
 interface Props {
     contents: LessonContent[];
@@ -16,9 +17,10 @@ interface Props {
     isDone?: boolean;
     lastScore?: number | null;
     onComplete?: () => void;
+    isLoading?: boolean;
 }
 
-const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete }: Props) => {
+const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete, isLoading }: Props) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isCompleting, setIsCompleting] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -162,6 +164,14 @@ const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete
             return <Typography color="error">Invalid chart data</Typography>;
         }
     };
+
+    if (isLoading) {
+        return (
+            <Box sx={{ py: 15, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <AppLoader fullscreen={false} kanji="読み込み中" />
+            </Box>
+        );
+    }
 
     if (!contents || contents.length === 0) {
         return (

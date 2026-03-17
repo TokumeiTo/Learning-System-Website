@@ -16,6 +16,7 @@ export interface ClassworkItem {
   maxPoints: number;
   resources: ClassworkResource[];
   mySubmission?: ClassworkSubmission; // Student specific
+  allSubmissions?: AdminSubmissionView[]; // All for admin
   createdAt: string;
   createdByName: string;
 }
@@ -35,6 +36,11 @@ export interface ClassworkSubmission {
   updatedAt?: string;
   grade?: number;
   feedback?: string;
+}
+
+export interface AdminSubmissionView extends ClassworkSubmission {
+  studentId: string;
+  studentName: string;
 }
 
 // --- Request Payloads (For API calls) ---

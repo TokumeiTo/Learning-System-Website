@@ -25,10 +25,14 @@ public class ClassworkController(IClassworkService service) : ControllerBase
     [HttpGet("course/{courseId}")]
     public async Task<ActionResult<List<ClassworkTopicDto>>> GetClasswork(Guid courseId)
     {
-        // Get the ID of the person making the request
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        var result = await service.GetCourseClassworkAsync(courseId, userId);
+        // Check if the current user is an Admin
+        bool isAdmin = User.IsInRole("Admin");
+
+        // Pass isAdmin as the isEditMode parameter
+        var result = await service.GetCourseClassworkAsync(courseId, userId, isEditMode: isAdmin);
+
         return Ok(result);
     }
 

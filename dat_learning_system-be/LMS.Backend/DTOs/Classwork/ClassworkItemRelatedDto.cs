@@ -28,4 +28,5 @@ public class ClassworkItemDto
 
     public List<ClassworkResourceDto> Resources { get; set; } = new();
     public ClassworkSubmissionDto? MySubmission { get; set; }
+    public List<AdminSubmissionViewDto> AllSubmissions { get; set; } = new();
 }

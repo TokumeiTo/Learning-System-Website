@@ -49,6 +49,11 @@ const ClassworkTab = ({ courseId, isEditMode }: Props) => {
         try {
             const data = await fetchCourseClasswork(courseId);
             setTopics(data);
+
+            if (selectedItem) {
+                const updated = data.flatMap(t => t.items).find(i => i.id === selectedItem.id);
+                if (updated) setSelectedItem(updated);
+            }
         } catch (error) {
             console.error("Failed to load classwork", error);
         } finally {
@@ -114,10 +119,26 @@ const ClassworkTab = ({ courseId, isEditMode }: Props) => {
             {/* Header */}
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1, px: 1 }}>
                 <Typography variant="overline" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.3)', letterSpacing: 1.5 }}>
-                    {isEditMode ? 'MANAGEMENT' : 'COURSE CONTENT'}
+                    {isEditMode ? 'MANAGING ASSIGNMENT' : 'CLASSWORK'}
                 </Typography>
                 {(isSaving || deletingId) && <CircularProgress size={14} sx={{ color: '#818cf8' }} />}
             </Stack>
+
+            {(!topics || topics.length === 0) && (
+                <Box
+                    sx={{
+                        p: 4,
+                        textAlign: 'center',
+                        bgcolor: 'rgba(255,255,255,0.02)',
+                        borderRadius: 3,
+                        border: '1px dashed rgba(255,255,255,0.1)'
+                    }}
+                >
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>
+                        Classwork not provided yet.
+                    </Typography>
+                </Box>
+            )}
 
             {/* Level 1: Topic Accordions */}
             <Box sx={{ flexGrow: 1 }}>
@@ -137,7 +158,7 @@ const ClassworkTab = ({ courseId, isEditMode }: Props) => {
                         <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#818cf8' }} />}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: '100%', pr: 1 }}>
                                 <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#818cf8' }}>
-                                    {topic.title}
+                                    Topic - {topic.title}
                                 </Typography>
 
                                 {isEditMode && (
@@ -146,10 +167,12 @@ const ClassworkTab = ({ courseId, isEditMode }: Props) => {
                                         disabled={deletingId === topic.id}
                                         onClick={(e) => handleDeleteTopic(e, topic.id, topic.title)}
                                         sx={{ color: 'rgba(255,255,255,0.2)', '&:hover': { color: '#f87171', bgcolor: 'rgba(248, 113, 113, 0.1)' } }}
+                                        component="div"
                                     >
                                         {deletingId === topic.id ? <CircularProgress size={16} color="inherit" /> : <DeleteIcon sx={{ fontSize: 18 }} />}
                                     </IconButton>
                                 )}
+
                             </Stack>
                         </AccordionSummary>
 
@@ -180,9 +203,25 @@ const ClassworkTab = ({ courseId, isEditMode }: Props) => {
                                                     <Typography sx={{ fontSize: '0.88rem', fontWeight: 600 }}>{item.title}</Typography>
                                                     <Stack direction="row" spacing={2}>
                                                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                            <TimeIcon sx={{ fontSize: 12 }} /> {dayjs(item.createdAt).format('DD MMM')}
+                                                            <TimeIcon sx={{ fontSize: 12 }} /> Assigned at {dayjs(item.createdAt).format('DD MMM')}
                                                         </Typography>
                                                     </Stack>
+                                                    {item.dueDate && (
+                                                        <Typography
+                                                            variant="caption"
+                                                            sx={{
+                                                                color: dayjs().isAfter(dayjs(item.dueDate)) ? '#f87171' : '#fbbf24',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: 0.5,
+                                                                fontWeight: 600
+                                                            }}
+                                                        >
+                                                            <TimeIcon sx={{ fontSize: 12 }} />
+                                                            Due {dayjs(item.dueDate).format('DD MMM, hh:mm A')}
+                                                            {dayjs().isAfter(dayjs(item.dueDate)) && " (Past Due)"}
+                                                        </Typography>
+                                                    )}
                                                 </Box>
                                             </Stack>
                                         </AccordionSummary>
@@ -196,9 +235,9 @@ const ClassworkTab = ({ courseId, isEditMode }: Props) => {
 
                                             <Stack direction="row" justifyContent="space-between" alignItems="center">
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <UserIcon sx={{ fontSize: 16, color: 'rgba(255,255,255,0.2)' }} />
                                                     <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>
-                                                        Posted by <span style={{ color: '#818cf8', fontWeight: 600 }}>{item.createdByName || 'Instructor'}</span>
+                                                        {isEditMode ? 'Assigned by' : 'Provided by'}
+                                                        <span style={{ color: '#818cf8', fontWeight: 600, marginLeft: '5px' }}>{item.createdByName || 'Instructor'}</span>
                                                     </Typography>
                                                 </Box>
 
@@ -226,7 +265,7 @@ const ClassworkTab = ({ courseId, isEditMode }: Props) => {
                                                             '&:hover': { bgcolor: '#818cf8', color: 'white' }
                                                         }}
                                                     >
-                                                        {item.itemType === 'Assignment' ? 'View Assignment' : 'View Material'}
+                                                        {item.itemType === 'Assignment' ? 'Assignment Submission' : 'View Material'}
                                                     </Button>
                                                 </Stack>
                                             </Stack>
@@ -280,6 +319,7 @@ const ClassworkTab = ({ courseId, isEditMode }: Props) => {
             {/* Detail Modal */}
             {selectedItem && (
                 <ClassworkDetailModal
+                    key={selectedItem.id + JSON.stringify(selectedItem.allSubmissions?.length)}
                     item={selectedItem}
                     open={Boolean(selectedItem)}
                     onClose={() => setSelectedItem(null)}

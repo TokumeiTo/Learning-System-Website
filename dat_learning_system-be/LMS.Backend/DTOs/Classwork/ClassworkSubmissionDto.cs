@@ -15,7 +15,13 @@ public class ClassworkSubmissionDto
     public string FileName { get; set; } = string.Empty;
     public DateTime SubmittedAt { get; set; }
     public DateTime? UpdatedAt { get; set; } // If not null, UI shows "Edited on..."
-    
+
     public double? Grade { get; set; }
     public string? Feedback { get; set; }
+}
+
+public class AdminSubmissionViewDto : ClassworkSubmissionDto
+{
+    public string StudentId { get; set; } = string.Empty;
+    public string StudentName { get; set; } = string.Empty;
 }

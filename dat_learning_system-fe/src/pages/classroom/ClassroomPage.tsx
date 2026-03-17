@@ -11,6 +11,7 @@ import { useAuth } from '../../hooks/useAuth';
 import LessonContentSection from '../../components/classroom/LessonContentSection';
 import LessonContentViewer from '../../components/classroom/LessonContentViewer';
 import ClassroomSidebar from '../../components/classroom/ClassroomSidebar';
+import AppLoader from '../../components/feedback/AppLoader';
 
 const ClassroomPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +26,7 @@ const ClassroomPage = () => {
   const [data, setData] = useState<ClassroomView | null>(null);
   const [currentLessonId, setCurrentLessonId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isLessonLoading, setIsLessonLoading] = useState(false);
 
   /**
    * Derived State: Always find the current lesson from the fresh data array.
@@ -40,6 +42,7 @@ const ClassroomPage = () => {
     if (!id) return;
     try {
       if (!isSilent) setLoading(true);
+      setIsLessonLoading(true);
       const res = await fetchClassroomData(id);
       setData(res);
 
@@ -56,6 +59,7 @@ const ClassroomPage = () => {
       console.error("Error loading classroom:", err);
     } finally {
       setLoading(false);
+      setIsLessonLoading(false);
     }
   }, [id, currentLessonId]);
 
@@ -74,8 +78,8 @@ const ClassroomPage = () => {
         return { ...lesson, isDone: true, lastScore: percentage ?? lesson.lastScore };
       }
       const currentIndex = data.lessons.findIndex((l) => l.id === currentLesson.id);
-      const nextLesson = data.lessons[currentIndex +1];
-      
+      const nextLesson = data.lessons[currentIndex + 1];
+
       if (nextLesson && lesson.id === nextLesson.id) {
         return { ...lesson, isLocked: false };
       }
@@ -85,9 +89,26 @@ const ClassroomPage = () => {
     setData({ ...data, lessons: updatedLessons });
   };
 
+  const handleLessonSelection = (lessonId: string) => {
+    if (lessonId === currentLessonId) return;
+
+    setIsLessonLoading(true);
+    setCurrentLessonId(lessonId);
+
+    // Simulate a brief delay or wait for state to settle
+    setTimeout(() => setIsLessonLoading(false), 400);
+  };
+
   if (loading) return (
-    <Box sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: '#0f172a' }}>
-      <CircularProgress />
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {/* You can pass a specific Kanji like '教' (Teach) or '読' (Read) */}
+      <AppLoader fullscreen={true} kanji="教室に入ろうとしています..." />
     </Box>
   );
 
@@ -179,6 +200,7 @@ const ClassroomPage = () => {
                 isDone={currentLesson?.isDone}
                 lastScore={currentLesson?.lastScore}
                 onComplete={handleLessonComplete}
+                isLoading={isLessonLoading}
               />
             )}
           </Paper>
@@ -190,7 +212,7 @@ const ClassroomPage = () => {
             data={data}
             setData={setData}
             currentLessonId={currentLessonId}
-            setCurrentLessonId={setCurrentLessonId}
+            setCurrentLessonId={handleLessonSelection}
             isEditMode={isEditMode && canEdit}
           />
         </Box>

@@ -6,8 +6,7 @@ public interface IClassworkService
 {
     // Topic logic
     Task<ClassworkTopicDto> AddTopicAsync(CreateClassworkTopicDto dto, string adminUserId);
-    Task<List<ClassworkTopicDto>> GetCourseClassworkAsync(Guid courseId, string? userId = null)
-;
+    Task<List<ClassworkTopicDto>> GetCourseClassworkAsync(Guid courseId, string? userId = null, bool isEditMode = false);
     Task<bool> RemoveTopicAsync(Guid topicId);
 
     // Item/Assignment logic

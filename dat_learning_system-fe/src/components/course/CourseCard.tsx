@@ -12,7 +12,7 @@ interface CourseCardProps {
     onRefresh?: () => void;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, onRefresh}) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, onRefresh }) => {
     const theme = useTheme();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -38,8 +38,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRefresh}) => {
                 overflow: 'hidden',
                 '&:hover': {
                     transform: 'translateY(-8px)',
-                    boxShadow: theme.palette.mode === 'dark' 
-                        ? `0 20px 40px ${alpha(theme.palette.common.black, 0.4)}` 
+                    boxShadow: theme.palette.mode === 'dark'
+                        ? `0 20px 40px ${alpha(theme.palette.common.black, 0.4)}`
                         : theme.shadows[10],
                     borderColor: 'primary.main',
                 }
@@ -142,9 +142,9 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRefresh}) => {
                             '&:hover': {
                                 overflowY: 'auto',
                                 '&::-webkit-scrollbar': { width: '4px' },
-                                '&::-webkit-scrollbar-thumb': { 
-                                    bgcolor: 'divider', 
-                                    borderRadius: '10px' 
+                                '&::-webkit-scrollbar-thumb': {
+                                    bgcolor: 'divider',
+                                    borderRadius: '10px'
                                 }
                             },
                             wordBreak: 'break-word'
@@ -156,7 +156,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRefresh}) => {
                     {/* Stats Row */}
                     <Stack direction="row" spacing={2.5} sx={{ mb: 2 }}>
                         <StatItem icon={<Timer sx={{ fontSize: 16 }} />} label={`${course.totalHours}h`} />
-                        <StatItem icon={<MenuBook sx={{ fontSize: 16 }} />} label={`${course.topics?.length || 0} Topics`} />
+                        <StatItem
+                            icon={<MenuBook sx={{ fontSize: 16 }} />}
+                            label={`${course.classworkTopics?.length || 0} Topics`}
+                        />
                         <StatItem icon={<Group sx={{ fontSize: 16 }} />} label={course.enrolledCount} />
                     </Stack>
 

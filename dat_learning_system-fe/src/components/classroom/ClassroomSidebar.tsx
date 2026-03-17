@@ -110,8 +110,16 @@ const ClassroomSidebar = memo(({
         {/* Tab Panel: Chat */}
         {activeTab === 2 && (
           <Fade in={activeTab === 2}>
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)' }}>
+            <Box
+              sx={{
+                p: 4,
+                textAlign: 'center',
+                bgcolor: 'rgba(255,255,255,0.02)',
+                borderRadius: 3,
+                border: '1px dashed rgba(255,255,255,0.1)'
+              }}
+            >
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>
                 Study group chat is currently disabled.
               </Typography>
             </Box>

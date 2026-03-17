@@ -81,5 +81,8 @@ public class CourseService : ICourseService
     }
 
     public async Task<IEnumerable<Course>> GetAllCoursesAsync()
-        => await _courseRepo.GetAllAsync();
+    {
+        // Use the specialized repo method we just created
+        return await _courseRepo.GetAllWithTopicsAsync();
+    }
 }

@@ -5,6 +5,7 @@ namespace LMS.Backend.Repo.Interface;
 public interface IUserRepository
 {
     Task<ApplicationUser?> GetByIdAsync(string id);
+    Task<List<ApplicationUser>> GetUsersByIdsAsync(List<string> ids);
     Task<List<string>> GetAdminUserIdsAsync();
     Task<ApplicationUser?> GetByCompanyCodeAsync(string companyCode);
     Task<bool> UpdateAsync(ApplicationUser user);

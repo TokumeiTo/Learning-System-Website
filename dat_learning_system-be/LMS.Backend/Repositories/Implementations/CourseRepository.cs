@@ -9,6 +9,13 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
 {
     public CourseRepository(AppDbContext context) : base(context) { }
 
+    public async Task<IEnumerable<Course>> GetAllWithTopicsAsync()
+    {
+        return await _context.Courses
+            .Include(c => c.ClassworkTopics) // Fetch the topics so .Count works
+            .AsNoTracking()
+            .ToListAsync();
+    }
     public async Task<Course?> GetFullClassroomDetailsAsync(Guid courseId)
     {
         return await _context.Courses

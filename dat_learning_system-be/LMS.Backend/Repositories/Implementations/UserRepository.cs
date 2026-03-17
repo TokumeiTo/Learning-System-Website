@@ -19,6 +19,12 @@ public class UserRepository : IUserRepository
             .Include(u => u.OrgUnit)
             .FirstOrDefaultAsync(u => u.Id == id);
     }
+    public async Task<List<ApplicationUser>> GetUsersByIdsAsync(List<string> ids)
+    {
+        return await _context.Users
+            .Where(u => ids.Contains(u.Id))
+            .ToListAsync();
+    }
     public async Task<List<string>> GetAdminUserIdsAsync()
     {
         return await _context.Users

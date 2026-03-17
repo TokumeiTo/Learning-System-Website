@@ -9,6 +9,7 @@ import DraftBlock from './LessonContentDraftBlock';
 import { bulkSaveLessonContents } from '../../api/classroom.api';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import MessagePopup from '../feedback/MessagePopup';
+import AppLoader from '../feedback/AppLoader';
 
 // --- Main Section ---
 const LessonContentSection = ({
@@ -20,6 +21,7 @@ const LessonContentSection = ({
 }) => {
   const [drafts, setDrafts] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLocalLoading, setIsLocalLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorPopup, setErrorPopup] = useState({ open: false, message: '' });
 
@@ -30,11 +32,17 @@ const LessonContentSection = ({
   // When lesson changes, load its existing content into drafts
   useEffect(() => {
     if (currentLesson) {
-      setDrafts(currentLesson.contents.map(c => ({
-        ...c,
-        tempId: String(c.id),
-        test: c.test || null
-      })));
+      setIsLocalLoading(true);
+      const timer = setTimeout(() => {
+        setDrafts(currentLesson.contents.map(c => ({
+          ...c,
+          tempId: String(c.id),
+          test: c.test || null
+        })));
+        setIsLocalLoading(false);
+      }, 300);
+
+      return () => clearTimeout(timer);
     }
   }, [currentLesson]);
 
@@ -169,35 +177,41 @@ const LessonContentSection = ({
       </Paper>
 
       {/* Canvas */}
-      <DndContext
-        sensors={sensors} // Added sensors
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={drafts.map(d => d.tempId)} strategy={verticalListSortingStrategy}>
-          <Stack spacing={2}> {/* Stack adds nice spacing between blocks */}
-            {drafts.length === 0 && (
-              <Box sx={{
-                textAlign: 'center',
-                py: 10,
-                border: '2px dashed #334155',
-                borderRadius: 4,
-                color: '#94a3b8'
-              }}>
-                <Typography>No content yet. Click a tool above to start building your lesson.</Typography>
-              </Box>
-            )}
-            {drafts.map((block) => (
-              <DraftBlock
-                key={block.tempId}
-                block={block}
-                updateBlock={updateBlock}
-                removeBlock={(id: string) => setDrafts(drafts.filter(d => d.tempId !== id))}
-              />
-            ))}
-          </Stack>
-        </SortableContext>
-      </DndContext>
+      {isLocalLoading ? (
+        <Box sx={{ py: 10 }}>
+          <AppLoader fullscreen={false} kanji="作" /> {/* "作" for Create/Make */}
+        </Box>
+      ) : (
+        <DndContext
+          sensors={sensors} // Added sensors
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={drafts.map(d => d.tempId)} strategy={verticalListSortingStrategy}>
+            <Stack spacing={2}> {/* Stack adds nice spacing between blocks */}
+              {drafts.length === 0 && (
+                <Box sx={{
+                  textAlign: 'center',
+                  py: 10,
+                  border: '2px dashed #334155',
+                  borderRadius: 4,
+                  color: '#94a3b8'
+                }}>
+                  <Typography>No content yet. Click a tool above to start building your lesson.</Typography>
+                </Box>
+              )}
+              {drafts.map((block) => (
+                <DraftBlock
+                  key={block.tempId}
+                  block={block}
+                  updateBlock={updateBlock}
+                  removeBlock={(id: string) => setDrafts(drafts.filter(d => d.tempId !== id))}
+                />
+              ))}
+            </Stack>
+          </SortableContext>
+        </DndContext>
+      )}
 
       {/* --- SUCCESS MODAL --- */}
       <Dialog
