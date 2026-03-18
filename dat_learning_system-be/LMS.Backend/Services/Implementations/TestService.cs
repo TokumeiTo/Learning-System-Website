@@ -67,23 +67,22 @@ public class TestService : ITestService
         bool isPassed = percentage >= test.PassingGrade;
 
         // 4. Record the specific attempt
-        var attempt = new LessonAttempt
+        var attemptData = new LessonAttempt
         {
-            Id = Guid.NewGuid(),
             UserId = userId,
             LessonId = submission.LessonId,
             TestId = test.Id,
             Score = earnedPoints,
             MaxScore = totalPoints,
-            Percentage = Math.Round(percentage, 2), // Keep 2 decimal places
+            Percentage = Math.Round(percentage, 2),
             IsPassed = isPassed,
-            AttemptedAt = DateTime.UtcNow,
             AnswerJson = System.Text.Json.JsonSerializer.Serialize(submission.Answers)
         };
 
-        await _testRepo.CreateAttemptAsync(attempt);
+        // Use the new Upsert logic
+        var finalAttempt = await _testRepo.UpsertAttemptAsync(attemptData);
 
-        // 5. Automation: Mark lesson as complete if passed
+        // 5. Automation: Mark lesson complete
         if (isPassed)
         {
             await _progressRepo.MarkAsCompleteAsync(userId, submission.LessonId);
@@ -92,11 +91,12 @@ public class TestService : ITestService
         // 6. Return Result (Cast percentage to double if your DTO requires it)
         return new LessonResultDto
         {
-            Score = earnedPoints,
-            MaxScore = totalPoints,
-            Percentage = attempt.Percentage,
-            IsPassed = isPassed,
-            AttemptedAt = attempt.AttemptedAt,
+            Score = finalAttempt.Score,
+            MaxScore = finalAttempt.MaxScore,
+            Percentage = finalAttempt.Percentage,
+            IsPassed = finalAttempt.IsPassed,
+            AttemptedAt = finalAttempt.AttemptedAt,
+            Attempts = finalAttempt.Attempts,
             UserAnswers = submission.Answers,
             CorrectAnswers = correctMapping
         };

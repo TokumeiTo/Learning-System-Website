@@ -13,7 +13,6 @@ public class Course
     public bool IsMandatory { get; set; }
     public string Thumbnail { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string CertificationImage { get; set; } = string.Empty;
     public double TotalHours { get; set; }
 
     public double Rating { get; set; }

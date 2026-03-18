@@ -60,20 +60,21 @@ public class OrgUnitRepository : IOrgUnitRepository
             .Select(u => new { u.Id, u.ParentId })
             .ToListAsync();
 
-        var resultIds = new List<int> { parentId };
+        var resultIds = new List<int>();
+        resultIds.Add(parentId);
 
         // 2. Recursive local function
-        void Traverse(int pid)
+        void GetChildren(int pid)
         {
-            var children = allUnits.Where(u => u.ParentId == pid).Select(u => u.Id).ToList();
-            foreach (var id in children)
+            var children = allUnits.Where(u => u.ParentId == pid).Select(u => u.Id);
+            foreach (var childId in children)
             {
-                resultIds.Add(id);
-                Traverse(id); // Go deeper
+                resultIds.Add(childId);
+                GetChildren(childId); // Recurse
             }
         }
 
-        Traverse(parentId);
-        return resultIds;
+        GetChildren(parentId);
+        return resultIds.Distinct().ToList();
     }
 }

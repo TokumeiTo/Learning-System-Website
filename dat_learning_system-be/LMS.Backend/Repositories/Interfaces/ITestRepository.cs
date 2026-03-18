@@ -6,13 +6,13 @@ public interface ITestRepository
 {
     // For Admin: Save/Update a test block
     Task<Test> UpsertTestAsync(Guid lessonContentId, Test test);
-    
+
     // For Student: Get all correct OptionIds for a lesson to grade it
     // Using a List<Guid> is memory efficient for grading
     Task<List<Guid>> GetCorrectOptionIdsForLessonAsync(Guid lessonId);
-    
+
     // Track attempt
-    Task<LessonAttempt> CreateAttemptAsync(LessonAttempt attempt);
+    Task<LessonAttempt> UpsertAttemptAsync(LessonAttempt newAttempt);
     Task<int> GetTotalPointsForLessonAsync(Guid lessonId);
     Task<Test?> GetTestByIdWithAnswersAsync(Guid testId);
 

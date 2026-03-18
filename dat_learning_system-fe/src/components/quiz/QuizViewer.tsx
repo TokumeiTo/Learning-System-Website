@@ -121,20 +121,22 @@ const QuizViewer = ({ data, testId, onFinish, isLocked, lessonId, existingScore,
 
                 {!isPassed && (
                     <Typography sx={{ color: 'rgba(255,255,255,0.6)', mb: 3, fontSize: '0.9rem' }}>
-                        You need {passingThreshold}% to pass. You can review your answers or try again.
+                        You need {passingThreshold}% to pass. Please try again.
                     </Typography>
                 )}
 
                 <Stack direction="row" spacing={2} justifyContent="center">
-                    <Button
-                        variant="outlined"
-                        startIcon={isLoadingHistory ? <CircularProgress size={20} color="inherit" /> : <Visibility />}
-                        onClick={() => setShowQuestions(true)}
-                        disabled={isLoadingHistory}
-                        sx={{ color: 'white', borderColor: '#334155' }}
-                    >
-                        {isLoadingHistory ? 'Loading Results...' : 'Review Answers'}
-                    </Button>
+                    {isPassed && (
+                        <Button
+                            variant="outlined"
+                            startIcon={isLoadingHistory ? <CircularProgress size={20} color="inherit" /> : <Visibility />}
+                            onClick={() => setShowQuestions(true)}
+                            disabled={isLoadingHistory}
+                            sx={{ color: 'white', borderColor: '#334155' }}
+                        >
+                            {isLoadingHistory ? 'Loading Results...' : 'Review Answers'}
+                        </Button>
+                    )}
                     {!isLocked && (
                         <Button
                             variant="contained"

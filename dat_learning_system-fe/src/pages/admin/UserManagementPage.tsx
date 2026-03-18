@@ -2,7 +2,11 @@ import { useEffect, useState, useMemo } from "react";
 import {
   Box, Button, TextField, Typography, Paper, IconButton, Chip, Stack,
   InputAdornment, Avatar, Badge, useTheme, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, CircularProgress
+  TableContainer, TableHead, TableRow, CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@mui/material";
 import { PersonAdd, Search, Edit, Delete, FilterList } from "@mui/icons-material";
 
@@ -28,6 +32,8 @@ const UserManagementPage = () => {
   const [processing, setProcessing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [filterUnitId, setFilterUnitId] = useState<number | "">("");
+  const [filterPosition, setFilterPosition] = useState<number | "">("");
 
   // Targets for Modals
   const [editTarget, setEditTarget] = useState<UserListItem | null>(null);
@@ -41,7 +47,12 @@ const UserManagementPage = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await getUsersList();
+      // Pass the filters to your API call
+      const data = await getUsersList(
+        searchTerm,
+        filterUnitId === "" ? undefined : filterUnitId,
+        filterPosition === "" ? undefined : filterPosition
+      );
       setUsers(data);
     } catch (err) {
       setPopup({ open: true, message: "Could not load users", severity: "error" });
@@ -50,7 +61,13 @@ const UserManagementPage = () => {
     }
   };
 
-  useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchUsers();
+    }, 300); // 300ms debounce prevents hitting the server too hard while typing
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, filterUnitId, filterPosition]);
 
   // 2. Filter Logic
   const filteredUsers = useMemo(() => {
@@ -179,7 +196,76 @@ const UserManagementPage = () => {
                   startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment>
                 }}
               />
-              <Button startIcon={<FilterList />} variant="outlined" color="inherit">Filters</Button>
+              <FormControl size="small" sx={{ flex: 1 }}>
+                <InputLabel id="position-filter-label">Position</InputLabel>
+                <Select
+                  labelId="position-filter-label"
+                  label="Position"
+                  value={filterPosition}
+                  onChange={(e) => setFilterPosition(e.target.value as number | "")}
+                >
+                  <MenuItem value="">All Positions</MenuItem>
+                  <MenuItem value={1}>Division Head</MenuItem>
+                  <MenuItem value={2}>Department Head</MenuItem>
+                  <MenuItem value={5}>Employee</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl size="small" sx={{ flex: 1 }}>
+                <InputLabel id="team-filter-label">Team</InputLabel>
+                <Select
+                  labelId="team-filter-label"
+                  label="Team"
+                  value={filterUnitId}
+                  onChange={(e) => setFilterUnitId(e.target.value as number | "")}
+                >
+                  <MenuItem value="">All Units</MenuItem>
+                  {/* --- Offshore & Development Units --- */}
+                  <MenuItem value={11}>Translator Team</MenuItem>
+                  <MenuItem value={9}>Other Local System Team</MenuItem>
+                  <MenuItem value={21}>Exchange System Team</MenuItem>
+                  <MenuItem value={22}>Common Application Infrastructure Team</MenuItem>
+                  <MenuItem value={23}>JICA BPO Team</MenuItem>
+                  <MenuItem value={24}>MAJA JLPT System Development Team</MenuItem>
+
+                  {/* --- System & Infrastructure Teams --- */}
+                  <MenuItem value={26}>System Team</MenuItem>
+                  <MenuItem value={27}>Network Team</MenuItem>
+                  <MenuItem value={28}>Service Desk Team</MenuItem>
+                  <MenuItem value={29}>OMG Team</MenuItem>
+                  <MenuItem value={31}>Aeon Infra Team</MenuItem>
+
+                  {/* --- Project & Development Teams --- */}
+                  <MenuItem value={30}>Local Project Team 1</MenuItem>
+                  <MenuItem value={33}>Mark Team</MenuItem>
+                  <MenuItem value={34}>SNR-MF Team</MenuItem>
+                  <MenuItem value={36}>FPD Team</MenuItem>
+                  <MenuItem value={37}>DBP Team</MenuItem>
+                  <MenuItem value={39}>TDB, D-Base Team</MenuItem>
+                  <MenuItem value={40}>CstNavi Team</MenuItem>
+                  <MenuItem value={41}>Delta Team</MenuItem>
+                  <MenuItem value={42}>OSS Team</MenuItem>
+                  <MenuItem value={43}>MODOS Team</MenuItem>
+                  <MenuItem value={44}>Block Chain Team</MenuItem>
+                  <MenuItem value={45}>WB4 Team</MenuItem>
+                  <MenuItem value={46}>SONAR-FR Team</MenuItem>
+                  <MenuItem value={47}>FAIMS-IT Team</MenuItem>
+                  <MenuItem value={48}>KOSMO-Network21 Team</MenuItem>
+                  <MenuItem value={49}>WEB Team</MenuItem>
+                  <MenuItem value={50}>KOSMO-NEXT Team</MenuItem>
+                  <MenuItem value={51}>HIME Team</MenuItem>
+                  <MenuItem value={52}>SoftPhone Team</MenuItem>
+                </Select>
+              </FormControl>
+
+              <Button
+                variant="text"
+                color="inherit"
+                onClick={() => { setSearchTerm(""); setFilterPosition(""); setFilterUnitId(""); }}
+                sx={{ fontWeight: 700 }}
+              >
+                Reset
+              </Button>
             </Paper>
 
             {/* Main Table */}
@@ -206,13 +292,13 @@ const UserManagementPage = () => {
                         <Typography sx={{ mt: 2 }} variant="body2" color="text.secondary">Loading directory...</Typography>
                       </TableCell>
                     </TableRow>
-                  ) : filteredUsers.length === 0 ? (
+                  ) : users.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} align="center" sx={{ py: 10 }}>
                         <Typography variant="body1" color="text.secondary">No users found matching your criteria.</Typography>
                       </TableCell>
                     </TableRow>
-                  ) : filteredUsers.map((user) => (
+                  ) : users.map((user) => (
                     <TableRow key={user.id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                       <TableCell>
                         <Stack direction="row" spacing={2} alignItems="center">

@@ -6,8 +6,18 @@ import { POSITIONS } from '../utils/positions';
 /**
  * Fetches the list of users based on the current user's scope.
  */
-export const getUsersList = async (): Promise<UserListItem[]> => {
-  const response = await api.get('/api/User/list');
+export const getUsersList = async (
+  search?: string,
+  unitId?: number | string,
+  position?: number | string
+) => {
+  const response = await api.get<UserListItem[]>('api/User/list', {
+    params: {
+      search: search || undefined,
+      unitId: unitId || undefined,
+      position: position || undefined
+    }
+  });
   return response.data;
 };
 

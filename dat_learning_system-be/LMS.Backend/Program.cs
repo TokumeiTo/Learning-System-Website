@@ -1,4 +1,3 @@
-// Builder and Configuration
 using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;

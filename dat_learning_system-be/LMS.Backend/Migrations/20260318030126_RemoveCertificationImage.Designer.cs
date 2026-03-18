@@ -3,6 +3,7 @@ using System;
 using LMS.Backend.Data.Dbcontext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LMS.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260318030126_RemoveCertificationImage")]
+    partial class RemoveCertificationImage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,7 +154,7 @@ namespace LMS.Backend.Migrations
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
                             CompanyCode = "00-0000",
-                            ConcurrencyStamp = "4ea4292a-8c7f-43aa-8139-193ff1ec0afe",
+                            ConcurrencyStamp = "3b6888ba-573f-4714-b764-2d08572b19f8",
                             Email = "admin@lms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin",
@@ -160,10 +163,10 @@ namespace LMS.Backend.Migrations
                             NormalizedEmail = "ADMIN@LMS.COM",
                             NormalizedUserName = "00-0000",
                             OrgUnitId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAEENDDrKN7MJRR5ZOe6v8VyXS92S6xHQpzvWAmH0g6dFpM8aqkAIFuB/3AtDx6/dgjQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIDSJ3YpEGWmb0Iv/ImgnfUKkgiQh/mntar8+5YVBYMNL3TaUJJiedoB8Jd7S91CtQ==",
                             PhoneNumberConfirmed = false,
                             Position = 0,
-                            SecurityStamp = "6b8c3000-c18c-4eb4-bec1-84e212776d40",
+                            SecurityStamp = "9ef08012-c7de-4f1b-8090-719a2f3a3fdc",
                             TwoFactorEnabled = false,
                             UserName = "00-0000"
                         });
@@ -677,9 +680,6 @@ namespace LMS.Backend.Migrations
 
                     b.Property<DateTime>("AttemptedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Attempts")
-                        .HasColumnType("integer");
 
                     b.Property<bool>("IsPassed")
                         .HasColumnType("boolean");

@@ -42,6 +42,7 @@ public class LessonResultDto
     public int MaxScore { get; set; }        // Total possible points
     public decimal Percentage { get; set; }    // (Score / MaxScore) * 100
     public bool IsPassed { get; set; }       // Based on Lesson.PassingScore
+    public int Attempts { get; set; }
     public DateTime AttemptedAt { get; set; }
 
     public Dictionary<Guid, Guid>? UserAnswers { get; set; }

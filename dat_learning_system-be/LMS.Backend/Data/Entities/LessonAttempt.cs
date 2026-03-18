@@ -18,6 +18,7 @@ public class LessonAttempt
     // NEW: Explicit percentage for easy UI rendering (e.g., 70.0)
     public decimal Percentage { get; set; }   
     public bool IsPassed { get; set; }       // (Score / MaxScore) * 100 >= Lesson.PassingScore
+    public int Attempts { get; set; }       // (Score / MaxScore) * 100 >= Lesson.PassingScore
     
     public string? AnswerJson { get; set; }
     public DateTime AttemptedAt { get; set; } = DateTime.UtcNow;

@@ -19,7 +19,7 @@ export default function BasicSelect({ value, onChange }: BasicSelectProps) {
   const { user } = useAuth();
 
   // Define roles that are allowed to see the Management Mode
-  const canManage = ['SuperAdmin', 'DivHead', 'DepHead', 'Admin'].includes(user?.position || '');
+  const canManage = ['SuperAdmin', 'DivHead', 'DepHead', 'Admin', 'ProjectManager', 'SecHead'].includes(user?.position || '');
 
   const handleChange = (event: SelectChangeEvent) => {
     onChange(event.target.value);

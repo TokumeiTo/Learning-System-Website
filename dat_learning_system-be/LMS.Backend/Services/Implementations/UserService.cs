@@ -33,9 +33,8 @@ public class UserService : IUserService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<IEnumerable<UserResponseDto>> GetUsersByScopeAsync(string currentUserId)
+    public async Task<IEnumerable<UserResponseDto>> GetUsersByScopeAsync(string currentUserId, int? filterUnitId = null, Position? filterPosition = null)
     {
-        // 1. Fetch user with OrgUnit to check for "Management Division" (Id 1)
         var currentUser = await _context.Users
             .Include(u => u.OrgUnit)
             .FirstOrDefaultAsync(u => u.Id == currentUserId);
@@ -44,53 +43,42 @@ public class UserService : IUserService
 
         var query = _context.Users.Include(u => u.OrgUnit).AsQueryable();
 
-        // 2. Global Filter: Company Scope
-        if (currentUser.Position != Position.SuperAdmin)
-        {
-            query = query.Where(u => u.CompanyCode == currentUser.CompanyCode);
-        }
+        // --- SECTION A: SECURITY & SCOPE (Same as before) ---
+        bool isGlobalManager = currentUser.Position == Position.Admin ||
+                               currentUser.Position == Position.SuperAdmin ||
+                               currentUser.OrgUnitId == 1;
 
-        // 3. ADMIN & MANAGEMENT LOGIC
-        // Check for Position.Admin OR being inside the Management Division (Id 1)
-        bool isManagement = currentUser.Position == Position.Admin ||
-                            currentUser.OrgUnitId == 1 ||
-                            currentUser.Position == Position.SuperAdmin;
-
-        if (isManagement)
+        if (isGlobalManager)
         {
-            // Admin/Management sees everyone in the company except SuperAdmins 
-            // (unless they ARE the SuperAdmin)
             if (currentUser.Position != Position.SuperAdmin)
             {
                 query = query.Where(u => u.Position != Position.SuperAdmin);
             }
+        }
+        else
+        {
+            if (!currentUser.OrgUnitId.HasValue) return Enumerable.Empty<UserResponseDto>();
 
-            var adminUsers = await query.ToListAsync();
-            return _mapper.Map<IEnumerable<UserResponseDto>>(adminUsers);
+            var branchIDs = await _unitRepo.GetAllRecursiveChildIds(currentUser.OrgUnitId.Value);
+            query = query.Where(u => branchIDs.Contains(u.OrgUnitId ?? 0));
+            query = query.Where(u => u.Position != Position.Admin && u.Position != Position.SuperAdmin);
         }
 
-        // 4. HIERARCHY LOGIC (For non-admin heads)
-        switch (currentUser.Position)
+        // Always exclude self
+        query = query.Where(u => u.Id != currentUserId);
+
+        // --- SECTION B: DYNAMIC FILTERS ---
+
+        // 1. Filter by specific Unit
+        if (filterUnitId.HasValue && filterUnitId.Value > 0)
         {
-            case Position.DivHead:
-            case Position.DepHead:
-            case Position.SecHead:
-                // Get the whole branch below them
-                var branchIds = await _unitRepo.GetAllRecursiveChildIds(currentUser.OrgUnitId ?? 0);
+            query = query.Where(u => u.OrgUnitId == filterUnitId.Value);
+        }
 
-                query = query.Where(u => branchIds.Contains(u.OrgUnitId ?? 0) &&
-                                        u.Position != Position.Admin &&
-                                        u.Position != Position.SuperAdmin);
-                break;
-
-            case Position.ProjectManager:
-                query = query.Where(u => u.OrgUnitId == currentUser.OrgUnitId &&
-                                        u.Position == Position.Employee);
-                break;
-
-            default:
-                // If you reach here, you are an Employee or have no access
-                return Enumerable.Empty<UserResponseDto>();
+        // 2. Filter by Position
+        if (filterPosition.HasValue)
+        {
+            query = query.Where(u => u.Position == filterPosition.Value);
         }
 
         var users = await query.ToListAsync();

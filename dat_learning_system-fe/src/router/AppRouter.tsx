@@ -221,7 +221,7 @@ export const AppRouter = () => {
         <Route
           path="admin/dashboard"
           element={
-            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin", "ProjectManager", "DivHead", "DepHead", "SecHead"]}>
               <AdminDashboard />
             </ProtectedRoute>
           }
@@ -230,7 +230,7 @@ export const AppRouter = () => {
         <Route
           path="admin/user_management"
           element={
-            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin", "ProjectManager", "DivHead"]}>
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin", "ProjectManager", "DivHead", "DepHead", "SecHead"]}>
               <UserManagementPage />
             </ProtectedRoute>
           }
@@ -239,7 +239,7 @@ export const AppRouter = () => {
         <Route
           path="admin/org_units"
           element={
-            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin", "DivHead"]}>
               <OrgPage />
             </ProtectedRoute>
           }

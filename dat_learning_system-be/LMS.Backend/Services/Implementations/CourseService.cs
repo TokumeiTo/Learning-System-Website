@@ -10,9 +10,9 @@ namespace LMS.Backend.Services.Implement;
 public class CourseService : ICourseService
 {
     private readonly ICourseRepository _courseRepo;
-    private readonly IClassworkRepository _classworkRepo; // Updated from ITopicRepository
+    private readonly IClassworkRepository _classworkRepo;
     private readonly IMapper _mapper;
-    private readonly IFileService _fileService; // Using your LocalFileService
+    private readonly IFileService _fileService;
 
     public CourseService(
         ICourseRepository courseRepo,

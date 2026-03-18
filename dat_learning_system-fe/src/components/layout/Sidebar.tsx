@@ -15,7 +15,6 @@ import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import CircleNotificationsIcon from '@mui/icons-material/CircleNotifications';
-import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 
 // Custom Components & Config
 import BasicSelect from "../common/Select";
@@ -88,7 +87,6 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
   // 2. Auto-detect Mode from URL (Survives direct Navigation)
   React.useEffect(() => {
-    // List your management routes here
     const managementRoutes = ["/umanage", "/org_units", "/admin", "/enrollements", "/logs"];
     const isManagementPage = managementRoutes.some(path => location.pathname.startsWith(path));
 

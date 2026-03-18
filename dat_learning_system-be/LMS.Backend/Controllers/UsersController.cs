@@ -1,3 +1,4 @@
+using LMS.Backend.Common;
 using LMS.Backend.DTOs.User;
 using LMS.Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -19,12 +20,12 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("list")]
-    public async Task<IActionResult> GetUsers()
+    public async Task<IActionResult> GetUsers([FromQuery] int? unitId, [FromQuery] Position? position)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(currentUserId)) return Unauthorized();
 
-        var users = await _userService.GetUsersByScopeAsync(currentUserId);
+        var users = await _userService.GetUsersByScopeAsync(currentUserId, unitId, position);
         return Ok(users);
     }
 
@@ -35,7 +36,7 @@ public class UserController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         var result = await _userService.UpdateUserAsync(id, dto);
-        
+
         // If result is false, it could mean NotFound OR Forbidden (cross-company)
         // For simplicity, we return Ok/NotFound, but you could split these
         return result ? Ok(new { message = "User updated successfully" }) : NotFound();
@@ -46,7 +47,7 @@ public class UserController : ControllerBase
     {
         // Note: Ensure your Frontend axios call uses { data: dto } for DELETE
         var result = await _userService.DeleteUserAsync(id, dto);
-        
+
         return result ? Ok(new { message = "User deleted successfully" }) : NotFound();
     }
 }

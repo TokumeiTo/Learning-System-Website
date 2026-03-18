@@ -73,11 +73,38 @@ public class TestRepository : ITestRepository
             .SumAsync(q => q.Points);
     }
 
-    public async Task<LessonAttempt> CreateAttemptAsync(LessonAttempt attempt)
+    public async Task<LessonAttempt> UpsertAttemptAsync(LessonAttempt newAttempt)
     {
-        await _context.LessonAttempts.AddAsync(attempt);
+        // Check for existing attempt by this user for this specific test
+        var existing = await _context.LessonAttempts
+            .FirstOrDefaultAsync(a => a.UserId == newAttempt.UserId && a.TestId == newAttempt.TestId);
+
+        if (existing == null)
+        {
+            // First time taking the test
+            newAttempt.Attempts = 1;
+            await _context.LessonAttempts.AddAsync(newAttempt);
+            await _context.SaveChangesAsync();
+            return newAttempt;
+        }
+
+        // Returning User: Update stats
+        // Logic: Only increment Attempts if they haven't passed yet
+        if (!existing.IsPassed)
+        {
+            existing.Attempts += 1;
+        }
+
+        // Always update the latest score and answers
+        existing.Score = newAttempt.Score;
+        existing.MaxScore = newAttempt.MaxScore;
+        existing.Percentage = newAttempt.Percentage;
+        existing.IsPassed = newAttempt.IsPassed;
+        existing.AnswerJson = newAttempt.AnswerJson;
+        existing.AttemptedAt = DateTime.UtcNow;
+
         await _context.SaveChangesAsync();
-        return attempt;
+        return existing;
     }
 
     // Helpers
