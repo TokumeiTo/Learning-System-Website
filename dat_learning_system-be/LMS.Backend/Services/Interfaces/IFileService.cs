@@ -5,4 +5,5 @@ public interface IFileService
     Task<string> UploadFileAsync(IFormFile file, string folderName);
     void DeleteFile(string fileUrl);
     Task<(Stream stream, string contentType, string fileName)> GetFileStreamForDownloadAsync(string fileUrl);
+    Task<string> UploadAndOptimizePdf(IFormFile file);
 }

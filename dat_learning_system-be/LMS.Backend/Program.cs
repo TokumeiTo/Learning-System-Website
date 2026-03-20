@@ -11,7 +11,9 @@ using LMS.Backend.Middlewares;
 using LMS.Backend.Services.Background;
 using LMS.Backend.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -115,6 +117,14 @@ builder.Services.AddSingleton<AuditInterceptor>();
 builder.Services.AddApplicationServices();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddHostedService<NotificationCleanupWorker>();
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 420_000_000; // 400 MB
+});
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = 420_000_000; // 400 MB
+});
 #endregion
 
 #region SECURITY & CORS
@@ -177,7 +187,21 @@ var app = builder.Build();
 // Exception Middleware
 app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseStaticFiles();
+// 1. Move CORS to the TOP (Before Static Files and Routing)
+app.UseCors("AllowReactApp");
+
+// 2. Tell Static Files to use the CORS policy
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        // This adds the "Access-Control-Allow-Origin" header to static files
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "http://localhost:5173");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Credentials", "true");
+        ctx.Context.Response.Headers.Append("Accept-Ranges", "bytes");
+    }
+});
 
 app.UseRouting();
 
@@ -187,10 +211,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-// Security and HTTP
-// app.UseHttpsRedirection();
-app.UseCors("AllowReactApp");
 
 // Auth
 app.UseAuthentication();

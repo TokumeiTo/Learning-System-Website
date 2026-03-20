@@ -1,0 +1,1 @@
+public record FileDownloadModel(string FilePath, string ContentType, string FileName);

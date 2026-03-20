@@ -14,6 +14,7 @@ using LMS.Backend.Common;
 using LMS.Backend.DTOs.Flashcard;
 using LMS.Backend.Data;
 using LMS.Backend.DTOs.Classwork;
+using LMS.Backend.DTOs.Library;
 
 namespace LMS.Backend.Helpers;
 
@@ -63,7 +64,7 @@ public class MappingProfile : Profile
         CreateMap<Course, CourseDetailDto>()
             .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src.Badge.ToString()))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
-        
+
 
         // --- LESSON MAPPING ---
         // Consolidate into one mapping for creation
@@ -128,13 +129,13 @@ public class MappingProfile : Profile
             // If Body is null (which it will be for a Test), ensure we don't crash
             .ForMember(dest => dest.Body, opt => opt.NullSubstitute(string.Empty));
 
-        // Enrollments
+        // --- ENROLLMENT MAPPING ---
         CreateMap<Enrollment, EnrollmentRequestDto>()
             .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.User.FullName))
             .ForMember(dest => dest.StudentEmail, opt => opt.MapFrom(src => src.User.Email))
             .ForMember(dest => dest.CourseTitle, opt => opt.MapFrom(src => src.Course.Title));
 
-        // Audit
+        // --- AUDIT MAPPING ---
         CreateMap<AuditLog, GlobalAuditLogDto>()
             .ForMember(dest => dest.PerformedBy, opt => opt.MapFrom(src => src.AdminUser != null
                 ? $"{src.AdminUser.Email}"
@@ -215,8 +216,8 @@ public class MappingProfile : Profile
         CreateMap<KanjiExampleDto, KanjiExample>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id == Guid.Empty ? Guid.NewGuid() : src.Id));
 
-        // GRAMMAR FLESHCARD MAPPING
-        // Inside your MappingProfile constructor
+
+        // --- GRAMMAR FLESHCARD MAPPING ---
 
         // 1. Grammar Mapping (Create/Update -> Entity)
         CreateMap<GrammarCreateUpdateDto, Grammar>()
@@ -237,7 +238,7 @@ public class MappingProfile : Profile
         CreateMap<Grammar, GrammarDto>();
         CreateMap<GrammarExample, GrammarExampleDto>();
 
-        // VOCABULARY MAPPING
+        // --- VOCABULARY MAPPING ---
         CreateMap<Vocabulary, VocabResponseDto>();
         CreateMap<VocabularyExample, VocabExampleDto>();
 
@@ -250,7 +251,7 @@ public class MappingProfile : Profile
         CreateMap<VocabExampleDto, VocabularyExample>()
             .ForMember(dest => dest.Id, opt => opt.Ignore());
 
-        // ONOMATOPOEIA
+        // --- ONOMATOPOEIA ---
         // Entity -> Response (For GET requests)
         CreateMap<Onomatopoeia, OnomatoResponseDto>();
         CreateMap<OnomatopoeiaExample, OnomatoExampleDto>();
@@ -260,5 +261,19 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Examples, opt => opt.MapFrom(src => src.Examples));
 
         CreateMap<OnomatoExampleDto, OnomatopoeiaExample>();
+
+
+        // --- LIBRARY / EBOOK MAPPING ---
+
+        // Entity -> Response (For GET)
+        CreateMap<EBook, EBookResponseDto>();
+
+        // Request -> Entity (For Create/Update)
+        CreateMap<EBookRequestDto, EBook>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.TotalDownloadCount, opt => opt.Ignore())
+            .ForMember(dest => dest.TotalReaderCount, opt => opt.Ignore())
+            .ForMember(dest => dest.AverageRating, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
     }
 }

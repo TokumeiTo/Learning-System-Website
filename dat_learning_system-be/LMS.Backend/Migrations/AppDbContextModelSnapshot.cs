@@ -151,7 +151,7 @@ namespace LMS.Backend.Migrations
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
                             CompanyCode = "00-0000",
-                            ConcurrencyStamp = "4ea4292a-8c7f-43aa-8139-193ff1ec0afe",
+                            ConcurrencyStamp = "87fab527-e018-4f54-ab44-897fb16eb87b",
                             Email = "admin@lms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin",
@@ -160,10 +160,10 @@ namespace LMS.Backend.Migrations
                             NormalizedEmail = "ADMIN@LMS.COM",
                             NormalizedUserName = "00-0000",
                             OrgUnitId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAEENDDrKN7MJRR5ZOe6v8VyXS92S6xHQpzvWAmH0g6dFpM8aqkAIFuB/3AtDx6/dgjQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECXBW9R0HLGuYIk1sAwBFFf8rSaRbt0uWtiDiGFgzKYesbvuyQ7o0yCEvC0Gc8zxXw==",
                             PhoneNumberConfirmed = false,
                             Position = 0,
-                            SecurityStamp = "6b8c3000-c18c-4eb4-bec1-84e212776d40",
+                            SecurityStamp = "4662f606-ffff-4b0a-9036-099920d9c11f",
                             TwoFactorEnabled = false,
                             UserName = "00-0000"
                         });
@@ -455,6 +455,76 @@ namespace LMS.Backend.Migrations
                         .IsUnique();
 
                     b.ToTable("CourseRatings");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.EBook", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<double>("AverageRating")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("double precision")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("ThumbnailUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("TotalDownloadCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("TotalReaderCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Category");
+
+                    b.ToTable("EBooks");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.Enrollment", b =>
@@ -1484,6 +1554,48 @@ namespace LMS.Backend.Migrations
                     b.ToTable("Tests");
                 });
 
+            modelBuilder.Entity("LMS.Backend.Data.Entities.UserBookProgress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EBookId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("HasDownloaded")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("HasOpened")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("LastAccessedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("TotalMinutesSpent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("double precision")
+                        .HasDefaultValue(0.0);
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EBookId");
+
+                    b.HasIndex("UserId", "EBookId")
+                        .IsUnique();
+
+                    b.ToTable("UserBookProgresses");
+                });
+
             modelBuilder.Entity("LMS.Backend.Data.Entities.UserLessonProgress", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2013,6 +2125,17 @@ namespace LMS.Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("LessonContent");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.UserBookProgress", b =>
+                {
+                    b.HasOne("LMS.Backend.Data.Entities.EBook", "EBook")
+                        .WithMany()
+                        .HasForeignKey("EBookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EBook");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.UserLessonProgress", b =>

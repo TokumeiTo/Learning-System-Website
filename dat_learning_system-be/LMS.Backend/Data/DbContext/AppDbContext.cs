@@ -45,6 +45,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<QuizSession> QuizSessions { get; set; }
     public DbSet<QuizSessionAnswer> QuizSessionAnswers { get; set; }
 
+    // --- E-LIBRARY TABLES ---
+    public DbSet<EBook> EBooks { get; set; }
+    public DbSet<UserBookProgress> UserBookProgresses { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         // Must call base for Identity tables to be created
