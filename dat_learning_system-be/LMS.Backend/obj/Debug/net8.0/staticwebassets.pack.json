@@ -1,60 +1,20 @@
 {
   "Files": [
     {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\4775f214-b355-4160-bc77-f2c4e005ac1c.jfif",
-      "PackagePath": "staticwebassets\\uploads\\4775f214-b355-4160-bc77-f2c4e005ac1c.jfif"
-    },
-    {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\5a24bc1a-0142-47b4-8bea-9c2fc8880f00.jfif",
-      "PackagePath": "staticwebassets\\uploads\\5a24bc1a-0142-47b4-8bea-9c2fc8880f00.jfif"
-    },
-    {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\68f0420c-0f69-40db-a7d5-0565b101b78c.jfif",
-      "PackagePath": "staticwebassets\\uploads\\68f0420c-0f69-40db-a7d5-0565b101b78c.jfif"
-    },
-    {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\77ce37df-5c4b-47c9-ab1b-db5849c6daf4.jfif",
-      "PackagePath": "staticwebassets\\uploads\\77ce37df-5c4b-47c9-ab1b-db5849c6daf4.jfif"
-    },
-    {
       "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\No_Thumbnail.svg",
       "PackagePath": "staticwebassets\\uploads\\No_Thumbnail.svg"
     },
     {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\images\\5a24bc1a-0142-47b4-8bea-9c2fc8880f00.jfif",
-      "PackagePath": "staticwebassets\\uploads\\images\\5a24bc1a-0142-47b4-8bea-9c2fc8880f00.jfif"
-    },
-    {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\images\\Capture001(1).png",
-      "PackagePath": "staticwebassets\\uploads\\images\\Capture001(1).png"
-    },
-    {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\images\\Capture001(2).png",
-      "PackagePath": "staticwebassets\\uploads\\images\\Capture001(2).png"
-    },
-    {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\images\\Capture001(3).png",
-      "PackagePath": "staticwebassets\\uploads\\images\\Capture001(3).png"
-    },
-    {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\images\\Capture001(4).png",
-      "PackagePath": "staticwebassets\\uploads\\images\\Capture001(4).png"
-    },
-    {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\images\\Capture001(5).png",
-      "PackagePath": "staticwebassets\\uploads\\images\\Capture001(5).png"
+      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\documents\\test.pdf",
+      "PackagePath": "staticwebassets\\uploads\\documents\\test.pdf"
     },
     {
       "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\images\\Capture001.png",
       "PackagePath": "staticwebassets\\uploads\\images\\Capture001.png"
     },
     {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\images\\Screenshot 2026-01-14 160651(1).png",
-      "PackagePath": "staticwebassets\\uploads\\images\\Screenshot 2026-01-14 160651(1).png"
-    },
-    {
-      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\images\\Screenshot 2026-01-14 160651.png",
-      "PackagePath": "staticwebassets\\uploads\\images\\Screenshot 2026-01-14 160651.png"
+      "Id": "C:\\Thz\\QC_Circle\\dat_learning_system-be\\LMS.Backend\\wwwroot\\uploads\\images\\MINNA N5 test book.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\MINNA N5 test book.jpg"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.LMS.Backend.Microsoft.AspNetCore.StaticWebAssets.props",

@@ -28,6 +28,7 @@ export const LEARNING_NAV = [
 export const MANAGEMENT_NAV = [
     { label: "Manager", path: "/admin/dashboard", icon: <DashboardIcon color="secondary" /> },
     { label: "User Management", path: "/admin/user_management", icon: <PeopleIcon color="secondary" /> },
+    { label: "Library Management", path: "/admin/library_management", icon: <LocalLibraryIcon color="secondary" /> },
     { label: "Org Structure", path: "/admin/org_units", icon: <AccountTreeIcon color="secondary" /> },
     { label: "Enrollments", path: "/admin/enrollments", icon: <AddCardIcon color="secondary" /> },
     { label: "Audits", path: "/admin/logs", icon: <DvrIcon color="secondary" /> },

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import {
   Box, Button, TextField, Typography, Paper, IconButton, Chip, Stack,
   InputAdornment, Avatar, Badge, useTheme, Table, TableBody, TableCell,
@@ -8,7 +8,7 @@ import {
   Select,
   MenuItem
 } from "@mui/material";
-import { PersonAdd, Search, Edit, Delete, FilterList } from "@mui/icons-material";
+import { PersonAdd, Search, Edit, Delete } from "@mui/icons-material";
 
 // Components
 import UserAddForm from "../../components/user/UserAddForm";
@@ -68,15 +68,6 @@ const UserManagementPage = () => {
     return () => clearTimeout(delayDebounce);
   }, [searchTerm, filterUnitId, filterPosition]);
 
-  // 2. Filter Logic
-  const filteredUsers = useMemo(() => {
-    return users.filter(u =>
-      u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [users, searchTerm]);
-
-  // 3. Action Handlers
   const handleAddUser = async (data: RegisterRequest) => {
     try {
       setProcessing(true);

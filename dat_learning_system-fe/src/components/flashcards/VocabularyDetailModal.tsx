@@ -7,7 +7,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import type { Vocabulary } from "../../types_interfaces/vocabulary";
 import { deleteVocab } from "../../api/vocabulary.api";
-import ConfirmModal from "../feedback/ComfirmModal";
+import ConfirmModal from "../feedback/ConfirmModal";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 

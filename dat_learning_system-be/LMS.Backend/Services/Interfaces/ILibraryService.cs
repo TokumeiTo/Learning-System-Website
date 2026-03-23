@@ -15,4 +15,5 @@ public interface ILibraryService
     Task RecordActivityAsync(string userId, BookActivityRequestDto activity);
     Task<UserBookProgressDto?> GetUserProgressAsync(string userId, int bookId);
     Task<FileDownloadModel?> PrepareDownloadAsync(int id);
+    Task<LibraryStatsDto> GetUserStatsAsync(string userId);
 }

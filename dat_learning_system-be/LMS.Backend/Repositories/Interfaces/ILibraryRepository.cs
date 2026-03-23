@@ -1,4 +1,5 @@
 using LMS.Backend.Data.Entities;
+using LMS.Backend.DTOs.Library;
 
 namespace LMS.Backend.Repo.Interface;
 
@@ -15,4 +16,6 @@ public interface ILibraryRepository
     // Activity & Tracking
     Task UpdateActivityAsync(string userId, int bookId, double minutesToAdd, bool? isDownloading = null, bool? isOpening = null);
     Task<UserBookProgress?> GetUserActivityAsync(string userId, int bookId);
+    Task<LibraryStatsDto> GetUserStatsAsync(string userId)
+;
 }

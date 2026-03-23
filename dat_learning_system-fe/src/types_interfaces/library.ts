@@ -36,6 +36,13 @@ export interface UserBookProgress {
     lastAccessedAt: string;
 }
 
+export interface LibraryStatsData {
+    totalBooks: number;
+    totalMinutesSpent: number;
+    booksOpened: number;
+    booksDownloaded: number;
+}
+
 export interface PagedLibraryResponse<T> {
     items: T[];
     totalCount: number;

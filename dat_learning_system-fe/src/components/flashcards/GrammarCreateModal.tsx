@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import type { JLPTLevel } from "../../types_interfaces/kanji";
 import type { Grammar, GrammarExample } from "../../types_interfaces/grammar";
 import { saveGrammar } from "../../api/grammar.api";
-import ConfirmModal from "../feedback/ComfirmModal";
+import ConfirmModal from "../feedback/ConfirmModal";
 
 type Props = {
     open: boolean;

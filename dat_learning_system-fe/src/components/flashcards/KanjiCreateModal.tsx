@@ -9,7 +9,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useState, useEffect } from "react";
 import type { Kanji, JLPTLevel, KanjiExample } from "../../types_interfaces/kanji";
 import { saveKanji } from "../../api/kanji.api";
-import ConfirmModal from "../feedback/ComfirmModal";
+import ConfirmModal from "../feedback/ConfirmModal";
 
 type Props = {
     open: boolean;

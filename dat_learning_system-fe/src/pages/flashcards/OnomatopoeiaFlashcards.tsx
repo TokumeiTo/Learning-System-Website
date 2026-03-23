@@ -7,7 +7,7 @@ import { ONOMATO_CATEGORIES } from "../../utils/onomato_type_category";
 import { getAllOnomato, deleteOnomato } from "../../api/onomatopoeia.api";
 import OnomatoFlashcard from "../../components/flashcards/OnomatoSpecificFlashcard";
 import OnomatoCreateModal from "../../components/flashcards/OnomatoCreateModal";
-import ConfirmModal from "../../components/feedback/ComfirmModal";
+import ConfirmModal from "../../components/feedback/ConfirmModal";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function OnomatoFlashcards() {

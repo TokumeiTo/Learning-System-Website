@@ -20,7 +20,7 @@ import GestureIcon from '@mui/icons-material/Gesture';
 import CloseIcon from "@mui/icons-material/Close";
 import { deleteKanji } from "../../api/kanji.api";
 import { useAuth } from "../../hooks/useAuth";
-import ConfirmModal from "../feedback/ComfirmModal";
+import ConfirmModal from "../feedback/ConfirmModal";
 
 type Props = {
     open: boolean;

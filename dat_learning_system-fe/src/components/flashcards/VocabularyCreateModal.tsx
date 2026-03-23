@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import type { Vocabulary, PartOfSpeech, VocabularyExample, UpsertVocabRequest } from "../../types_interfaces/vocabulary";
 import type { JLPTLevel } from "../../types_interfaces/kanji";
 import { saveVocab } from "../../api/vocabulary.api";
-import ConfirmModal from "../feedback/ComfirmModal";
+import ConfirmModal from "../feedback/ConfirmModal";
 
 interface Props {
     open: boolean;

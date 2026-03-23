@@ -40,6 +40,11 @@ public class LibraryService(
         };
     }
 
+    public async Task<LibraryStatsDto> GetUserStatsAsync(string userId)
+    {
+        return await repo.GetUserStatsAsync(userId);
+    }
+
     public async Task<EBookResponseDto?> GetBookByIdAsync(int id)
     {
         var book = await repo.GetBookByIdAsync(id);

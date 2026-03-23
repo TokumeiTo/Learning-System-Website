@@ -35,6 +35,7 @@ import GlobalAuditLog from "../pages/admin/AuditLogsPage";
 import NotificationPage from "../pages/notification/NotificationPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import EnrollmentGuard from "../components/auth/EnrollmentGuard";
+import LibraryAdminPage from "../pages/admin/LibraryAdminPage";
 
 export const AppRouter = () => {
   const { user } = useAuth();
@@ -223,6 +224,15 @@ export const AppRouter = () => {
           element={
             <ProtectedRoute allowedPositions={["Admin", "SuperAdmin", "ProjectManager", "DivHead", "DepHead", "SecHead"]}>
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin/library_management"
+          element={
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin", "ProjectManager", "DivHead", "DepHead", "SecHead"]}>
+              <LibraryAdminPage />
             </ProtectedRoute>
           }
         />

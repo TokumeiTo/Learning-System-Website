@@ -1,5 +1,6 @@
 using LMS.Backend.Data.Dbcontext;
 using LMS.Backend.Data.Entities;
+using LMS.Backend.DTOs.Library;
 using LMS.Backend.Repo.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -130,6 +131,30 @@ public class LibraryRepository(AppDbContext context) : ILibraryRepository
         return await context.UserBookProgresses
             .AsNoTracking()
             .FirstOrDefaultAsync(a => a.UserId == userId && a.EBookId == bookId);
+    }
+
+    public async Task<LibraryStatsDto> GetUserStatsAsync(string userId)
+    {
+        var stats = new LibraryStatsDto
+        {
+            // Total active books in library
+            TotalBooks = await context.EBooks.CountAsync(b => b.IsActive),
+
+            // Sum of all minutes and counts for THIS user
+            TotalMinutesSpent = await context.UserBookProgresses
+                .Where(p => p.UserId == userId)
+                .SumAsync(p => p.TotalMinutesSpent),
+
+            BooksOpened = await context.UserBookProgresses
+                .Where(p => p.UserId == userId && p.HasOpened)
+                .CountAsync(),
+
+            BooksDownloaded = await context.UserBookProgresses
+                .Where(p => p.UserId == userId && p.HasDownloaded)
+                .CountAsync()
+        };
+
+        return stats;
     }
 
     #endregion

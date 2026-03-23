@@ -54,6 +54,14 @@ public class LibraryController(ILibraryService libraryService) : ControllerBase
         return NoContent();
     }
 
+    [HttpGet("stats")]
+    public async Task<ActionResult<LibraryStatsDto>> GetLibraryStats()
+    {
+        var userId = GetUserId();
+        var stats = await libraryService.GetUserStatsAsync(userId);
+        return Ok(stats);
+    }
+
     [AllowAnonymous]
     [HttpGet("download/{id}")]
     public async Task<IActionResult> Download(int id)
@@ -69,7 +77,7 @@ public class LibraryController(ILibraryService libraryService) : ControllerBase
             downloadData.FilePath,
             downloadData.ContentType,
             downloadData.FileName,
-            enableRangeProcessing: true 
+            enableRangeProcessing: true
         );
     }
 
@@ -79,11 +87,11 @@ public class LibraryController(ILibraryService libraryService) : ControllerBase
 
     [Authorize(Roles = "SuperAdmin,Admin")]
     [HttpPost]
-    [RequestSizeLimit(420_000_000)] 
+    [RequestSizeLimit(420_000_000)]
     public async Task<ActionResult<EBookResponseDto>> Create([FromForm] EBookRequestDto request)
     {
         var createdBook = await libraryService.CreateBookAsync(request);
-        return CreatedAtAction(nameof(GetById), new { id = createdBook.Id }, createdBook);
+        return Ok(new { message = "Resource created successfully!", data = createdBook });
     }
 
     [Authorize(Roles = "Admin")]
@@ -92,8 +100,9 @@ public class LibraryController(ILibraryService libraryService) : ControllerBase
     public async Task<IActionResult> Update(int id, [FromForm] EBookRequestDto request)
     {
         var success = await libraryService.UpdateBookAsync(id, request);
-        if (!success) return NotFound($"Cannot update. Book {id} not found.");
-        return NoContent();
+        if (!success) return NotFound(new { message = $"Update failed. Book {id} not found." });
+
+        return Ok(new { message = "Resource updated successfully!" });
     }
 
     [Authorize(Roles = "Admin")]
@@ -101,9 +110,9 @@ public class LibraryController(ILibraryService libraryService) : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var success = await libraryService.DeleteBookAsync(id);
-        if (!success) return NotFound($"Cannot delete. Book {id} not found.");
+        if (!success) return NotFound(new { message = "Delete failed. Resource not found." });
 
-        return NoContent();
+        return Ok(new { message = "Resource moved to trash successfully." });
     }
 
     #endregion
@@ -113,7 +122,7 @@ public class LibraryController(ILibraryService libraryService) : ControllerBase
     private string GetUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        
+
         if (string.IsNullOrEmpty(userIdClaim))
             throw new UnauthorizedAccessException("User ID claim is missing.");
 

@@ -12,6 +12,7 @@ interface BookProps {
 
 const LibraryBookCard: React.FC<BookProps> = ({ book, onRead }) => {
     const theme = useTheme();
+    const progress = book.userProgress;
 
     const formatTime = (minutes: number | undefined) => {
         if (!minutes || minutes === 0) return "Not started";
@@ -36,7 +37,7 @@ const LibraryBookCard: React.FC<BookProps> = ({ book, onRead }) => {
             <Card sx={{ borderRadius: 6, bgcolor: 'transparent', boxShadow: 'none' }}>
                 <Box sx={{ position: 'relative', mb: 2, '&:hover .book-actions': { opacity: 1 } }}>
                     {/* DOWNLOAD COUNT BADGE (Top Right) */}
-                    <Box sx={{ 
+                    <Box sx={{
                         position: 'absolute', top: 12, right: 12, zIndex: 2,
                         bgcolor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
                         px: 1, py: 0.5, borderRadius: 2, display: 'flex', alignItems: 'center', gap: 0.5
@@ -73,20 +74,20 @@ const LibraryBookCard: React.FC<BookProps> = ({ book, onRead }) => {
                             variant="contained"
                             fullWidth
                             onClick={onRead}
-                            sx={{ 
-                                mx: 2, width: '80%', bgcolor: 'white', color: '#0f172a', 
-                                fontWeight: 800, borderRadius: 2, '&:hover': { bgcolor: '#f1f5f9' } 
+                            sx={{
+                                mx: 2, width: '80%', bgcolor: 'white', color: '#0f172a',
+                                fontWeight: 800, borderRadius: 2, '&:hover': { bgcolor: '#f1f5f9' }
                             }}
                         >
                             Read Now
                         </Button>
-                        
+
                         <Tooltip title="Download for Offline Study" arrow>
                             <Button
                                 startIcon={<Download />}
                                 variant="outlined"
-                                sx={{ 
-                                    color: 'white', borderColor: 'rgba(255,255,255,0.3)', 
+                                sx={{
+                                    color: 'white', borderColor: 'rgba(255,255,255,0.3)',
                                     fontWeight: 600, width: '80%', borderRadius: 2,
                                     '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }
                                 }}
@@ -100,7 +101,6 @@ const LibraryBookCard: React.FC<BookProps> = ({ book, onRead }) => {
                 </Box>
 
                 <CardContent sx={{ p: 1 }}>
-                    {/* ... Title and Star Rating remain same ... */}
                     <Stack direction="row" justifyContent="space-between" alignItems="start">
                         <Typography variant="subtitle2" fontWeight={800} noWrap sx={{ flex: 1, mr: 1 }}>
                             {book.title}
@@ -111,6 +111,26 @@ const LibraryBookCard: React.FC<BookProps> = ({ book, onRead }) => {
                                 {book.averageRating?.toFixed(1)}
                             </Typography>
                         </Stack>
+                        {progress && progress.hasOpened && (
+                            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
+                                <Box sx={{
+                                    px: 1,
+                                    py: 0.5,
+                                    bgcolor: 'action.selected',
+                                    borderRadius: 1,
+                                    border: '1px solid #e2e8f0'
+                                }}>
+                                    <Typography variant="caption" fontWeight={700} color="secondary">
+                                        {progress.totalMinutesSpent} MINS READ
+                                    </Typography>
+                                </Box>
+                                {progress.hasDownloaded && (
+                                    <Typography variant="caption" color="success.main" fontWeight={700}>
+                                        • DOWNLOADED
+                                    </Typography>
+                                )}
+                            </Stack>
+                        )}
                     </Stack>
 
                     <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>

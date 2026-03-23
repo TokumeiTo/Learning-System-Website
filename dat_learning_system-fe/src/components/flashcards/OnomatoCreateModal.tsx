@@ -13,7 +13,7 @@ import type {
 } from "../../types_interfaces/onomatopoeia";
 import { ONOMATO_TYPES, ONOMATO_CATEGORIES } from "../../utils/onomato_type_category";
 import { saveOnomato } from "../../api/onomatopoeia.api";
-import ConfirmModal from "../feedback/ComfirmModal";
+import ConfirmModal from "../feedback/ConfirmModal";
 
 interface Props {
     open: boolean;

@@ -1,9 +1,11 @@
 import api from "../hooks/useApi";
+import type { ApiResponse } from "../types_interfaces/api";
 import type {
     EBook,
     UserBookProgress,
     BookActivityRequest,
-    PagedLibraryResponse
+    PagedLibraryResponse,
+    LibraryStatsData
 } from "../types_interfaces/library";
 
 // --- Student Actions ---
@@ -43,31 +45,36 @@ export const recordBookActivity = async (payload: BookActivityRequest): Promise<
     return response.data;
 };
 
+export const fetchLibraryStats = async (): Promise<LibraryStatsData> => {
+    const response = await api.get('/api/Library/stats');
+    return response.data;
+};
+
 // --- Admin Actions ---
 
-export const createBook = async (payload: FormData, onProgress: (pct: number) => void): Promise<EBook> => {
+export const createBook = async (payload: FormData, onProgress: (pct: number) => void): Promise<ApiResponse<EBook>> => {
     const response = await api.post('/api/Library', payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
-            onProgress(percentCompleted);
+            const pct = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
+            onProgress(pct);
         }
     });
     return response.data;
 };
 
-export const updateBook = async (id: number, payload: FormData, onProgress: (pct: number) => void): Promise<void> => {
+export const updateBook = async (id: number, payload: FormData, onProgress: (pct: number) => void): Promise<ApiResponse> => {
     const response = await api.put(`/api/Library/${id}`, payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
-            onProgress(percentCompleted);
+            const pct = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
+            onProgress(pct);
         }
     });
     return response.data;
 };
 
-export const deleteBook = async (id: number): Promise<void> => {
+export const deleteBook = async (id: number): Promise<ApiResponse> => {
     const response = await api.delete(`/api/Library/${id}`);
     return response.data;
 };
