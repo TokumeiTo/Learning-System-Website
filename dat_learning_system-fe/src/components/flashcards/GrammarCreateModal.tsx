@@ -19,7 +19,6 @@ type Props = {
 };
 
 export default function GrammarCreateModal({ open, onClose, onSuccess, grammarToEdit }: Props) {
-    // 1. Individual State Hooks (Matching your Kanji style)
     const [title, setTitle] = useState("");
     const [jlptLevel, setJlptLevel] = useState<JLPTLevel>("N5");
     const [meaning, setMeaning] = useState("");

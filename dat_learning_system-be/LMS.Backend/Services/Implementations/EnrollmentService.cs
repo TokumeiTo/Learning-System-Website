@@ -138,7 +138,6 @@ public class EnrollmentService : IEnrollmentService
         // Fetch all records where Status is 'Approved' or 'Rejected'
         var history = await _repo.GetEnrollmentHistoryAsync();
 
-        // Map to your DTO (AutoMapper handles the conversion to StudentName, CourseTitle, etc.)
         return _mapper.Map<IEnumerable<EnrollmentRequestDto>>(history);
     }
 }

@@ -18,7 +18,6 @@ export const getVocabById = async (id: string): Promise<Vocabulary> => {
 // Save (Create or Update)
 export const saveVocab = async (data: UpsertVocabRequest): Promise<Vocabulary> => {
   // Matches Controller: [HttpPost("upsert")]
-  // We use your 'upsert' endpoint which handles both Add and Manual Sync Update
   const response = await api.post('/api/vocabulary/upsert', data);
   return response.data;
 };

@@ -15,7 +15,6 @@ import { translateText } from '../../api/translation.api';
 import type { TranslationHistoryItem, TranslationRequest } from '../../types_interfaces/translation';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
-// Your New Separated Components
 import TranslationResult from '../../components/translation/TranslationResult';
 import HistoryDrawer from '../../components/translation/HistoryDrawer';
 

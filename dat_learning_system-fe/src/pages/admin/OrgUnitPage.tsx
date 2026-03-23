@@ -145,7 +145,7 @@ const OrgPage: React.FC = () => {
                         <Box sx={{ 
                             p: 2, 
                             borderBottom: `1px solid ${theme.palette.divider}`, 
-                            bgcolor: theme.palette.background.gray // Using your custom gray token
+                            bgcolor: theme.palette.background.gray
                         }}>
                             <TextField
                                 fullWidth

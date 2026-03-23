@@ -39,9 +39,8 @@ public class UserProgressService : IUserProgressService
         return true;
     }
 
-    public async Task<bool> UpdateBookHeartbeatAsync(Guid userId, int bookId, int seconds)
+    public async Task<bool> UpdateBookHeartbeatAsync(string userId, int bookId, int seconds)
     {
-        // 1. Validation (matches your lesson logic)
         if (seconds <= 0 || seconds > 60) return false;
 
         // 2. Convert seconds to minutes for our "Lean" DB storage
@@ -59,7 +58,6 @@ public class UserProgressService : IUserProgressService
     }
     public async Task MarkAsCompleteAsync(string userId, Guid lessonId)
     {
-        // Simply pass the call to your repository
         await _repo.MarkAsCompleteAsync(userId, lessonId);
     }
 }

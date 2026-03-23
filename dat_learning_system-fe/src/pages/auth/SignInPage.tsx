@@ -51,7 +51,6 @@ export default function SignIn() {
       }
       // 2. Handle Custom Backend Messages (401 Unauthorized)
       else if (err.response?.status === 401) {
-        // This pulls the "Invalid Company Code or Password" string from your controller
         setGeneralError(err.response.data.message || 'Unauthorized Access');
       }
       // 3. Handle Generic/Network Errors

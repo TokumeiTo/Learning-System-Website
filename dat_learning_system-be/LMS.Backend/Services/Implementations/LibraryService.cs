@@ -46,13 +46,13 @@ public class LibraryService(
         return book == null ? null : mapper.Map<EBookResponseDto>(book);
     }
 
-    public async Task<UserBookProgressDto?> GetUserProgressAsync(Guid userId, int bookId)
+    public async Task<UserBookProgressDto?> GetUserProgressAsync(string userId, int bookId)
     {
         var progress = await repo.GetUserActivityAsync(userId, bookId);
         return progress == null ? null : mapper.Map<UserBookProgressDto>(progress);
     }
 
-    public async Task RecordActivityAsync(Guid userId, BookActivityRequestDto activity)
+    public async Task RecordActivityAsync(string userId, BookActivityRequestDto activity)
     {
         await repo.UpdateActivityAsync(
             userId,

@@ -2,7 +2,7 @@ using LMS.Backend.DTOs.Translation;
 using LMS.Backend.Services.Interfaces;
 using System.Net;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions; // Added for script detection
+using System.Text.RegularExpressions;
 using Kawazu;
 using LMS.Backend.Data.Models;
 
@@ -79,10 +79,10 @@ public class TranslationService : ITranslationService
         string cleanText = text.Replace("[Technical IT Context]:", "").Trim();
 
         // Check for Myanmar Script (Unicode Range U+1000–U+109F)
-        if (Regex.IsMatch(text, @"[\u1000-\u109F]")) return "my";
+        if (Regex.IsMatch(cleanText, @"[\u1000-\u109F]")) return "my";
 
         // Check for Japanese Script (Hiragana/Katakana/Kanji)
-        if (Regex.IsMatch(text, @"[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]")) return "ja";
+        if (Regex.IsMatch(cleanText, @"[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]")) return "ja";
 
         // Default to English
         return "en";

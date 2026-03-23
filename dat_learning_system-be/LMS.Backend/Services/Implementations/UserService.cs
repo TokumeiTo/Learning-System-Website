@@ -117,7 +117,7 @@ public class UserService : IUserService
         targetUser.OrgUnitId = dto.OrgUnitId;
 
         // 5. Explicit Enum parsing for Position
-        // Use Number parsing because your Frontend sends "1", "2" etc.
+        // Use Number parsing because Frontend sends "1", "2" etc.
         targetUser.Position = EnumMappingHelper.MapPosition(dto.Position, targetUser.Position);
 
         // 6. Save changes via repository
@@ -144,7 +144,7 @@ public class UserService : IUserService
         }
 
         // 3. Set Audit Reason for Interceptor
-        // This is picked up by your AuditInterceptor before the record is purged
+        // This is picked up by AuditInterceptor before the record is purged
         if (_httpContextAccessor.HttpContext != null)
         {
             _httpContextAccessor.HttpContext.Items["AuditReason"] = dto.DeletedReason ?? "No reason provided";
@@ -159,7 +159,6 @@ public class UserService : IUserService
         var user = await _userRepo.GetByIdAsync(id);
         if (user == null) return null;
 
-        // Use your existing mapping logic to return UserResponseDto
         return _mapper.Map<UserResponseDto>(user);
     }
 }

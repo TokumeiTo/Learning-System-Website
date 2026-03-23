@@ -12,7 +12,6 @@
           "BCrypt.Net-Next": "4.0.3",
           "FluentValidation.AspNetCore": "11.3.1",
           "Kawazu": "1.1.4",
-          "LanguageDetection": "1.2.0",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "8.0.0",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.0",
           "Microsoft.AspNetCore.OpenApi": "8.0.22",
@@ -211,14 +210,6 @@
           "lib/net5.0/Kawazu.dll": {
             "assemblyVersion": "1.1.4.0",
             "fileVersion": "1.1.4.0"
-          }
-        }
-      },
-      "LanguageDetection/1.2.0": {
-        "runtime": {
-          "lib/net45/LanguageDetection.dll": {
-            "assemblyVersion": "1.1.0.0",
-            "fileVersion": "1.1.0.0"
           }
         }
       },
@@ -1683,13 +1674,6 @@
       "sha512": "sha512-ZXSCv+STeJomB+sjHBk74b30rAI/JTPAzanC7YhsP+6qy7HzZV5QYHhtpXd21jdCUjvSasAhbIZzpa+BFZoOfA==",
       "path": "kawazu/1.1.4",
       "hashPath": "kawazu.1.1.4.nupkg.sha512"
-    },
-    "LanguageDetection/1.2.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-kjRoYZNahh3Ot/HZO8Yh8lRjYagsnCOt82qnzKSOuVx51aWvguQ/p31+8ye9kR9nfWwyh3i8Xjq/16WPzcQpsg==",
-      "path": "languagedetection/1.2.0",
-      "hashPath": "languagedetection.1.2.0.nupkg.sha512"
     },
     "LibNMeCab/0.10.1": {
       "type": "package",

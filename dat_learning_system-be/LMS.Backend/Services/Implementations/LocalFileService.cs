@@ -57,7 +57,7 @@ public class LocalFileService : IFileService
         }
     }
 
-    public async Task<(Stream stream, string contentType, string fileName)> GetFileStreamForDownloadAsync(string fileUrl)
+    public Task<(Stream stream, string contentType, string fileName)> GetFileStreamForDownloadAsync(string fileUrl)
     {
         if (string.IsNullOrEmpty(fileUrl)) throw new FileNotFoundException();
 
@@ -75,7 +75,8 @@ public class LocalFileService : IFileService
             contentType = "application/octet-stream";
         }
 
-        return (stream, contentType, Path.GetFileName(fullPath));
+        var result = (stream: (Stream)stream, contentType, fileName: Path.GetFileName(fullPath));
+        return Task.FromResult(result);
     }
 
     public async Task<string> UploadAndOptimizePdf(IFormFile file)
@@ -126,9 +127,8 @@ public class LocalFileService : IFileService
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            // Log your error here (e.g., _logger.LogError(ex, "PDF Optimization failed"))
             throw;
         }
         finally

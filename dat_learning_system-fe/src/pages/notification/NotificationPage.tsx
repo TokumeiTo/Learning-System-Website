@@ -108,7 +108,6 @@ const NotificationPage = () => {
         }
 
         // 2. Navigate based on type
-        // Assuming your Notification type has a 'referenceId' or similar
         switch (noti.referenceType) {
             case 'Course':
                 navigate(`/courses`);

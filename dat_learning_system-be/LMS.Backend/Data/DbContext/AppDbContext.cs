@@ -40,11 +40,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Vocabulary> Vocabularies { get; set; }
     public DbSet<VocabularyExample> VocabularyExamples { get; set; }
     public DbSet<Onomatopoeia> Onomatopoeias { get; set; }
-    // --- QUIZ & PRATICE TABLES ---
-    public DbSet<QuizItem> QuizItems { get; set; }
-    public DbSet<QuizSession> QuizSessions { get; set; }
-    public DbSet<QuizSessionAnswer> QuizSessionAnswers { get; set; }
-
+   
     // --- E-LIBRARY TABLES ---
     public DbSet<EBook> EBooks { get; set; }
     public DbSet<UserBookProgress> UserBookProgresses { get; set; }

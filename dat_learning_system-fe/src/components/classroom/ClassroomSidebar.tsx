@@ -100,7 +100,7 @@ const ClassroomSidebar = memo(({
           <Fade in={activeTab === 1}>
             <Box>
               <ClassworkTab
-                courseId={data.courseId} // Assuming your data prop has the course ID
+                courseId={data.courseId}
                 isEditMode={isEditMode}
               />
             </Box>

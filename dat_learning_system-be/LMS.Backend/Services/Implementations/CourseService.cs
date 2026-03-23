@@ -51,7 +51,6 @@ public class CourseService : ICourseService
         // 3. File Upload using LocalFileService
         if (dto.ThumbnailFile != null && dto.ThumbnailFile.Length > 0)
         {
-            // Reusing your logic: uploads/thumbnails/filename
             course.Thumbnail = await _fileService.UploadFileAsync(dto.ThumbnailFile, "thumbnails");
         }
         else

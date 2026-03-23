@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using LMS.Backend.Data.Entities;
 
-namespace YourApp.Data.Configurations
+namespace LMS.Backend.Data.Configurations
 {
     public class KanjiExampleConfiguration : IEntityTypeConfiguration<KanjiExample>
     {

@@ -62,7 +62,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Badge, opt => opt.Ignore())
             .ForMember(dest => dest.Thumbnail, opt => opt.Ignore());
         CreateMap<Course, CourseDetailDto>()
-            .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src.Badge.ToString()))
+            .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src!.Badge!.ToString()))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
 

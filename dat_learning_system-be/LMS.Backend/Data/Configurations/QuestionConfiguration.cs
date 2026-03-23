@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LMS.Backend.Data.Configurations;
+
 public class QuestionConfiguration : IEntityTypeConfiguration<Question>
 {
     public void Configure(EntityTypeBuilder<Question> builder)
     {
         builder.HasKey(q => q.Id);
-        
-        // Good: allows for long markdown/formatted questions
+
         builder.Property(q => q.QuestionText).IsRequired().HasColumnType("text");
         builder.Property(q => q.Points).HasDefaultValue(1);
 
@@ -24,6 +24,8 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
         // Essential for retrieving questions in the correct sequence for the QuizViewer
         builder.HasIndex(q => new { q.TestId, q.SortOrder });
 
-        builder.HasQueryFilter(q => q.Test.LessonContent.Lesson.Course.Status != CourseStatus.Closed);
+        builder.HasQueryFilter(q =>
+            q.Test!.LessonContent!.Lesson!.Course!.Status != CourseStatus.Closed); builder.HasQueryFilter(q =>
+            q.Test!.LessonContent!.Lesson!.Course!.Status != CourseStatus.Closed);
     }
 }

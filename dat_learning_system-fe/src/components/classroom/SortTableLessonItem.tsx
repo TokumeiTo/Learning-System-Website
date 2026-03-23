@@ -38,8 +38,8 @@ const SortableLessonItem = ({
     const [prevLocked, setPrevLocked] = useState(item.isLocked);
     const [showUnlockAnim, setShowUnlockAnim] = useState(false);
     const isTestLesson = item.title.toLowerCase().includes('test');
-    const testColor = '#a7f3d0'; // Light green (MUI green[200]ish)
-    const activeColor = '#6366f1'; // Your purple
+    const testColor = '#a7f3d0';
+    const activeColor = '#6366f1';
 
     const {
         attributes, listeners, setNodeRef, transform, transition, isDragging
@@ -119,7 +119,7 @@ const SortableLessonItem = ({
                     </ListItemIcon>
                 )}
 
-                {/* 2. Status Icon (Your AnimatePresence logic) */}
+                {/* 2. Status Icon */}
                 <ListItemIcon sx={{
                     minWidth: 32,
                     color: item.isLocked && !isEditMode

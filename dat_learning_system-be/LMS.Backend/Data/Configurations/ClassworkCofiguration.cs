@@ -89,7 +89,6 @@ public class ClassworkSubmissionConfiguration : IEntityTypeConfiguration<Classwo
         builder.HasIndex(x => x.ClassworkItemId);
         
         // Ensure one student can only have one submission record per item
-        // This supports your "Overwrite" logic at the DB level
         builder.HasIndex(x => new { x.ClassworkItemId, x.UserId }).IsUnique();
     }
 }

@@ -6,8 +6,8 @@ import {
     Switch
 } from '@mui/material';
 import {
-    Delete, DragIndicator, YouTube, CloudUpload,
-    Link as LinkIcon, ZoomIn as ZoomInIcon
+    Delete, DragIndicator, CloudUpload,
+    Link as LinkIcon
 } from '@mui/icons-material';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import { useSortable } from '@dnd-kit/sortable';
@@ -49,26 +49,6 @@ const DraftBlock = ({ block, updateBlock, removeBlock }: any) => {
                 });
             }
             reader.readAsDataURL(file);
-        }
-    };
-
-    const handlePreviewFile = (body: string) => {
-        // If it's Base64 (Pending Save), we create a temporary Blob URL
-        if (body.startsWith('data:')) {
-            const byteString = atob(body.split(',')[1]);
-            const mimeString = body.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            const blob = new Blob([ab], { type: mimeString });
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
-        } else {
-            // If it's a saved path from the server
-            const fullUrl = body.startsWith('http') ? body : `${import.meta.env.VITE_API_URL}${body}`;
-            window.open(fullUrl, '_blank');
         }
     };
 
@@ -311,7 +291,6 @@ const DraftBlock = ({ block, updateBlock, removeBlock }: any) => {
                                     {block.contentType === 'image' ? (
                                         <Box
                                             component="img"
-                                            // If it's a saved path, we might need to prefix your API URL if not absolute
                                             src={isSavedFile ? block.body.startsWith('http') ? block.body : `${import.meta.env.VITE_API_URL}${block.body}` : block.body}
 
                                             sx={{ width: '100%', maxHeight: 400, objectFit: 'contain' }}

@@ -47,7 +47,6 @@ const UserManagementPage = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      // Pass the filters to your API call
       const data = await getUsersList(
         searchTerm,
         filterUnitId === "" ? undefined : filterUnitId,
@@ -82,17 +81,14 @@ const UserManagementPage = () => {
     try {
       setProcessing(true);
 
-      // 1. Call the API (now using your 'api' instance with interceptors)
       const res = await registerApi(data);
 
-      // 2. Check the result from your C# RegisterResponse
       if (res.isSuccess) {
         // Use the message from the backend: e.g., "User registered successfully!"
         setPopup({ open: true, message: res.message, severity: "success" });
         setShowAddForm(false);
         fetchUsers();
       } else {
-        // Handle cases where isSuccess is false (custom logic from your service)
         setPopup({ open: true, message: res.message || "Registration failed", severity: "error" });
       }
     } catch (err: any) {

@@ -57,7 +57,6 @@ export default function QuizSetupPage() {
                     ))}
                 </Box>
 
-                {/* Level Tabs stick to bottom as per your design */}
                 <Box bgcolor="primary.main" sx={{ position: 'fixed', bottom: 20, borderRadius: '20px', boxShadow: 3 }}>
                     <Tabs value={level} onChange={(_, v) => setLevel(v)} centered sx={{ "& .MuiTab-root": { color: "white" } }}>
                         {LEVELS.map((lvl) => <Tab key={lvl} label={lvl} value={lvl} />)}

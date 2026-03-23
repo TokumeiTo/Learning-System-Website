@@ -81,7 +81,7 @@ public class LibraryRepository(AppDbContext context) : ILibraryRepository
 
     #region Tracking Logic
 
-    public async Task UpdateActivityAsync(Guid userId, int bookId, double minutesToAdd, bool? isDownloading = null, bool? isOpening = null)
+    public async Task UpdateActivityAsync(string userId, int bookId, double minutesToAdd, bool? isDownloading = null, bool? isOpening = null)
     {
         var activity = await context.UserBookProgresses
             .FirstOrDefaultAsync(a => a.UserId == userId && a.EBookId == bookId);
@@ -125,7 +125,7 @@ public class LibraryRepository(AppDbContext context) : ILibraryRepository
         await context.SaveChangesAsync();
     }
 
-    public async Task<UserBookProgress?> GetUserActivityAsync(Guid userId, int bookId)
+    public async Task<UserBookProgress?> GetUserActivityAsync(string userId, int bookId)
     {
         return await context.UserBookProgresses
             .AsNoTracking()

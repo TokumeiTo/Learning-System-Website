@@ -296,15 +296,6 @@
           }
         }
       },
-      "LanguageDetection/1.2.0": {
-        "type": "package",
-        "compile": {
-          "lib/net45/LanguageDetection.dll": {}
-        },
-        "runtime": {
-          "lib/net45/LanguageDetection.dll": {}
-        }
-      },
       "LibNMeCab/0.10.1": {
         "type": "package",
         "compile": {
@@ -3086,18 +3077,6 @@
         "lib/net5.0/Kawazu.dll",
         "lib/netcoreapp3.1/Kawazu.dll",
         "lib/netstandard2.0/Kawazu.dll"
-      ]
-    },
-    "LanguageDetection/1.2.0": {
-      "sha512": "kjRoYZNahh3Ot/HZO8Yh8lRjYagsnCOt82qnzKSOuVx51aWvguQ/p31+8ye9kR9nfWwyh3i8Xjq/16WPzcQpsg==",
-      "type": "package",
-      "path": "languagedetection/1.2.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "languagedetection.1.2.0.nupkg.sha512",
-        "languagedetection.nuspec",
-        "lib/net45/LanguageDetection.dll"
       ]
     },
     "LibNMeCab/0.10.1": {
@@ -8224,7 +8203,6 @@
       "BCrypt.Net-Next >= 4.0.3",
       "FluentValidation.AspNetCore >= 11.3.1",
       "Kawazu >= 1.1.4",
-      "LanguageDetection >= 1.2.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 8.0.0",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 8.0.0",
       "Microsoft.AspNetCore.OpenApi >= 8.0.22",
@@ -8295,10 +8273,6 @@
             "target": "Package",
             "version": "[1.1.4, )"
           },
-          "LanguageDetection": {
-            "target": "Package",
-            "version": "[1.2.0, )"
-          },
           "Microsoft.AspNetCore.Authentication.JwtBearer": {
             "target": "Package",
             "version": "[8.0.0, )"
@@ -8364,17 +8338,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Package 'LanguageDetection 1.2.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.",
-      "libraryId": "LanguageDetection",
-      "targetGraphs": [
-        "net8.0"
-      ]
-    }
-  ]
+  }
 }

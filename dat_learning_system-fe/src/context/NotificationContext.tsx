@@ -28,7 +28,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         connection.start()
             .then(() => {
                 console.log("Connected to SignalR!");
-                // Ensure user.id is the GUID string from your new LoginResponse
                 if (user?.id) {
                     connection.invoke("JoinUserGroup", user.id);
                 }

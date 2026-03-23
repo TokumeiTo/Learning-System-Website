@@ -12,7 +12,7 @@ public interface ILibraryService
     Task<bool> DeleteBookAsync(int id);
 
     // Activity
-    Task RecordActivityAsync(Guid userId, BookActivityRequestDto activity);
-    Task<UserBookProgressDto?> GetUserProgressAsync(Guid userId, int bookId);
+    Task RecordActivityAsync(string userId, BookActivityRequestDto activity);
+    Task<UserBookProgressDto?> GetUserProgressAsync(string userId, int bookId);
     Task<FileDownloadModel?> PrepareDownloadAsync(int id);
 }

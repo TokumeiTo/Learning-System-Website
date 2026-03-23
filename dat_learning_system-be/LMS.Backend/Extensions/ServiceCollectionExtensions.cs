@@ -28,7 +28,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IGrammarFlashcardRepository, GrammarFlashcardRepository>();
         services.AddScoped<IVocabularyRepository, VocabularyRepository>();
         services.AddScoped<IOnomatoRepository, OnomatoRepository>();
-        services.AddScoped<IJlptQuizRepository, JlptQuizRepository>();
         services.AddScoped<ILibraryRepository, LibraryRepository>();
 
         // Services
@@ -41,7 +40,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IClassworkService, ClassworkService>();
         services.AddScoped<IMediaHandlerService, MediaHandlerService>();
         services.AddScoped<ILessonService, LessonService>();
-        services.AddScoped<ILessonAttemptService, LessonAttemptService>();
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<ITranslationService, TranslationService>();
@@ -52,7 +50,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IGrammarFlashcardService, GrammarFlashcardService>();
         services.AddScoped<IVocabularyService, VocabularyService>();
         services.AddScoped<IOnomatoService, OnomatoService>();
-        services.AddScoped<IJlptQuizService, JlptQuizService>();
         services.AddScoped<ILibraryService, LibraryService>();
 
         // Helpers

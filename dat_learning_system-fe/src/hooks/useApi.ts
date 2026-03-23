@@ -18,7 +18,6 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        // This 'data' is the 'response' object from your Backend ExceptionMiddleware
         const backendError = error.response?.data;
 
         // Log it or show a Toast notification

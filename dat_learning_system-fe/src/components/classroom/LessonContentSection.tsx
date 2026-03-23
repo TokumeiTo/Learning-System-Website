@@ -151,7 +151,7 @@ const LessonContentSection = ({
         <Button
           size="small"
           startIcon={<FilePresentIcon />}
-          onClick={() => addDraft('file')} // Add 'file' type to your content logic
+          onClick={() => addDraft('file')}
           sx={{ color: 'white' }}
         >
           Document

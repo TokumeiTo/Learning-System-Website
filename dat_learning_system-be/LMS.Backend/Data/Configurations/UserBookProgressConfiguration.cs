@@ -18,7 +18,6 @@ public class UserBookProgressConfiguration : IEntityTypeConfiguration<UserBookPr
         builder.Property(a => a.HasOpened).HasDefaultValue(false);
 
         // Relationship: If a book is deleted, we usually want to keep activity 
-        // for logs, or use DeleteBehavior.Cascade if you want a clean wipe.
         builder.HasOne(a => a.EBook)
                .WithMany() 
                .HasForeignKey(a => a.EBookId)

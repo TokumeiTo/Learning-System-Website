@@ -33,7 +33,7 @@ export const updateUser = async (id: string, data: UserUpdateFields): Promise<Ap
     fullName: data.fullName,
     position: positionLabel, // Send the STRING label as the DTO expects
     orgUnitId: data.orgUnitId.toString() === "" ? null : Number(data.orgUnitId),
-    updatedReason: data.updatedReason // This matches your DTO key exactly!
+    updatedReason: data.updatedReason
   };
 
   const response = await api.put(`/api/User/${id}`, payload);
@@ -49,5 +49,5 @@ export const deleteUser = async (id: string, data: UserDeleteFields): Promise<Ap
   // We pass 'data' directly. Axios takes this 'data' object 
   // and puts it into the request body.
   const response = await api.delete(`/api/User/${id}`, { data });
-  return response.data; // Returns { message: "..." } from your C# Controller
+  return response.data;
 };

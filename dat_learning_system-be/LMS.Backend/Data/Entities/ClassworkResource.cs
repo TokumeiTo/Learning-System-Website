@@ -8,7 +8,7 @@ public class ClassworkResource
     public Guid Id { get; set; }
     public Guid ClassworkItemId { get; set; }
 
-    // The path from your Local File Service (e.g., /uploads/classwork/file.pdf) 
+    // The path from Local File Service (e.g., /uploads/classwork/file.pdf) 
     // or an external URL.
     [Required]
     public string ResourceUrl { get; set; } = string.Empty;

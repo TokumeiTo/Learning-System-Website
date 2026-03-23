@@ -108,22 +108,6 @@ public class LessonAttemptDto
     public int? TimeTakenSeconds { get; set; }
 }
 
-public class LinkQuestionDto
-{
-    public Guid TestId { get; set; }
-    // The Guid of the Kanji, Vocabulary, or Grammar record from your existing tables
-    public string SourceId { get; set; } = string.Empty;
-
-    // Mapping to your QuizDisplayMode Enum (0: KanjiReading, 2: GrammarStar, etc.)
-    public int DisplayMode { get; set; }
-
-    public int Points { get; set; } = 10;
-
-    // Optional: Used specifically for Grammar Star to store the sentence structure 
-    // or for a Custom Prompt that overrides the default Flashcard display.
-    public string? CustomPrompt { get; set; }
-}
-
 public class GlobalSearchResultDto
 {
     public string Id { get; set; } = string.Empty;

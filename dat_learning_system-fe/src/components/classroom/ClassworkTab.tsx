@@ -10,11 +10,10 @@ import {
     PersonOutline as UserIcon,
     AssignmentOutlined as AssignmentIcon,
     InsertDriveFileOutlined as FileIcon,
-    DeleteOutline as DeleteIcon // Added Delete Icon
+    DeleteOutline as DeleteIcon
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 
-// Added deleteClassworkItem and deleteClassworkTopic to your imports
 import {
     fetchCourseClasswork,
     createClassworkTopic,

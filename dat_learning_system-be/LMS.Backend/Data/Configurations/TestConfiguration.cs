@@ -26,11 +26,6 @@ public class TestConfiguration : IEntityTypeConfiguration<Test>
                .HasForeignKey(q => q.TestId)
                .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(t => t.QuizItems)
-               .WithOne(qi => qi.Test)
-               .HasForeignKey(qi => qi.TestId)
-               .OnDelete(DeleteBehavior.Cascade);
-
         // UPDATED: Filter must check if LessonContent is null before checking Course status
         builder.HasQueryFilter(t => t.LessonContentId == null || 
                t.LessonContent!.Lesson.Course.Status != CourseStatus.Closed);

@@ -47,7 +47,6 @@ const EnrollmentHistory: React.FC = () => {
 
     const executeUpdate = async (id: string, approve: boolean, reason: string) => {
         try {
-            // Change respondToEnrollment to return the result in your api.ts
             const result = await respondToEnrollment(id, approve, reason);
 
             // Show success toast with backend message

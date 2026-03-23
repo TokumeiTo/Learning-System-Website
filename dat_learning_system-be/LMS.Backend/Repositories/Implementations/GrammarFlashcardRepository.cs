@@ -35,10 +35,11 @@ public class GrammarFlashcardRepository : IGrammarFlashcardRepository
         await _context.Grammars.AddAsync(grammar);
     }
 
-    public async Task UpdateAsync(Grammar grammar)
+    public Task UpdateAsync(Grammar grammar)
     {
-        // Tracking is handled by EF; we just ensure the state is Modified
         _context.Entry(grammar).State = EntityState.Modified;
+
+        return Task.CompletedTask;
     }
 
     public async Task DeleteAsync(Guid id)

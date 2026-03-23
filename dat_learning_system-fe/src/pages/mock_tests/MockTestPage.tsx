@@ -98,7 +98,7 @@ const MockTestPage = () => {
     );
   }
 
-  // 3. ACTUAL EXAM VIEW (Your provided UI)
+  // 3. ACTUAL EXAM VIEW
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#0f172a', p: 4, color: 'white' }}>
       {/* Top Bar: Progress & Timer */}

@@ -186,8 +186,6 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         </List>
       </Box>
 
-      {/* ... Rest of your component (Common items, Profile) is perfect as it is ... */}
-
       <Divider />
       <List>
         {isDrawerOpen && <Typography variant="overline" sx={{ px: 3, color: 'text.secondary', fontWeight: '500' }}>General</Typography>}

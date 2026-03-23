@@ -21,7 +21,7 @@ public class DictionaryController : ControllerBase
 
         var client = _httpClientFactory.CreateClient();
         
-        // This is the proxy part: your C# server calls Jisho
+        // This is the proxy part: C# server calls Jisho
         var url = $"https://jisho.org/api/v1/search/words?keyword={System.Net.WebUtility.UrlEncode(keyword)}";
         
         var response = await client.GetAsync(url);
@@ -29,7 +29,7 @@ public class DictionaryController : ControllerBase
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
-            // We return the raw JSON string from Jisho back to your React app
+            // We return the raw JSON string from Jisho back to React app
             return Content(content, "application/json");
         }
 

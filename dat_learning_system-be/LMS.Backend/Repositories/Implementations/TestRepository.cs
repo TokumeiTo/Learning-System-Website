@@ -69,7 +69,7 @@ public class TestRepository : ITestRepository
     public async Task<int> GetTotalPointsForLessonAsync(Guid lessonId)
     {
         return await _context.Questions
-            .Where(q => q.Test.IsActive && q.Test.LessonContent.LessonId == lessonId)
+            .Where(q => q.Test.IsActive && q.Test!.LessonContent!.LessonId == lessonId)
             .SumAsync(q => q.Points);
     }
 
@@ -118,7 +118,7 @@ public class TestRepository : ITestRepository
             var q = questionsList[i];
 
             if (q.Id == Guid.Empty) q.Id = Guid.NewGuid();
-            q.SortOrder = i + 1; // Fixes your SortOrder bug
+            q.SortOrder = i + 1;
 
             foreach (var opt in q.Options)
             {
@@ -131,8 +131,8 @@ public class TestRepository : ITestRepository
     {
         return await _context.QuestionOptions
             .Where(o => o.IsCorrect &&
-                    o.Question.Test.IsActive &&
-                    o.Question.Test.LessonContent.LessonId == lessonId)
+                    o.Question!.Test!.IsActive &&
+                    o.Question!.Test!.LessonContent!.LessonId == lessonId)
             .Select(o => o.Id)
             .ToListAsync();
     }

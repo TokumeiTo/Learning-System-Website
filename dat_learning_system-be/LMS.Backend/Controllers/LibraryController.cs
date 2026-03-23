@@ -18,7 +18,7 @@ public class LibraryController(ILibraryService libraryService) : ControllerBase
         [FromQuery] string? category,
         [FromQuery] string? search,
         [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 12) // Updated default to match your React hook
+        [FromQuery] int pageSize = 12) // Match to React hook
     {
         if (page < 1) page = 1;
         if (pageSize > 100) pageSize = 100;
@@ -39,7 +39,7 @@ public class LibraryController(ILibraryService libraryService) : ControllerBase
     [HttpGet("{id}/my-progress")]
     public async Task<ActionResult<UserBookProgressDto>> GetMyProgress(int id)
     {
-        var userId = GetUserId(); // Now returns Guid
+        var userId = GetUserId(); // Now returns string
         var progress = await libraryService.GetUserProgressAsync(userId, id);
 
         if (progress == null) return NotFound("No progress found for this book.");
@@ -110,17 +110,14 @@ public class LibraryController(ILibraryService libraryService) : ControllerBase
 
     #region Helpers
 
-    private Guid GetUserId()
+    private string GetUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         
         if (string.IsNullOrEmpty(userIdClaim))
             throw new UnauthorizedAccessException("User ID claim is missing.");
 
-        if (!Guid.TryParse(userIdClaim, out var guidUserId))
-            throw new UnauthorizedAccessException("User ID is not a valid GUID.");
-
-        return guidUserId;
+        return userIdClaim;
     }
 
     #endregion

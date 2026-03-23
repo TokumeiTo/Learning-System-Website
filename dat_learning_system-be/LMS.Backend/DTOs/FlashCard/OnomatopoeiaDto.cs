@@ -30,6 +30,6 @@ public class OnomatoUpsertRequestDto
     public string Category { get; set; } = "N/A";
     public string? Explanation { get; set; }
 
-    // We send the full list every time to support your "Manual Sync" logic
+    // We send the full list every time to support "Manual Sync" logic
     public List<OnomatoExampleDto> Examples { get; set; } = new();
 }

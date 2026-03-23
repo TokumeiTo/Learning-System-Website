@@ -46,7 +46,6 @@ const BugReportForm: React.FC = () => {
     });
 
     const onSubmit = async (data: BugFormInputs) => {
-        // Replace with your real API call (e.g., axios.post('/api/bugs', data))
         await new Promise((resolve) => setTimeout(resolve, 2000));
         console.log("Bug Report Data:", data);
     };

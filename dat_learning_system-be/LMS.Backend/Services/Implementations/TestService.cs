@@ -88,7 +88,6 @@ public class TestService : ITestService
             await _progressRepo.MarkAsCompleteAsync(userId, submission.LessonId);
         }
 
-        // 6. Return Result (Cast percentage to double if your DTO requires it)
         return new LessonResultDto
         {
             Score = finalAttempt.Score,

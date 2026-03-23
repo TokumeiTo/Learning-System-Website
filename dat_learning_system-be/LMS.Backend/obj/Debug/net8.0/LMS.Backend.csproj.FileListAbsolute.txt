@@ -34,7 +34,6 @@ C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\itext.svg.d
 C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\itext.bouncy-castle-adapter.dll
 C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\itext.commons.dll
 C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\Kawazu.dll
-C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\LanguageDetection.dll
 C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\LibNMeCab.dll
 C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\LibNMeCab.IpaDicBin.dll
 C:\Thz\QC_Circle\dat_learning_system-be\LMS.Backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

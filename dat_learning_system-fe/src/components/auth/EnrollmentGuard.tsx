@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { getEnrollmentStatus } from '../../api/enrollment.api';
 import { CircularProgress, Box } from '@mui/material';
-import { useAuth } from '../../hooks/useAuth'; // Import your auth hook
+import { useAuth } from '../../hooks/useAuth';
 
 const EnrollmentGuard = ({ children }: { children: React.ReactNode }) => {
     const { id } = useParams<{ id: string }>();

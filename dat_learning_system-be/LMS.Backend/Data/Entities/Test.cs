@@ -16,7 +16,4 @@ public class Test
 
     // For Lesson Tests
     public ICollection<Question> Questions { get; set; } = new List<Question>();
-    // For Jlpt Quizzes
-    public virtual ICollection<QuizItem> QuizItems { get; set; } = new List<QuizItem>();
-    public virtual ICollection<QuizSession> Sessions { get; set; } = new List<QuizSession>();
 }

@@ -15,7 +15,7 @@ import type { JlptTestDto, QuizSession } from "../../types_interfaces/jlptquiz";
 import QuizIntroModal from "../../components/quiz/QuizIntroModal";
 import PageLayout from "../../components/layout/PageLayout";
 
-// Your Admin Components
+// Admin Components
 import AdminQuizCreator from "../../components/admin/AdminQuizCreator";
 import AdminAddQuestion from "../../components/admin/AdminAddQuestion";
 
@@ -55,7 +55,6 @@ export default function QuizListPage() {
     const handleStartQuiz = async (testId: string) => {
         try {
             const sessionId = await startQuizSession(testId);
-            // SessionId is a number from your backend
             navigate(`/quiz/run/${testId}`, { state: { sessionId, level, category } });
         } catch (err) {
             console.error("Failed to initiate session", err);

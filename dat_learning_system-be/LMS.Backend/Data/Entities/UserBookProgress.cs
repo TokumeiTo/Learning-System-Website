@@ -3,7 +3,7 @@ namespace LMS.Backend.Data.Entities;
 public class UserBookProgress
 {
     public int Id { get; set; }
-    public Guid UserId { get; set; }
+    public string UserId { get; set; } = null!;
     public int EBookId { get; set; }
 
     // Anti-Cheating Flags

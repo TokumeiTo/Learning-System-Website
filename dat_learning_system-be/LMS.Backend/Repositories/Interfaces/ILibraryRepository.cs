@@ -13,6 +13,6 @@ public interface ILibraryRepository
     Task<(IEnumerable<EBook> Items, int TotalCount)> GetAllPagedAsync(string? category, string? search, int page, int pageSize);
 
     // Activity & Tracking
-    Task UpdateActivityAsync(Guid userId, int bookId, double minutesToAdd, bool? isDownloading = null, bool? isOpening = null);
-    Task<UserBookProgress?> GetUserActivityAsync(Guid userId, int bookId);
+    Task UpdateActivityAsync(string userId, int bookId, double minutesToAdd, bool? isDownloading = null, bool? isOpening = null);
+    Task<UserBookProgress?> GetUserActivityAsync(string userId, int bookId);
 }

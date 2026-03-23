@@ -6,7 +6,6 @@ import type { TranslationRequest, TranslationResponse } from "../types_interface
  * The backend handles the IT-context logic and the external API call.
  */
 export const translateText = async (data: TranslationRequest): Promise<TranslationResponse> => {
-    // This matches the [HttpPost("translate")] route in your TranslationController
     const res = await api.post<TranslationResponse>("/api/translation/translate", data);
     return res.data;
 };
