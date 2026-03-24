@@ -9,13 +9,13 @@ public class RoadMap
     public string? ThumbnailUrl { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    public ICollection<RoadmapStep> Nodes { get; set; } = new List<RoadmapStep>();
+    public ICollection<RoadmapStep> Steps { get; set; } = new List<RoadmapStep>();
 }
 
 public class RoadmapStep
 {
     public int Id { get; set; }
-    public int LearningPathId { get; set; }
+    public int RoadMapId { get; set; }
     public RoadMap RoadMap { get; set; } = null!;
 
     public string Title { get; set; } = string.Empty;
@@ -25,7 +25,7 @@ public class RoadmapStep
     public string? Content { get; set; } 
     
     // If NodeType is EBook, store the ID here to link to your existing Library
-    public int? LinkedResourceId { get; set; } 
+    public string? LinkedResourceId { get; set; } 
 
     public int SortOrder { get; set; }
 }

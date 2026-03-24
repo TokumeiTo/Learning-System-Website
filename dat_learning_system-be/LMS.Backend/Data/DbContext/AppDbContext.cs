@@ -40,11 +40,14 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Vocabulary> Vocabularies { get; set; }
     public DbSet<VocabularyExample> VocabularyExamples { get; set; }
     public DbSet<Onomatopoeia> Onomatopoeias { get; set; }
-   
+
     // --- E-LIBRARY TABLES ---
     public DbSet<EBook> EBooks { get; set; }
     public DbSet<UserBookProgress> UserBookProgresses { get; set; }
 
+    // --- ROADMAP TABLES ---
+    public DbSet<RoadMap> RoadMaps { get; set; }
+    public DbSet<RoadmapStep> RoadMapSteps { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

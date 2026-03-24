@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVocabularyRepository, VocabularyRepository>();
         services.AddScoped<IOnomatoRepository, OnomatoRepository>();
         services.AddScoped<ILibraryRepository, LibraryRepository>();
+        services.AddScoped<IRoadmapRepository, RoadmapRepository>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
@@ -51,6 +52,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVocabularyService, VocabularyService>();
         services.AddScoped<IOnomatoService, OnomatoService>();
         services.AddScoped<ILibraryService, LibraryService>();
+        services.AddScoped<IRoadmapService, RoadmapService>();
 
         // Helpers
         services.AddSingleton<JwtHelper>();

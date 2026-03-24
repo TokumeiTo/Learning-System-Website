@@ -3,6 +3,7 @@ using System;
 using LMS.Backend.Data.Dbcontext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LMS.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260324050910_AddRoadMapSystemTableNameChange")]
+    partial class AddRoadMapSystemTableNameChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,7 +154,7 @@ namespace LMS.Backend.Migrations
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
                             CompanyCode = "00-0000",
-                            ConcurrencyStamp = "a42846b7-3544-449a-8506-70435614769b",
+                            ConcurrencyStamp = "7dac8993-b44a-4ddd-b57e-f5500df161b9",
                             Email = "admin@lms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin",
@@ -160,10 +163,10 @@ namespace LMS.Backend.Migrations
                             NormalizedEmail = "ADMIN@LMS.COM",
                             NormalizedUserName = "00-0000",
                             OrgUnitId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAEMPwWmCA5s+wSPtS9/Eh1iYfRmssdM9d0m4+4OgfrdW8sq4PP/cwIWsL7pzT8W9atA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENkeuwrYxrHxnbxGwQbiaFSi/QRsypYwjp/svZjiQE5L4aK0vTemJzhxje6gv7y8sg==",
                             PhoneNumberConfirmed = false,
                             Position = 0,
-                            SecurityStamp = "d1999049-2049-404d-b245-308cec6e7405",
+                            SecurityStamp = "480d0bbc-a3b6-46aa-88c1-6790ff0ff44b",
                             TwoFactorEnabled = false,
                             UserName = "00-0000"
                         });
@@ -1464,9 +1467,8 @@ namespace LMS.Backend.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("text");
 
-                    b.Property<string>("LinkedResourceId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                    b.Property<int?>("LinkedResourceId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("NodeType")
                         .IsRequired()
@@ -1487,6 +1489,8 @@ namespace LMS.Backend.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LinkedResourceId");
 
                     b.HasIndex("RoadMapId", "SortOrder");
 
@@ -2053,6 +2057,11 @@ namespace LMS.Backend.Migrations
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.RoadmapStep", b =>
                 {
+                    b.HasOne("LMS.Backend.Data.Entities.EBook", null)
+                        .WithMany()
+                        .HasForeignKey("LinkedResourceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("LMS.Backend.Data.Entities.RoadMap", "RoadMap")
                         .WithMany("Steps")
                         .HasForeignKey("RoadMapId")

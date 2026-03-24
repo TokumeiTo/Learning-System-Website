@@ -15,6 +15,7 @@ using LMS.Backend.DTOs.Flashcard;
 using LMS.Backend.Data;
 using LMS.Backend.DTOs.Classwork;
 using LMS.Backend.DTOs.Library;
+using LMS.Backend.DTOs.RoadMap;
 
 namespace LMS.Backend.Helpers;
 
@@ -277,5 +278,13 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
 
         CreateMap<UserBookProgress, UserBookProgressDto>().ReverseMap();
+
+
+        // --- ROADMAP MAPPING ---
+        CreateMap<RoadMap, RoadmapResponseDto>()
+            .ForMember(dest => dest.StepCount, opt => opt.MapFrom(src => src.Steps.Count));
+
+        CreateMap<RoadmapStep, RoadmapStepDto>();
+        CreateMap<RoadmapRequestDto, RoadMap>();
     }
 }
