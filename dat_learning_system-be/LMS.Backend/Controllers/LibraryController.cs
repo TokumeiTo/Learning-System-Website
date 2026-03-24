@@ -23,15 +23,21 @@ public class LibraryController(ILibraryService libraryService) : ControllerBase
         if (page < 1) page = 1;
         if (pageSize > 100) pageSize = 100;
 
-        var result = await libraryService.GetPagedBooksAsync(category, search, page, pageSize);
+        var userId = GetUserId();
+        var result = await libraryService.GetPagedBooksAsync(userId, category, search, page, pageSize);
         return Ok(result);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<EBookResponseDto>> GetById(int id)
     {
+        var userId = GetUserId();
         var book = await libraryService.GetBookByIdAsync(id);
+
         if (book == null) return NotFound($"Book with ID {id} not found.");
+
+        var progress = await libraryService.GetUserProgressAsync(userId, id);
+        book.UserProgress = progress;
 
         return Ok(book);
     }

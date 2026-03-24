@@ -19,6 +19,7 @@ public class EBookResponseDto
     public int TotalReaderCount { get; set; }
     public double AverageRating { get; set; }
     public DateTime CreatedAt { get; set; }
+    public UserBookProgressDto? UserProgress { get; set; }
 }
 
 // Personal progress data (Specific to the logged-in student)

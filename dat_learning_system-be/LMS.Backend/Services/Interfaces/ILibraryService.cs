@@ -5,7 +5,7 @@ namespace LMS.Backend.Services.Interfaces;
 public interface ILibraryService
 {
     Task<IEnumerable<EBookResponseDto>> GetAllBooksAsync(string? category = null);
-    Task<PagedLibraryResponseDto> GetPagedBooksAsync(string? category, string? search, int page, int pageSize);
+    Task<PagedLibraryResponseDto> GetPagedBooksAsync(string userId, string? category, string? search, int page, int pageSize);
     Task<EBookResponseDto?> GetBookByIdAsync(int id);
     Task<EBookResponseDto> CreateBookAsync(EBookRequestDto request);
     Task<bool> UpdateBookAsync(int id, EBookRequestDto request);

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Box, Typography, Stack, Paper, Button, Card, CardContent, useTheme, Tooltip } from '@mui/material';
-import { Download, Star, AccessTimeFilled, GetApp } from '@mui/icons-material'; // Added GetApp for download icon
+import { Box, Typography, Stack, Paper, Button, Card, CardContent, useTheme, Tooltip, Chip } from '@mui/material';
+import { Download, AccessTimeFilled, GetApp, AutoStories } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import type { EBook } from '../../types_interfaces/library';
 import { getDownloadUrl } from '../../api/library.api';
+import { useLibraryTracker } from '../../hooks/useLibraryTracker';
 
 interface BookProps {
     book: EBook;
@@ -12,34 +13,50 @@ interface BookProps {
 
 const LibraryBookCard: React.FC<BookProps> = ({ book, onRead }) => {
     const theme = useTheme();
+    const { trackDownload } = useLibraryTracker();
     const progress = book.userProgress;
+    const timeSpent = progress?.totalMinutesSpent ?? 0;
 
-    const formatTime = (minutes: number | undefined) => {
-        if (!minutes || minutes === 0) return "Not started";
-        if (minutes < 60) return `${minutes}m studied`;
-        const h = Math.floor(minutes / 60);
-        const m = minutes % 60;
-        return `${h}h ${m}m studied`;
+    const handleDownloadClick = async () => {
+        await trackDownload(book.id);
     };
 
-    const timeSpent = book.userProgress?.totalMinutesSpent ?? 0;
+    const formatTime = (minutes: number) => {
+        if (minutes <= 0) return "Not started";
+        if (minutes < 60) return `${Math.round(minutes)}m studied`;
+        const h = Math.floor(minutes / 60);
+        const m = Math.round(minutes % 60);
+        return m > 0 ? `${h}h ${m}m` : `${h}h`;
+    };
 
     return (
         <Box
             component={motion.div}
             layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
             whileHover={{ y: -10 }}
-            sx={{ width: 200 }}
+            sx={{ width: 230 }} // Slightly wider for description
         >
-            <Card sx={{ borderRadius: 6, bgcolor: 'transparent', boxShadow: 'none' }}>
-                <Box sx={{ position: 'relative', mb: 2, '&:hover .book-actions': { opacity: 1 } }}>
-                    {/* DOWNLOAD COUNT BADGE (Top Right) */}
+            <Card sx={{ borderRadius: 5, bgcolor: 'background.paper', overflow: 'hidden', boxShadow: theme.shadows[2] }}>
+                <Box sx={{ position: 'relative', height: 280, '&:hover .book-overlay': { opacity: 1 } }}>
+                    
+                    {/* CATEGORY CHIP - High Visibility */}
+                    <Chip 
+                        label={book.category} 
+                        size="small"
+                        sx={{ 
+                            position: 'absolute', top: 12, left: 12, zIndex: 4,
+                            bgcolor: 'rgba(255, 255, 255, 0.9)', color: 'primary.dark',
+                            fontWeight: 800, fontSize: '0.65rem', backdropFilter: 'blur(4px)',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                        }} 
+                    />
+
+                    {/* DOWNLOAD COUNT */}
                     <Box sx={{
-                        position: 'absolute', top: 12, right: 12, zIndex: 2,
-                        bgcolor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
+                        position: 'absolute', top: 12, right: 12, zIndex: 4,
+                        bgcolor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(8px)',
                         px: 1, py: 0.5, borderRadius: 2, display: 'flex', alignItems: 'center', gap: 0.5
                     }}>
                         <GetApp sx={{ fontSize: 12, color: 'white' }} />
@@ -48,110 +65,86 @@ const LibraryBookCard: React.FC<BookProps> = ({ book, onRead }) => {
                         </Typography>
                     </Box>
 
-                    <Paper
-                        elevation={10}
-                        sx={{ borderRadius: 4, overflow: 'hidden', height: 280, position: 'relative' }}
-                    >
+                    <Box sx={{ height: '100%', width: '100%', overflow: 'hidden' }}>
                         <img
                             src={book.thumbnailUrl.startsWith('http') ? book.thumbnailUrl : `${import.meta.env.VITE_API_URL}${book.thumbnailUrl}`}
                             alt={book.title}
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
-                    </Paper>
+                    </Box>
 
-                    {/* HOVER ACTIONS */}
+                    {/* HOVER OVERLAY - Includes Description */}
                     <Box
-                        className="book-actions"
+                        className="book-overlay"
                         sx={{
-                            position: 'absolute', inset: 0, bgcolor: 'rgba(15, 23, 42, 0.85)',
-                            borderRadius: 4, display: 'flex', flexDirection: 'column',
-                            justifyContent: 'center', alignItems: 'center', gap: 2,
-                            opacity: 0, transition: 'all 0.3s ease', backdropFilter: 'blur(6px)',
-                            zIndex: 3
+                            position: 'absolute', inset: 0, 
+                            background: 'linear-gradient(to bottom, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.95))',
+                            display: 'flex', flexDirection: 'column', justifyContent: 'center', p: 2,
+                            opacity: 0, transition: 'opacity 0.3s ease', zIndex: 5, color: 'white'
                         }}
                     >
-                        <Button
-                            variant="contained"
-                            fullWidth
-                            onClick={onRead}
-                            sx={{
-                                mx: 2, width: '80%', bgcolor: 'white', color: '#0f172a',
-                                fontWeight: 800, borderRadius: 2, '&:hover': { bgcolor: '#f1f5f9' }
-                            }}
-                        >
-                            Read Now
-                        </Button>
+                        <Typography variant="caption" sx={{ mb: 1, opacity: 0.8, fontWeight: 600, textTransform: 'uppercase' }}>
+                            About this book
+                        </Typography>
+                        <Typography variant="body2" sx={{ 
+                            mb: 3, fontSize: '0.75rem', 
+                            display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden', lineHeight: 1.5,
+                            textIndent: '10px'
+                        }}>
+                            {book.description || "No description available for this textbook."}
+                        </Typography>
 
-                        <Tooltip title="Download for Offline Study" arrow>
+                        <Stack spacing={1.5}>
                             <Button
-                                startIcon={<Download />}
+                                variant="contained"
+                                startIcon={<AutoStories />}
+                                onClick={onRead}
+                                sx={{ 
+                                    bgcolor: 'white', color: 'primary.main', fontWeight: 800,
+                                    '&:hover': { bgcolor: 'grey.100' }
+                                }}
+                            >
+                                Read
+                            </Button>
+                            <Button
                                 variant="outlined"
-                                sx={{
-                                    color: 'white', borderColor: 'rgba(255,255,255,0.3)',
-                                    fontWeight: 600, width: '80%', borderRadius: 2,
+                                startIcon={<Download />}
+                                onClick={handleDownloadClick}
+                                href={getDownloadUrl(book.id)}
+                                sx={{ 
+                                    color: 'white', borderColor: 'rgba(255,255,255,0.4)',
                                     '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }
                                 }}
-                                // Use the dedicated download endpoint
-                                href={getDownloadUrl(book.id)}
                             >
-                                Download
+                                Get PDF
                             </Button>
-                        </Tooltip>
+                        </Stack>
                     </Box>
                 </Box>
 
-                <CardContent sx={{ p: 1 }}>
-                    <Stack direction="row" justifyContent="space-between" alignItems="start">
-                        <Typography variant="subtitle2" fontWeight={800} noWrap sx={{ flex: 1, mr: 1 }}>
-                            {book.title}
-                        </Typography>
-                        <Stack direction="row" alignItems="center" spacing={0.3}>
-                            <Star sx={{ fontSize: 14, color: '#f59e0b' }} />
-                            <Typography variant="caption" fontWeight={700}>
-                                {book.averageRating?.toFixed(1)}
-                            </Typography>
-                        </Stack>
-                        {progress && progress.hasOpened && (
-                            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
-                                <Box sx={{
-                                    px: 1,
-                                    py: 0.5,
-                                    bgcolor: 'action.selected',
-                                    borderRadius: 1,
-                                    border: '1px solid #e2e8f0'
-                                }}>
-                                    <Typography variant="caption" fontWeight={700} color="secondary">
-                                        {progress.totalMinutesSpent} MINS READ
-                                    </Typography>
-                                </Box>
-                                {progress.hasDownloaded && (
-                                    <Typography variant="caption" color="success.main" fontWeight={700}>
-                                        • DOWNLOADED
-                                    </Typography>
-                                )}
-                            </Stack>
-                        )}
-                    </Stack>
-
-                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
-                        {book.author}
+                <CardContent sx={{ p: 2 }}>
+                    <Typography variant="subtitle1" fontWeight={800} noWrap sx={{ lineHeight: 1.2 }}>
+                        {book.title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                        by {book.author}
                     </Typography>
 
-                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <AccessTimeFilled
-                            sx={{
-                                fontSize: 14,
-                                color: timeSpent > 0 ? theme.palette.primary.main : theme.palette.text.disabled
-                            }}
-                        />
-                        <Typography
-                            variant="caption"
-                            fontWeight={800}
-                            sx={{ color: timeSpent > 0 ? theme.palette.primary.main : theme.palette.text.disabled }}
-                        >
-                            {formatTime(timeSpent)}
-                        </Typography>
-                    </Stack>
+                    <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Stack direction="row" alignItems="center" spacing={0.5}>
+                            <AccessTimeFilled sx={{ fontSize: 14, color: timeSpent > 0 ? 'primary.main' : 'text.disabled' }} />
+                            <Typography variant="caption" fontWeight={700} sx={{ color: timeSpent > 0 ? 'primary.main' : 'text.disabled', fontSize: '0.7rem' }}>
+                                {formatTime(timeSpent)}
+                            </Typography>
+                        </Stack>
+
+                        {progress?.hasDownloaded && (
+                            <Tooltip title="Available Offline">
+                                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
+                            </Tooltip>
+                        )}
+                    </Box>
                 </CardContent>
             </Card>
         </Box>

@@ -15,37 +15,72 @@ export const useLibraryTracker = () => {
             // Use forcePage if provided (e.g., resetting to page 1 on search), else use current state
             const targetPage = forcePage ?? page;
             const response = await fetchAllBooks(targetPage, pageSize, category, search);
-            
+
             setBooks(response.items || []);
             setTotalCount(response.totalCount);
         } catch (err) {
             console.error("Failed to load catalog:", err);
-            setBooks([]); 
+            setBooks([]);
         } finally {
             setLoading(false);
         }
     }, [page, pageSize]);
 
     const startTracking = (bookId: number) => {
-        recordBookActivity({ eBookId: bookId, isOpening: true, minutesToAdd: 0 });
+        const interval = setInterval(async () => {
+            try {
+                await recordBookActivity({ eBookId: bookId, minutesToAdd: 1 });
 
-        const interval = setInterval(() => {
-            recordBookActivity({ eBookId: bookId, minutesToAdd: 1 });
-            console.log(`Heartbeat sent for book ${bookId}`);
-        }, 60000);
+                setBooks(prevBooks =>
+                    prevBooks.map(b => b.id === bookId
+                        ? {
+                            ...b,
+                            userProgress: {
+                                ...(b.userProgress || {
+                                    eBookId: b.id,
+                                    hasDownloaded: false,
+                                    hasOpened: true,
+                                    lastAccessedAt: new Date().toISOString()
+                                }),
+                                totalMinutesSpent: (b.userProgress?.totalMinutesSpent ?? 0) + 1
+                            }
+                        }
+                        : b
+                    )
+                );
+
+                console.log(`Updated local state for book ${bookId}`);
+            } catch (err) {
+                console.error("Heartbeat failed", err);
+            }
+        }, 60000); // 1 minute
 
         return () => clearInterval(interval);
     };
 
+    const trackDownload = async (bookId: number) => {
+        try {
+            await recordBookActivity({
+                eBookId: bookId,
+                isDownloading: true,
+                minutesToAdd: 0
+            });
+            console.log(`Download tracked for book ${bookId}`);
+        } catch (err) {
+            console.error("Failed to track download:", err);
+        }
+    };
+
     // Export EVERYTHING the component needs to control the view
-    return { 
-        books, 
-        totalCount, 
-        loading, 
-        page, 
-        setPage, 
-        pageSize, 
-        loadCatalog, 
-        startTracking 
+    return {
+        books,
+        totalCount,
+        loading,
+        page,
+        setPage,
+        pageSize,
+        loadCatalog,
+        startTracking,
+        trackDownload
     };
 };

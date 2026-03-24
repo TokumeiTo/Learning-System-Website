@@ -275,5 +275,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.TotalReaderCount, opt => opt.Ignore())
             .ForMember(dest => dest.AverageRating, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
+
+        CreateMap<UserBookProgress, UserBookProgressDto>().ReverseMap();
     }
 }

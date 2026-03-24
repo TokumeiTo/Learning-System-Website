@@ -78,6 +78,13 @@ public class LibraryRepository(AppDbContext context) : ILibraryRepository
         return await context.SaveChangesAsync() > 0;
     }
 
+    public async Task<IEnumerable<UserBookProgress>> GetUserProgressListAsync(string userId)
+    {
+        return await context.UserBookProgresses
+            .Where(p => p.UserId == userId)
+            .ToListAsync();
+    }
+
     #endregion
 
     #region Tracking Logic

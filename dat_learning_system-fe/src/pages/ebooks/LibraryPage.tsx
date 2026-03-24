@@ -14,6 +14,7 @@ import PDFViewerDialog from '../../components/mediaRelated/PDFViewerDialog';
 import { useLibraryTracker } from '../../hooks/useLibraryTracker';
 import type { EBook, LibraryStatsData } from '../../types_interfaces/library';
 import { fetchLibraryStats } from '../../api/library.api';
+import { JAPANESE_STUDY_TIPS } from '../../utils/learningTips';
 
 const LibraryPage: React.FC = () => {
     // 1. Destructure all pagination controls from our updated hook
@@ -34,6 +35,10 @@ const LibraryPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedBook, setSelectedBook] = useState<EBook | null>(null);
     const [stats, setStats] = useState<LibraryStatsData | null>(null);
+
+    const randomTip = React.useMemo(() => {
+        return JAPANESE_STUDY_TIPS[Math.floor(Math.random() * JAPANESE_STUDY_TIPS.length)].tip;
+    }, []);
 
     // 2. Load data whenever Category or Search changes
     // CRITICAL: We reset to page 1 when filters change to avoid "empty page" bugs
@@ -77,14 +82,20 @@ const LibraryPage: React.FC = () => {
                     <Typography variant="body1" color="text.secondary">Access specialized resources.</Typography>
                 </Stack>
 
-                <LearningTip tip="Consistency beats intensity! Your N3 journey starts with the first page." />
+                <LearningTip tip={randomTip} />
 
-                {stats && (
+                {stats ? (
                     <LibraryStats
-                        readCount={stats.totalBooks}
-                        inProgress={Math.round(stats.totalMinutesSpent)}
-                        targetLevel={`${stats.booksOpened} READ`}
+                        totalBooks={stats.totalBooks}
+                        totalMinutes={Math.round(stats.totalMinutesSpent)}
+                        openedCount={stats.booksOpened}
+                        downloadedCount={stats.booksDownloaded}
                     />
+                ) : (
+                    // Skeleton or placeholder while stats load
+                    <Stack direction="row" spacing={3} sx={{ mb: 4, opacity: 0.5 }}>
+                        <Box><Typography variant="h4">--</Typography><Typography variant="caption">LOADING...</Typography></Box>
+                    </Stack>
                 )}
 
                 <LibraryFilters

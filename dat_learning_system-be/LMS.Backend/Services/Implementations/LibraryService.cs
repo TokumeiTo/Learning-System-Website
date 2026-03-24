@@ -20,16 +20,33 @@ public class LibraryService(
         return mapper.Map<IEnumerable<EBookResponseDto>>(books);
     }
 
+    // Services/Implement/LibraryService.cs
     public async Task<PagedLibraryResponseDto> GetPagedBooksAsync(
-      string? category,
-      string? search, // Add this
-      int page,
-      int pageSize)
+        string userId,
+        string? category,
+        string? search,
+        int page,
+        int pageSize)
     {
-        // Pass search to the repo
+        // 1. Get books from Repo
         var (books, totalCount) = await repo.GetAllPagedAsync(category, search, page, pageSize);
 
-        var items = mapper.Map<IEnumerable<EBookResponseDto>>(books);
+        // 2. Get all progress for this user
+        var userProgressList = await repo.GetUserProgressListAsync(userId);
+
+        // 3. Map Books to DTOs
+        var items = mapper.Map<List<EBookResponseDto>>(books);
+
+        // 4. Match them up
+        foreach (var item in items)
+        {
+            var progressRecord = userProgressList.FirstOrDefault(p => p.EBookId == item.Id);
+            if (progressRecord != null)
+            {
+                // Map the specific progress record to the DTO property
+                item.UserProgress = mapper.Map<UserBookProgressDto>(progressRecord);
+            }
+        }
 
         return new PagedLibraryResponseDto
         {
