@@ -14,7 +14,7 @@ import AddCardIcon from '@mui/icons-material/AddCard';
 import DvrIcon from '@mui/icons-material/Dvr';
 
 export const LEARNING_NAV = [
-    { label: "Roadmap", path: "/path", icon: <FollowTheSignsIcon color="primary" /> },
+    { label: "Roadmap", path: "/roadmaps", icon: <FollowTheSignsIcon color="primary" /> },
     { label: "Courses", path: "/courses", icon: <CastForEducationIcon color="primary" /> },
     { label: "Schedule", path: "/schedule", icon: <EditCalendarIcon color="primary" /> },
     { label: "Flashcards", path: "/flashcards", icon: <StyleIcon color="primary" /> },

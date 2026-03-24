@@ -3,7 +3,7 @@ import { type Kanji } from "../types_interfaces/kanji";
 export const kanjiMockData: Kanji[] = [
     {
         id: "1",
-        kanji: "日",
+        character: "日",
         jlptLevel: "N5",
         onyomi: ["ニチ", "ジツ"],
         kunyomi: ["ひ", "か"],
@@ -30,7 +30,7 @@ export const kanjiMockData: Kanji[] = [
     },
     {
         id: "2",
-        kanji: "人",
+        character: "人",
         jlptLevel: "N5",
         onyomi: ["ジン", "ニン"],
         kunyomi: ["ひと", '-り', '-と'],
@@ -58,7 +58,7 @@ export const kanjiMockData: Kanji[] = [
     },
     {
         id: "3",
-        kanji: "月",
+        character: "月",
         jlptLevel: "N5",
         onyomi: ["ゲツ", "ガツ"],
         kunyomi: ["つき"],
@@ -80,7 +80,7 @@ export const kanjiMockData: Kanji[] = [
     },
     {
         id: "4",
-        kanji: "議",
+        character: "議",
         jlptLevel: "N3",
         onyomi: ["ギ"],
         meaning: "discussion; deliberation, thought; opinion",
@@ -96,7 +96,7 @@ export const kanjiMockData: Kanji[] = [
     },
     {
         id: "5",
-        kanji: "買",
+        character: "買",
         jlptLevel: "N5",
         onyomi: ["バイ"],
         kunyomi: ["か。う"],
@@ -114,7 +114,7 @@ export const kanjiMockData: Kanji[] = [
     },
     {
         id: "6",
-        kanji: "酒",
+        character: "酒",
         jlptLevel: "N5",
         onyomi: ["シュ"],
         kunyomi: ["さけ", "さか‐"],
@@ -131,7 +131,7 @@ export const kanjiMockData: Kanji[] = [
     },
     {
         id: "7",
-        kanji: "海",
+        character: "海",
         jlptLevel: "N5",
         onyomi: ["カイ"],
         kunyomi: ["うみ"],
@@ -148,7 +148,7 @@ export const kanjiMockData: Kanji[] = [
     },
     {
         id: "8",
-        kanji: "弓",
+        character: "弓",
         jlptLevel: "N5",
         onyomi: ["ニチ", "ジツ"],
         kunyomi: ["ひ", "か"],

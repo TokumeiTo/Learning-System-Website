@@ -36,6 +36,9 @@ import NotificationPage from "../pages/notification/NotificationPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import EnrollmentGuard from "../components/auth/EnrollmentGuard";
 import LibraryAdminPage from "../pages/admin/LibraryAdminPage";
+import RoadmapListPage from "../pages/roadmap/RoadmapListPage";
+import RoadmapDetailsPage from "../components/roadmap/RoadmapDetailsPage";
+import RoadmapEditPage from "../pages/roadmap/RoadmapEditPage";
 
 export const AppRouter = () => {
   const { user } = useAuth();
@@ -180,6 +183,33 @@ export const AppRouter = () => {
         />
 
         <Route
+          path="/roadmaps"
+          element={
+            <ProtectedRoute>
+              <RoadmapListPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/roadmaps/:id"
+          element={
+            <ProtectedRoute>
+              <RoadmapDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/roadmaps/:id/edit"
+          element={
+            <ProtectedRoute>
+              <RoadmapEditPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/mock_test"
           element={
             <ProtectedRoute>
@@ -233,6 +263,15 @@ export const AppRouter = () => {
           element={
             <ProtectedRoute allowedPositions={["Admin", "SuperAdmin", "ProjectManager", "DivHead", "DepHead", "SecHead"]}>
               <LibraryAdminPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin/roadmaps/:id/edit"
+          element={
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin", "ProjectManager", "DivHead", "DepHead", "SecHead"]}>
+              <RoadmapEditPage />
             </ProtectedRoute>
           }
         />
