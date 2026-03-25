@@ -37,36 +37,41 @@ public class RoadmapRepository(AppDbContext context) : IRoadmapRepository
         return await context.SaveChangesAsync() > 0;
     }
 
-    public async Task<IEnumerable<RoadmapGlobalSourceDto>> SearchResourcesAsync(string searchTerm)
+    public async Task<IEnumerable<RoadmapGlobalSourceDto>> SearchResourcesAsync(string searchTerm, string resourceType)
     {
         var query = searchTerm.ToLower();
 
-        // 1. Fetch matching EBooks
-        var ebooks = await context.EBooks
-            .Where(e => e.Title.ToLower().Contains(query))
-            .Select(e => new RoadmapGlobalSourceDto
-            {
-                Value = $"EBook - {e.Id}",
-                Title = e.Title,
-                Description = e.Description ?? string.Empty,
-                Type = "EBook"
-            })
-            .ToListAsync();
+        // 1. If user selected EBook, only search EBooks
+        if (resourceType == "EBook")
+        {
+            return await context.EBooks
+                .Where(e => e.Title.ToLower().Contains(query))
+                .Select(e => new RoadmapGlobalSourceDto
+                {
+                    Value = $"EBook - {e.Id}",
+                    Title = e.Title,
+                    Description = e.Description ?? string.Empty,
+                    Type = "EBook"
+                })
+                .ToListAsync();
+        }
 
-        // 2. Fetch matching Courses
-        var courses = await context.Courses
-            .Where(c => c.Title.ToLower().Contains(query))
-            .Select(c => new RoadmapGlobalSourceDto
-            {
-                Value = $"Course - {c.Id}",
-                Title = c.Title,
-                Description = c.Description ?? string.Empty,
-                Type = "Course"
-            })
-            .ToListAsync();
+        // 2. If user selected Course, only search Courses
+        if (resourceType == "Course")
+        {
+            return await context.Courses
+                .Where(c => c.Title.ToLower().Contains(query))
+                .Select(c => new RoadmapGlobalSourceDto
+                {
+                    Value = $"Course - {c.Id}", // Or {c.Url} if you store URLs
+                    Title = c.Title,
+                    Description = c.Description ?? string.Empty,
+                    Type = "Course"
+                })
+                .ToListAsync();
+        }
 
-        // 3. Combine and return
-        return ebooks.Concat(courses).OrderBy(r => r.Title);
+        return new List<RoadmapGlobalSourceDto>();
     }
 
     public async Task<object?> GetEBookBasicInfoAsync(int id)

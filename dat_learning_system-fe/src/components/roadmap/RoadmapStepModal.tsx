@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
-    Button, TextField, MenuItem, Stack
+    Button, TextField, MenuItem, Stack, Autocomplete, CircularProgress, Typography, Box, Chip
 } from '@mui/material';
-import type { RoadmapStep } from '../../types_interfaces/roadmap';
-import type { EBook } from '../../types_interfaces/library';
-// Import from your existing API layer
-import { fetchAllBooks } from '../../api/library.api';
+import type { RoadmapStep, RoadmapGlobalSourceDto } from '../../types_interfaces/roadmap';
+import { searchRoadmapResources } from '../../api/roadmap.api';
 
 interface StepModalProps {
     open: boolean;
@@ -16,100 +14,150 @@ interface StepModalProps {
 }
 
 const RoadmapStepModal: React.FC<StepModalProps> = ({ open, onClose, onSave, initialData }) => {
-    const [step, setStep] = useState<RoadmapStep>(initialData || {
-        id: 0,
-        title: '',
-        nodeType: 'Instruction',
-        content: '',
-        linkedResourceId: undefined,
-        sortOrder: 0
-    });
+    // 1. Refs for raw text (typing here triggers 0 re-renders)
+    const titleRef = useRef<HTMLInputElement>(null);
+    const contentRef = useRef<HTMLInputElement>(null);
 
-    const [books, setBooks] = useState<EBook[]>([]);
-    const [loadingBooks, setLoadingBooks] = useState(false);
+    // 2. State ONLY for UI logic (type switching & search)
+    const [nodeType, setNodeType] = useState<RoadmapStep['nodeType']>(initialData?.nodeType || 'Instruction');
+    const [linkedResourceId, setLinkedResourceId] = useState(initialData?.linkedResourceId || '');
+    const [options, setOptions] = useState<RoadmapGlobalSourceDto[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
+    // Sync state if initialData changes (for Edit mode)
     useEffect(() => {
-        const loadBooks = async () => {
-            if (open && step.nodeType === 'EBook') {
-                setLoadingBooks(true);
-                try {
-                    // Using your fetchAllBooks with a large pageSize for the Admin picker
-                    const response = await fetchAllBooks(1, 100);
-                    setBooks(response.items); // Accessing .items from PagedLibraryResponse
-                } catch (err) {
-                    console.error("Failed to load books for roadmap editor", err);
-                } finally {
-                    setLoadingBooks(false);
-                }
+        if (initialData) {
+            setNodeType(initialData.nodeType);
+            setLinkedResourceId(initialData.linkedResourceId || '');
+        }
+    }, [initialData]);
+
+    // 3. Debounced Search Logic
+    useEffect(() => {
+        if (searchQuery.length < 2 || nodeType === 'Instruction') {
+            setOptions([]);
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            setLoading(true);
+            try {
+                const results = await searchRoadmapResources(searchQuery, nodeType);
+                setOptions(results);
+            } catch (err) {
+                console.error("Search failed", err);
+            } finally {
+                setLoading(false);
             }
-        };
-        loadBooks();
-    }, [open, step.nodeType]);
+        }, 400);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery, nodeType]);
 
     const handleSave = () => {
-        onSave(step);
+        const finalStep: RoadmapStep = {
+            ...initialData, // Keep existing ID/sortOrder
+            id: initialData?.id || 0,
+            title: titleRef.current?.value || '',
+            content: contentRef.current?.value || '',
+            nodeType: nodeType,
+            linkedResourceId: linkedResourceId,
+            sortOrder: initialData?.sortOrder || 0
+        };
+
+        if (!finalStep.title) return; // Basic validation
+        onSave(finalStep);
         onClose();
     };
 
     return (
-        <Dialog
-            open={open} onClose={onClose} disableEnforceFocus
-            disableAutoFocus={false} fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: 4 } }}
+        <Dialog 
+            open={open} 
+            onClose={onClose} 
+            fullWidth 
+            maxWidth="xs"
+            PaperProps={{ sx: { borderRadius: 4 } }}
         >
             <DialogTitle sx={{ fontWeight: 900 }}>
                 {initialData ? 'Edit Milestone' : 'New Milestone'}
             </DialogTitle>
+
             <DialogContent>
                 <Stack spacing={3} sx={{ mt: 1 }}>
+                    {/* UNCONTROLLED TITLE */}
                     <TextField
+                        inputRef={titleRef}
                         label="Step Title"
                         fullWidth
-                        value={step.title}
-                        onChange={(e) => setStep({ ...step, title: e.target.value })}
+                        defaultValue={initialData?.title || ''}
                     />
 
+                    {/* CONTROLLED TYPE (Required for UI logic) */}
                     <TextField
                         select
                         label="Step Type"
-                        value={step.nodeType}
-                        onChange={(e) => setStep({ ...step, nodeType: e.target.value as any, linkedResourceId: undefined })}
+                        value={nodeType}
+                        onChange={(e) => {
+                            setNodeType(e.target.value as any);
+                            setLinkedResourceId(''); // Reset link on type change
+                            setOptions([]);
+                        }}
                     >
                         <MenuItem value="Instruction">Manual Instruction</MenuItem>
                         <MenuItem value="EBook">Library Resource (EBook)</MenuItem>
                         <MenuItem value="Course">External Link (Course)</MenuItem>
                     </TextField>
 
-                    {step.nodeType === 'EBook' && (
-                        <TextField
-                            select
-                            label="Select EBook"
-                            fullWidth
-                            value={step.linkedResourceId || ''}
-                            onChange={(e) => setStep({ ...step, linkedResourceId: Number(e.target.value) })}
-                            disabled={loadingBooks}
-                            helperText={loadingBooks ? "Loading library..." : "Choose a book to link to this step"}
-                        >
-                            {books.map((book) => (
-                                <MenuItem key={book.id} value={book.id}>
-                                    {book.title}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                    {/* SEARCH BOX (Only shows if needed) */}
+                    {nodeType !== 'Instruction' && (
+                        <Autocomplete
+                            options={options}
+                            loading={loading}
+                            getOptionLabel={(option) => option.title}
+                            onInputChange={(_, value) => setSearchQuery(value)}
+                            onChange={(_, newValue) => setLinkedResourceId(newValue?.value || '')}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label={`Link ${nodeType}`}
+                                    InputProps={{
+                                        ...params.InputProps,
+                                        endAdornment: (
+                                            <>
+                                                {loading ? <CircularProgress size={20} /> : null}
+                                                {params.InputProps.endAdornment}
+                                            </>
+                                        ),
+                                    }}
+                                />
+                            )}
+                            renderOption={(props, option) => (
+                                <Box component="li" {...props} key={option.value}>
+                                    <Stack>
+                                        <Typography variant="body2" fontWeight={700}>{option.title}</Typography>
+                                        <Typography variant="caption" color="text.secondary">{option.description}</Typography>
+                                    </Stack>
+                                </Box>
+                            )}
+                        />
                     )}
 
+                    {/* UNCONTROLLED CONTENT */}
                     <TextField
-                        label={step.nodeType === 'Course' ? 'Course URL' : 'Content / Instructions'}
+                        inputRef={contentRef}
+                        label="Instructions"
                         multiline
-                        rows={3}
+                        rows={4}
                         fullWidth
-                        value={step.content}
-                        onChange={(e) => setStep({ ...step, content: e.target.value })}
+                        defaultValue={initialData?.content || ''}
                     />
                 </Stack>
             </DialogContent>
+
             <DialogActions sx={{ p: 3 }}>
-                <Button onClick={onClose} color="inherit" sx={{ fontWeight: 700 }}>Cancel</Button>
-                <Button variant="contained" onClick={handleSave} disabled={!step.title} sx={{ fontWeight: 800 }}>
+                <Button onClick={onClose} color="inherit">Cancel</Button>
+                <Button variant="contained" onClick={handleSave} sx={{ fontWeight: 800 }}>
                     Confirm
                 </Button>
             </DialogActions>

@@ -1,7 +1,8 @@
 import api from "../hooks/useApi";
-import type { 
-    RoadmapResponse, 
-    RoadmapRequest 
+import type {
+    RoadmapResponse,
+    RoadmapRequest,
+    RoadmapGlobalSourceDto
 } from "../types_interfaces/roadmap";
 
 /**
@@ -43,5 +44,19 @@ export const deleteRoadmap = async (id: number): Promise<void> => {
 
 export const duplicateRoadmap = async (id: number): Promise<RoadmapResponse> => {
     const response = await api.post<RoadmapResponse>(`/api/Roadmap/${id}/duplicate`);
+    return response.data;
+};
+
+/**
+ * Admin: Search for resources (EBooks/Courses) to link to steps
+ * @param term Search keyword (e.g., "React", "N3")
+ */
+export const searchRoadmapResources = async (term: string, type: string): Promise<RoadmapGlobalSourceDto[]> => {
+    // If term is empty, return empty list to save a network call
+    if (!term.trim()) return [];
+
+    const response = await api.get<RoadmapGlobalSourceDto[]>(`api/Roadmap/search-resources`, {
+        params: { term, type }
+    });
     return response.data;
 };

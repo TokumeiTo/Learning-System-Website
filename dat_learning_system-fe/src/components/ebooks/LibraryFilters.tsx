@@ -1,6 +1,6 @@
 import React from 'react';
-import { Stack, Chip, Paper, InputBase, FormControl, Select, MenuItem } from '@mui/material';
-import { Search, Sort, Dashboard, Terminal, Translate, Language } from '@mui/icons-material';
+import { Stack, Chip, Paper, InputBase, FormControl, Select, MenuItem, IconButton } from '@mui/material';
+import { Search, Sort, Dashboard, Terminal, Translate, Language, Close } from '@mui/icons-material';
 
 interface FilterProps {
     activeCategory: string;
@@ -11,8 +11,8 @@ interface FilterProps {
     setSearchTerm: (term: string) => void; // Added
 }
 
-const LibraryFilters: React.FC<FilterProps> = ({ 
-    activeCategory, setActiveCategory, sortBy, setSortBy, searchTerm, setSearchTerm 
+const LibraryFilters: React.FC<FilterProps> = ({
+    activeCategory, setActiveCategory, sortBy, setSortBy, searchTerm, setSearchTerm
 }) => {
     const categories = [
         { label: 'All', icon: <Dashboard fontSize="small" /> },
@@ -44,18 +44,31 @@ const LibraryFilters: React.FC<FilterProps> = ({
             </Stack>
 
             <Stack direction="row" spacing={2} sx={{ width: { xs: '100%', lg: 'auto' } }}>
-                <Paper elevation={0} sx={{
-                    display: 'flex', alignItems: 'center', px: 2, py: 0.5,
-                    borderRadius: 3, bgcolor: 'background.paper', border: '1px solid #e2e8f0',
-                    width: { xs: '100%', lg: 300 }
-                }}>
-                    <Search sx={{ color: 'gray', fontSize: 20 }} />
+                <Paper
+                    elevation={0}
+                    sx={{
+                        display: 'flex', alignItems: 'center', px: 2, py: 0.5,
+                        borderRadius: 3,
+                        bgcolor: 'background.paper',
+                        // Logic: if there's a search term, make the border blue to show it's "Active"
+                        border: searchTerm ? '1px solid #3b82f6' : '1px solid #e2e8f0',
+                        boxShadow: searchTerm ? '0 0 0 2px rgba(59, 130, 246, 0.1)' : 'none',
+                        transition: 'all 0.2s ease',
+                        width: { xs: '100%', lg: 300 }
+                    }}
+                >
+                    <Search sx={{ color: searchTerm ? 'primary.main' : 'gray', fontSize: 20 }} />
                     <InputBase
                         sx={{ ml: 1, flex: 1, fontSize: 14 }}
                         placeholder="Search titles..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
+                    {searchTerm && (
+                        <IconButton size="small" onClick={() => setSearchTerm('')}>
+                            <Close sx={{ fontSize: 16 }} />
+                        </IconButton>
+                    )}
                 </Paper>
 
                 <FormControl size="small" sx={{ minWidth: 120 }}>

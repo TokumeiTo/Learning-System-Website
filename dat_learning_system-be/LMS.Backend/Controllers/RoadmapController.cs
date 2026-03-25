@@ -25,16 +25,33 @@ public class RoadmapController(IRoadmapService roadmapService) : ControllerBase
     }
 
     [Authorize(Roles = "Admin")]
+    [HttpGet("search-resources")]
+    public async Task<ActionResult<IEnumerable<RoadmapGlobalSourceDto>>> SearchResources(
+    [FromQuery] string term,
+    [FromQuery] string type) // Added parameter
+    {
+        if (string.IsNullOrWhiteSpace(term)) return Ok(new List<RoadmapGlobalSourceDto>());
+
+        // Pass both term and type to the service
+        var results = await roadmapService.SearchResourcesAsync(term, type);
+        return Ok(results);
+    }
+
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult> Create(RoadmapRequestDto request)
     {
         var created = await roadmapService.CreateRoadmapAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
+
     [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<ActionResult<RoadmapResponseDto>> Update(int id, RoadmapResponseDto request)
     {
+        // Simple safety check: URL ID must match Body ID
+        if (id != request.Id) return BadRequest("Mismatched Roadmap ID.");
+
         var updated = await roadmapService.UpdateRoadmapAsync(id, request);
         if (updated == null) return NotFound();
         return Ok(updated);

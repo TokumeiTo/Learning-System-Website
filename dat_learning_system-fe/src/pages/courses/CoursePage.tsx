@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
     Box, Typography, Stack,
     Button, useTheme, CircularProgress,
     Chip,
     Paper,
-    InputBase
+    InputBase,
+    IconButton
 } from '@mui/material';
-import { Search, Add, Terminal, Translate, Language, Dashboard, AutoAwesome } from '@mui/icons-material';
+import { Search, Add, Terminal, Translate, Language, Dashboard, AutoAwesome, Close } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLayout from '../../components/layout/PageLayout';
 import type { Course } from '../../types_interfaces/course';
@@ -25,6 +27,7 @@ const CoursesPage: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const location = useLocation();
     const { user } = useAuth();
     // Check against DB IDs for maximum accuracy
     const canManageCourses = user?.position === "Admin" || user?.position === "SuperAdmin";
@@ -44,6 +47,16 @@ const CoursesPage: React.FC = () => {
     useEffect(() => {
         fetchCourses();
     }, []);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const searchFromUrl = params.get('search');
+
+        if (searchFromUrl) {
+            setSearchTerm(searchFromUrl);
+            setFilter('All');
+        }
+    }, [location.search]);
 
     const categories = ['All', 'Japanese', 'IT', 'English', 'Custom'];
 
@@ -168,7 +181,7 @@ const CoursesPage: React.FC = () => {
                             py: 0.8,
                             borderRadius: 3,
                             bgcolor: 'background.paper',
-                            border: `1px solid ${theme.palette.divider}`,
+                            border: searchTerm ? '1px solid #1976d2' : `1px solid ${theme.palette.divider}`, // Highlight if searching
                             width: { xs: '100%', lg: 350 },
                             transition: '0.2s',
                             '&:focus-within': {
@@ -177,13 +190,24 @@ const CoursesPage: React.FC = () => {
                             }
                         }}
                     >
-                        <Search sx={{ color: 'text.disabled', fontSize: 20 }} />
+                        <Search sx={{ color: searchTerm ? 'primary.main' : 'text.disabled', fontSize: 20 }} />
                         <InputBase
                             sx={{ ml: 1, flex: 1, fontSize: 14, fontWeight: 500 }}
                             placeholder="Search courses..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
+                        {searchTerm && (
+                            <IconButton
+                                size="small"
+                                onClick={() => {
+                                    setSearchTerm('');
+                                    window.history.replaceState({}, '', '/courses'); // Clean the URL
+                                }}
+                            >
+                                <Close sx={{ fontSize: 18 }} />
+                            </IconButton>
+                        )}
                     </Paper>
                 </Stack>
 

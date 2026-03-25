@@ -21,7 +21,7 @@ Backend Reqirement request
 13. Microsoft.AspNetCore.Cors
 14. xUnit & Microsoft.AspNetCore.Mvc.Testing (Testing)
 15. Git for version control access
-
+16. Node js(Latest LTS)
 
 
 BackEnd API
@@ -32,6 +32,8 @@ dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
 dotnet add package Microsoft.EntityFrameworkCore.Design
 dotnet tool install dotnet-ef --version 8.* --add-source https://api.nuget.org/v3/index.json
 dotnet add package Kawazu
+dotnet add package Microsoft.AspNetCore.StaticFiles
+dotnet add package Bcrypt.Net-Next
 
 dotnet ef database update
 
@@ -58,21 +60,15 @@ npm install jwt-decode
 npm install @microsoft/signalr
 npm install react-quill-new
 
-Chat gpt
-⚠️ Intentionally NOT installed yet:
-
-Redis
-
-MediatR
-
-Background jobs
-
-Caching libs
-
 
 External APIs
-
 - Jisho API = $"https://jisho.org/api/v1/search/words?keyword={System.Net.WebUtility.UrlEncode(keyword)}";
 - MyMemory API= _config["Translation:ApiUrl"] ?? "https://api.mymemory.translated.net/get";
+
+CDN Workers
+- <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
+
+Others 
 - Kawazu to show furigana
-- Language detection
+- Vite
+- Nuget

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Stack, CircularProgress, Pagination } from '@mui/material';
+import { Box, Typography, Stack, CircularProgress, Pagination, Button } from '@mui/material';
 import { AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 
 // Layout & UI Components
 import PageLayout from '../../components/layout/PageLayout';
@@ -29,6 +30,8 @@ const LibraryPage: React.FC = () => {
         startTracking
     } = useLibraryTracker();
 
+    const location = useLocation();
+
     // UI States
     const [activeCategory, setActiveCategory] = useState('All');
     const [sortBy, setSortBy] = useState('Newest');
@@ -40,8 +43,15 @@ const LibraryPage: React.FC = () => {
         return JAPANESE_STUDY_TIPS[Math.floor(Math.random() * JAPANESE_STUDY_TIPS.length)].tip;
     }, []);
 
-    // 2. Load data whenever Category or Search changes
-    // CRITICAL: We reset to page 1 when filters change to avoid "empty page" bugs
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const searchFromUrl = params.get('search');
+
+        if (searchFromUrl) {
+            setSearchTerm(searchFromUrl);
+        }
+    }, [location.search]);
+
     useEffect(() => {
         const categoryParam = activeCategory === 'All' ? undefined : activeCategory;
         setPage(1);
@@ -116,6 +126,19 @@ const LibraryPage: React.FC = () => {
                     minHeight: '400px',
                     position: 'relative'
                 }}>
+                    {!loading && books.length === 0 && (
+                        <Stack alignItems="center" sx={{ width: '100%', mt: 10 }}>
+                            <Typography variant="h6" color="text.secondary">
+                                No resources found for "{searchTerm}"
+                            </Typography>
+                            <Button
+                                onClick={() => setSearchTerm('')}
+                                sx={{ mt: 2, fontWeight: 700 }}
+                            >
+                                View all books
+                            </Button>
+                        </Stack>
+                    )}
                     {loading ? (
                         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
                             <CircularProgress size={60} thickness={5} />

@@ -3,7 +3,9 @@ export interface RoadmapStep {
     title: string;
     nodeType: 'EBook' | 'Course' | 'Instruction';
     content?: string;
-    linkedResourceId?: number;
+    linkedResourceId?: string;
+    linkedResourceTitle?: string;
+    linkedResourceDescription?: string;
     sortOrder: number;
 }
 
@@ -12,7 +14,6 @@ export interface RoadmapResponse {
     title: string;
     description: string;
     targetRole?: string;
-    thumbnailUrl?: string;
     stepCount: number;
     steps: RoadmapStep[];
 }
@@ -21,5 +22,12 @@ export interface RoadmapRequest {
     title: string;
     description: string;
     targetRole?: string;
-    // Note: If you add thumbnail upload later, this might become FormData
+    linkedResourceId?: string | null;
+}
+
+export interface RoadmapGlobalSourceDto {
+    value: string;       // e.g., "EBook - 1" or "Course - uuid"
+    title: string;       // The Name of the book/course
+    description: string; // Brief summary
+    type: string;        // "EBook" or "Course"
 }

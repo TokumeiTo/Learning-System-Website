@@ -4,20 +4,20 @@ import {
     Container, Box, Typography, Button, Stack,
     Divider, Paper, IconButton
 } from '@mui/material';
-import { ArrowBack, Save } from '@mui/icons-material';
+import { ArrowBack, Save, Map } from '@mui/icons-material';
 import { fetchRoadmapById, updateRoadmap } from '../../api/roadmap.api';
-import type { RoadmapResponse, RoadmapStep } from '../../types_interfaces/roadmap';
+import type { RoadmapResponse, RoadmapStep, RoadmapRequest } from '../../types_interfaces/roadmap';
 import RoadmapForm from '../../components/roadmap/RoadmapForm';
 import RoadmapStepListEditor from '../../components/roadmap/RoadmapStepListEditor';
 import PageLayout from '../../components/layout/PageLayout';
-// Import your new loader
 import AppLoader from '../../components/feedback/AppLoader'; 
 
 const RoadmapEditPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [roadmap, setRoadmap] = useState<RoadmapResponse | null>(null);
-    const [loading, setLoading] = useState(true); // Added loading state
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
@@ -35,6 +35,13 @@ const RoadmapEditPage: React.FC = () => {
         loadData();
     }, [id]);
 
+    // Updates the state when the Form (Title/Desc) changes
+    const handleHeaderChange = (updatedHeader: Partial<RoadmapRequest>) => {
+        if (!roadmap) return;
+        setRoadmap({ ...roadmap, ...updatedHeader });
+    };
+
+    // Updates the state when the Step List changes
     const handleUpdateSteps = (newSteps: RoadmapStep[]) => {
         if (!roadmap) return;
         setRoadmap({ ...roadmap, steps: newSteps });
@@ -43,15 +50,17 @@ const RoadmapEditPage: React.FC = () => {
     const handleSaveAll = async () => {
         if (!roadmap || !id) return;
         try {
+            setSaving(true);
             await updateRoadmap(Number(id), roadmap);
             alert("Blueprint updated successfully!");
             navigate('/roadmaps');
         } catch (err) {
             alert("Failed to save changes.");
+        } finally {
+            setSaving(false);
         }
     };
 
-    // 1. Show your custom AppLoader while fetching
     if (loading) {
         return (
             <PageLayout>
@@ -60,7 +69,6 @@ const RoadmapEditPage: React.FC = () => {
         );
     }
 
-    // 2. Handle the case where the ID actually doesn't exist in DB
     if (!roadmap) {
         return (
             <PageLayout>
@@ -75,45 +83,51 @@ const RoadmapEditPage: React.FC = () => {
     return (
         <PageLayout>
             <Container maxWidth="md" sx={{ py: 6 }}>
-                {/* Header and Content remain the same... */}
+                {/* Unified Header with Save Action */}
                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
                     <Stack direction="row" spacing={2} alignItems="center">
-                        <IconButton onClick={() => navigate('/roadmaps')}>
+                        <IconButton onClick={() => navigate('/roadmaps')} sx={{ border: '1px solid #eee' }}>
                             <ArrowBack />
                         </IconButton>
                         <Box>
                             <Typography variant="h5" fontWeight={900}>Edit RoadMap</Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                ID: {id} • {roadmap.steps.length} Milestones
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Map sx={{ fontSize: 12 }} /> ID: {id} • {roadmap.steps.length} Milestones
                             </Typography>
                         </Box>
                     </Stack>
+
                     <Button
                         variant="contained"
                         startIcon={<Save />}
                         onClick={handleSaveAll}
-                        sx={{ borderRadius: 3, fontWeight: 800, px: 3 }}
+                        disabled={saving}
+                        sx={{ borderRadius: 3, fontWeight: 800, px: 4, py: 1.2, boxShadow: 3 }}
                     >
-                        Save All Changes
+                        {saving ? 'Saving...' : 'Save All Changes'}
                     </Button>
                 </Stack>
 
                 <Stack spacing={4}>
-                    <Paper variant="outlined" sx={{ p: 3, borderRadius: 4 }}>
+                    {/* Part 1: General Info (No internal submit button) */}
+                    <Paper variant="outlined" sx={{ p: 4, borderRadius: 4, borderStyle: 'dashed', borderWidth: 2 }}>
                         <RoadmapForm
-                            initialData={{
+                            data={{
                                 title: roadmap.title,
                                 description: roadmap.description,
-                                targetRole: roadmap.targetRole
+                                targetRole: roadmap.targetRole || ''
                             }}
-                            onSubmit={(data) => setRoadmap({ ...roadmap, ...data })}
+                            onChange={handleHeaderChange}
                         />
                     </Paper>
 
                     <Divider />
 
+                    {/* Part 2: Step Editor */}
                     <Box>
-                        <Typography variant="h6" fontWeight={800} sx={{ mb: 2 }}> Path Milestones</Typography>
+                        <Typography variant="h6" fontWeight={800} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                            🚀 Path Milestones
+                        </Typography>
                         <RoadmapStepListEditor
                             steps={roadmap.steps}
                             onUpdateSteps={handleUpdateSteps}

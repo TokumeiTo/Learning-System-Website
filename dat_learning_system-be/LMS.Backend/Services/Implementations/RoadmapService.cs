@@ -58,7 +58,6 @@ public class RoadmapService(IRoadmapRepository repo, IMapper mapper) : IRoadmapS
         existingRoadmap.Title = updateDto.Title;
         existingRoadmap.Description = updateDto.Description;
         existingRoadmap.TargetRole = updateDto.TargetRole;
-        existingRoadmap.ThumbnailUrl = updateDto.ThumbnailUrl;
 
         // 2. Sync Steps (Manual "Check -> Update/Add/Delete" Logic)
         var incomingStepIds = updateDto.Steps.Select(s => s.Id).ToList();
@@ -139,7 +138,6 @@ public class RoadmapService(IRoadmapRepository repo, IMapper mapper) : IRoadmapS
             Title = $"{original.Title} (Copy)",
             Description = original.Description,
             TargetRole = original.TargetRole,
-            ThumbnailUrl = original.ThumbnailUrl,
             CreatedAt = DateTime.UtcNow,
             Steps = original.Steps.Select(s => new RoadmapStep
             {
@@ -171,5 +169,11 @@ public class RoadmapService(IRoadmapRepository repo, IMapper mapper) : IRoadmapS
             "Course" => await repo.GetCourseBasicInfoAsync(Guid.Parse(rawId)),
             _ => null
         };
+    }
+
+    public async Task<IEnumerable<RoadmapGlobalSourceDto>> SearchResourcesAsync(string term,string type)
+    {
+        // Simply pass the call to the repository we updated earlier
+        return await repo.SearchResourcesAsync(term, type);
     }
 }

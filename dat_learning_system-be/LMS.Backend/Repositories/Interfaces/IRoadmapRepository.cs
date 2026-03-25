@@ -10,7 +10,7 @@ public interface IRoadmapRepository
     Task<RoadMap> CreateAsync(RoadMap roadmap);
     Task UpdateAsync(RoadMap roadmap);
     Task<bool> DeleteAsync(int id);
-    Task<IEnumerable<RoadmapGlobalSourceDto>> SearchResourcesAsync(string searchTerm);
+    Task<IEnumerable<RoadmapGlobalSourceDto>> SearchResourcesAsync(string searchTerm, string resourceType);
     Task<object?> GetEBookBasicInfoAsync(int id);
     Task<object?> GetCourseBasicInfoAsync(Guid id);
 }

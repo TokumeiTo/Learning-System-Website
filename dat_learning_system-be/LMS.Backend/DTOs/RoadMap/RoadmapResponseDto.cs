@@ -6,7 +6,6 @@ public class RoadmapResponseDto
     public string Title { get; set; } = null!;
     public string Description { get; set; } = null!;
     public string? TargetRole { get; set; }
-    public string? ThumbnailUrl { get; set; }
     public int StepCount { get; set; }
     public List<RoadmapStepDto> Steps { get; set; } = new();
 }

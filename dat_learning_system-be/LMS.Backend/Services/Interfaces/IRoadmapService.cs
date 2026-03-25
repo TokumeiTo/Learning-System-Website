@@ -10,4 +10,5 @@ public interface IRoadmapService
     Task<RoadmapResponseDto?> UpdateRoadmapAsync(int id, RoadmapResponseDto updateDto);
     Task<RoadmapResponseDto?> DuplicateRoadmapAsync(int id);
     Task<bool> DeleteRoadmapAsync(int id);
+    Task<IEnumerable<RoadmapGlobalSourceDto>> SearchResourcesAsync(string term, string type);
 }

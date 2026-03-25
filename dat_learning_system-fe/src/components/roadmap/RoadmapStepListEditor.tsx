@@ -70,8 +70,32 @@ const StepListEditor: React.FC<EditorProps> = ({ steps, onUpdateSteps }) => {
                         }>
                             <ListItemText
                                 primary={step.title}
-                                secondary={`${step.nodeType} - Order: ${step.sortOrder}`}
-                                primaryTypographyProps={{ fontWeight: 700 }}
+                                // HIGHLIGHT: Use slotProps to target the secondary typography component
+                                slotProps={{
+                                    secondary: {
+                                        component: 'div', // This prevents the <p> vs <div> error
+                                        variant: 'body2',
+                                        sx: { color: 'text.secondary' } // You can even move styles here
+                                    },
+                                    primary: {
+                                        fontWeight: 700
+                                    }
+                                }}
+                                secondary={
+                                    <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                                            {step.nodeType}
+                                        </Typography>
+                                        {step.linkedResourceId && (
+                                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                • Linked: {step.linkedResourceId}
+                                            </Typography>
+                                        )}
+                                        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                                            • Order: {step.sortOrder}
+                                        </Typography>
+                                    </Stack>
+                                }
                             />
                         </ListItem>
                     </Paper>

@@ -6,7 +6,6 @@ public class RoadMap
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string? TargetRole { get; set; } 
-    public string? ThumbnailUrl { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<RoadmapStep> Steps { get; set; } = new List<RoadmapStep>();
