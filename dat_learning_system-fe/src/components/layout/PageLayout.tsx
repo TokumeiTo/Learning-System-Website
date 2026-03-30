@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import AppLoader from "../feedback/AppLoader";
-import { useTheme } from "@mui/material";
+import AnnouncementBanner from "../announcement/AnnouncementBanner";
+import { useTheme, Container } from "@mui/material";
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -16,18 +17,15 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
   const toggleSidebar = () => setOpen((o) => !o);
 
   const [loading, setLoading] = useState(true);
-  const theme = useTheme();
-  /* Minimum loader duration */
+
   useEffect(() => {
     const MIN_DURATION = 500;
     const start = Date.now();
-
     const finish = () => {
       const elapsed = Date.now() - start;
       const delay = Math.max(0, MIN_DURATION - elapsed);
       setTimeout(() => setLoading(false), delay);
     };
-
     finish();
   }, []);
 
@@ -40,14 +38,11 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
         bgcolor: "background.gradient",
       }}
     >
-      {/* Sidebar */}
       <Sidebar open={open} onClose={toggleSidebar} />
 
-      {/* Right content */}
       <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <Navbar open={open} onToggle={toggleSidebar} />
 
-        {/* Main content */}
         <Box
           component="main"
           sx={{
@@ -56,10 +51,10 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
             paddingTop: '65px',
             position: "relative",
             display: "flex",
-            justifyContent: "center",
+            flexDirection: "column", // Changed to column to stack Banner + Content
+            alignItems: "center",
           }}
         >
-          {/* Children Loader */}
           <AnimatePresence mode="wait">
             {loading ? (
               <motion.div
@@ -82,31 +77,20 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
                 transition={{ duration: 0.2, ease: "easeOut" }}
                 sx={{
                   width: "100%",
-                  maxWidth: "100%",
-                  scrollbarWidth: "none",
-                  scrollbarColor: "transparent transparent",
-                  transition: "scrollbar-color 0.3s, scrollbar-width 0.3s",
-
-                  "&:hover": {
-                    scrollbarWidth: "thin",
-                    scrollbarColor: `#008cffff ${theme.palette.background.paper}`,
-                  },
-
-                  "&::-webkit-scrollbar": {
-                    width: 6,
-                  },
-                  "&::-webkit-scrollbar-thumb": {
-                    backgroundColor: "transparent",
-                    borderRadius: 8,
-                  },
-                  "&:hover::-webkit-scrollbar-thumb": {
-                    backgroundColor: "#008cffff",
-                  },
+                  flex: 1,
+                  overflowY: "auto", // Handle scrolling here
+                  // ... your existing scrollbar styles ...
                 }}
               >
+                {/* --- ANNOUNCEMENT AREA --- */}
+                {/* We use a Container to keep the banner aligned with your content width */}
+                <Container maxWidth="lg" sx={{ mt: 2, bgcolor:'background.paper'}}>
+                   <AnnouncementBanner />
+                </Container>
+
+                {/* --- PAGE CHILDREN --- */}
                 {children}
               </Box>
-
             )}
           </AnimatePresence>
         </Box>

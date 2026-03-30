@@ -3,7 +3,7 @@ import type {
     Announcement, 
     UpsertAnnouncementRequest, 
     Notification 
-} from '../types_interfaces/notifications';
+} from '../types_interfaces/noti_announce';
 
 // --- ANNOUNCEMENT ENDPOINTS ---
 

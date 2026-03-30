@@ -10,4 +10,9 @@ public class NotificationHub : Hub
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, userId);
     }
+
+    public async Task JoinPositionGroup(string position)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, position);
+    }
 }

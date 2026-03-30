@@ -39,6 +39,7 @@ import LibraryAdminPage from "../pages/admin/LibraryAdminPage";
 import RoadmapListPage from "../pages/roadmap/RoadmapListPage";
 import RoadmapDetailsPage from "../components/roadmap/RoadmapDetailsPage";
 import RoadmapEditPage from "../pages/roadmap/RoadmapEditPage";
+import AnnouncementManagementPage from "../pages/admin/AnnouncementManagementPage";
 
 export const AppRouter = () => {
   const { user } = useAuth();
@@ -299,6 +300,15 @@ export const AppRouter = () => {
           element={
             <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
               <EnrollmentApprovalPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin/announcements"
+          element={
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+              <AnnouncementManagementPage />
             </ProtectedRoute>
           }
         />

@@ -186,15 +186,15 @@ public class MappingProfile : Profile
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // --- ANNOUNCEMENTS ---
-        CreateMap<Announcement, AnnouncementResponseDto>()
-            .ForMember(dest => dest.TargetPosition, opt => opt.MapFrom(src => src.TargetPosition.ToString()))
-            .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.CreatedByUser.FullName));
-
         CreateMap<UpsertAnnouncementDto, Announcement>()
             .ForMember(dest => dest.TargetPosition, opt => opt.MapFrom(src =>
-                EnumMappingHelper.MapPosition(src.TargetPosition, Position.Employee))) // Using Mapping POSITIONs helper!
-            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // Don't let users set creation date
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id ?? Guid.NewGuid()));
+                (src.TargetPositions == null || !src.TargetPositions.Any())
+                    ? null
+                    : string.Join(",", src.TargetPositions))) // Joins ["Admin", "DivHead"] into "Admin,DivHead"
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
+
+        CreateMap<Announcement, AnnouncementResponseDto>()
+            .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.CreatedByUser.FullName));
 
         // --- NOTIFICATIONS ---
         CreateMap<Notification, NotificationResponseDto>();

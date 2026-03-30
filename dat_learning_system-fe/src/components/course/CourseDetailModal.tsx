@@ -162,8 +162,8 @@ const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onC
                     {/* Meta Stats Row */}
                     <Stack direction="row" flexWrap="wrap" gap={3}>
                         <DetailItem icon={<Timer />} label="Duration" value={`${course.totalHours}h`} />
-                        <DetailItem icon={<MenuBook />} label="Curriculum" value={`${course.topics?.length || 0} Topics`} />
-                        <DetailItem icon={<WorkspacePremium />} label="Certificate" value="Included" />
+                        <DetailItem icon={<MenuBook />} label="Topics" value={`${course.classworkTopics?.length || 0} Topics`} />
+                        <DetailItem icon={<WorkspacePremium />} label="Curriculum" value={`${course.lessons?.length || 0}`} />
                     </Stack>
 
                     {/* 3. Enrollment Action Area */}

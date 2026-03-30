@@ -4,7 +4,7 @@ using LMS.Backend.Data.Entities;
 using LMS.Backend.Repo.Interface;
 using Microsoft.EntityFrameworkCore;
 
-namespace LMS.Backend.Data.Repositories;
+namespace LMS.Backend.Repo.Implement;
 
 public class AnnouncementRepository : IAnnouncementRepository
 {
@@ -25,9 +25,11 @@ public class AnnouncementRepository : IAnnouncementRepository
 
     public async Task<IEnumerable<Announcement>> GetForUserAsync(Position userPosition)
     {
-        // For regular users: Only current/future announcements matching their position
+        var positionString = userPosition.ToString();
+
         return await _context.Announcements
-            .Where(a => (a.TargetPosition == null || a.TargetPosition == userPosition) 
+            .Where(a => (string.IsNullOrEmpty(a.TargetPosition) ||
+                         a.TargetPosition.Contains(positionString))
                         && a.DisplayUntil > DateTime.UtcNow)
             .OrderByDescending(a => a.CreatedAt)
             .ToListAsync();
@@ -51,7 +53,7 @@ public class AnnouncementRepository : IAnnouncementRepository
         {
             // Ensure ID is generated if not provided, though Guid.NewGuid() is usually handled in the DTO/Service
             if (announcement.Id == Guid.Empty) announcement.Id = Guid.NewGuid();
-            
+
             await _context.Announcements.AddAsync(announcement);
         }
         else

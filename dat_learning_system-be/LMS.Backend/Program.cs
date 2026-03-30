@@ -120,6 +120,7 @@ builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddApplicationServices();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddHostedService<NotificationCleanupWorker>();
+builder.Services.AddHostedService<AnnouncementCleanupWorker>();
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 420_000_000; // 400 MB

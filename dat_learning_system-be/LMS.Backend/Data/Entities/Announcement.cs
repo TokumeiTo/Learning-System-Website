@@ -10,7 +10,7 @@ public class Announcement
     
     // Logic: If null, everyone sees it. 
     // If set, only users with this Position see it.
-    public Position? TargetPosition { get; set; }
+    public string? TargetPosition { get; set; }
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     

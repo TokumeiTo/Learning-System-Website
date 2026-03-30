@@ -14,7 +14,7 @@ export interface UpsertAnnouncementRequest {
     id?: string;             
     title: string;
     content: string;
-    targetPosition?: string; 
+    targetPositions: string[];
     displayUntil: string;
 }
 

@@ -87,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
   // 2. Auto-detect Mode from URL (Survives direct Navigation)
   React.useEffect(() => {
-    const managementRoutes = ["/umanage", "/org_units", "/admin", "/enrollements", "/logs"];
+    const managementRoutes = ["/umanage", "/org_units", "/admin", "/enrollements","/announcements", "/logs"];
     const isManagementPage = managementRoutes.some(path => location.pathname.startsWith(path));
 
     if (isManagementPage) {

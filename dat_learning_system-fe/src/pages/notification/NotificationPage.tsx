@@ -17,7 +17,7 @@ import { formatDistanceToNow } from 'date-fns';
 import PageLayout from '../../components/layout/PageLayout';
 
 import { getMyNotifications, markNotificationAsRead, clearAllNotifications } from '../../api/announce_noti.api';
-import type { Notification } from '../../types_interfaces/notifications';
+import type { Notification } from '../../types_interfaces/noti_announce';
 import MessagePopup from '../../components/feedback/MessagePopup';
 import { useNavigate } from 'react-router-dom';
 

@@ -50,7 +50,7 @@ public class LessonContentUploadDto
 {
     public Guid? Id { get; set; }
     public string ContentType { get; set; } = string.Empty; // "text", "image", "file", etc.
-    public string? Body { get; set; } // Will be HTML for text, or null for files
+    public string Body { get; set; } = string.Empty; // Will be HTML for text, or null for files
     public string? FileName { get; set; } // The name of the attached file to match
     public int SortOrder { get; set; }
     public TestDto? Test { get; set; }

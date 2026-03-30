@@ -12,6 +12,7 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AddCardIcon from '@mui/icons-material/AddCard';
 import DvrIcon from '@mui/icons-material/Dvr';
+import CampaignIcon from '@mui/icons-material/Campaign';
 
 export const LEARNING_NAV = [
     { label: "Roadmap", path: "/roadmaps", icon: <FollowTheSignsIcon color="primary" /> },
@@ -29,6 +30,7 @@ export const MANAGEMENT_NAV = [
     { label: "Manager", path: "/admin/dashboard", icon: <DashboardIcon color="secondary" /> },
     { label: "User Management", path: "/admin/user_management", icon: <PeopleIcon color="secondary" /> },
     { label: "Library Management", path: "/admin/library_management", icon: <LocalLibraryIcon color="secondary" /> },
+    { label: "Announcements", path: "/admin/announcements", icon: <CampaignIcon color="secondary" /> },
     { label: "Org Structure", path: "/admin/org_units", icon: <AccountTreeIcon color="secondary" /> },
     { label: "Enrollments", path: "/admin/enrollments", icon: <AddCardIcon color="secondary" /> },
     { label: "Audits", path: "/admin/logs", icon: <DvrIcon color="secondary" /> },

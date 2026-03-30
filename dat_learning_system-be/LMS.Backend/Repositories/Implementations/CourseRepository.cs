@@ -13,6 +13,7 @@ public class CourseRepository : BaseRepository<Course>, ICourseRepository
     {
         return await _context.Courses
             .Include(c => c.ClassworkTopics) // Fetch the topics so .Count works
+            .Include(c => c.Lessons)
             .AsNoTracking()
             .ToListAsync();
     }

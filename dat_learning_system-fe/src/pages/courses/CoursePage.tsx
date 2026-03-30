@@ -18,6 +18,7 @@ import { getCourses, createCourse } from '../../api/course.api';
 
 import CreateCourseCard from '../../components/course/CreateCourseCard';
 import CourseCard from '../../components/course/CourseCard';
+import MessagePopup from '../../components/feedback/MessagePopup';
 import { useAuth } from '../../hooks/useAuth';
 
 const CoursesPage: React.FC = () => {
@@ -27,6 +28,7 @@ const CoursesPage: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [errorPopup, setErrorPopup] = useState({ open: false, message: '' });
     const location = useLocation();
     const { user } = useAuth();
     // Check against DB IDs for maximum accuracy
@@ -38,7 +40,7 @@ const CoursesPage: React.FC = () => {
             const data = await getCourses();
             setCourses(data);
         } catch (error) {
-            console.error("Failed to fetch courses:", error);
+            setErrorPopup({ open: true, message: "Fail to fetch courses!!" });
         } finally {
             setLoading(false);
         }
@@ -82,18 +84,13 @@ const CoursesPage: React.FC = () => {
 
     return (
         <PageLayout>
-            <Box sx={{
-                p: { xs: 2, md: 6 },
-                minHeight: '100vh',
-            }}>
-
                 {/* Header Section */}
                 <Stack
                     direction={{ xs: 'column', sm: 'row' }}
                     justifyContent="space-between"
                     alignItems={{ sm: 'flex-end' }}
                     spacing={2}
-                    sx={{ mb: 4 }}
+                    sx={{ mb: 4, p:3 }}
                 >
                     <Stack spacing={1}>
                         <Typography variant="h3" fontWeight={900} sx={{ letterSpacing: '-1.5px', color: 'text.primary' }}>
@@ -126,10 +123,9 @@ const CoursesPage: React.FC = () => {
                 {/* Filter & Search Bar Area */}
                 <Stack
                     direction={{ xs: 'column', lg: 'row' }}
-                    spacing={3}
                     justifyContent="space-between"
                     alignItems={{ xs: 'start', lg: 'center' }}
-                    sx={{ mb: 6, position: 'sticky', top: '75px', zIndex: '300' }}
+                    sx={{ mb: 6, position: 'sticky', top: '75px', zIndex: '300', p: 3 }}
                 >
                     {/* Category Pills (Replaces Tabs) */}
                     <Stack
@@ -182,7 +178,7 @@ const CoursesPage: React.FC = () => {
                             borderRadius: 3,
                             bgcolor: 'background.paper',
                             border: searchTerm ? '1px solid #1976d2' : `1px solid ${theme.palette.divider}`, // Highlight if searching
-                            width: { xs: '100%', lg: 350 },
+                            width: { md:'100%', lg: 350 },
                             transition: '0.2s',
                             '&:focus-within': {
                                 borderColor: 'primary.main',
@@ -226,7 +222,8 @@ const CoursesPage: React.FC = () => {
                             xs: '1fr',
                             sm: 'repeat(auto-fill, minmax(340px, 1fr))'
                         },
-                        gap: 7
+                        gap: 7,
+                        p:3
                     }}>
                         <AnimatePresence mode="popLayout">
                             {isCreating && (
@@ -274,7 +271,13 @@ const CoursesPage: React.FC = () => {
                         )}
                     </Box>
                 )}
-            </Box>
+
+            <MessagePopup
+                open={errorPopup.open}
+                message={errorPopup.message}
+                severity="error"
+                onClose={() => setErrorPopup({ ...errorPopup, open: false })}
+            />
         </PageLayout>
     );
 };
