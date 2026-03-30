@@ -80,7 +80,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
             .ForMember(dest => dest.Contents, opt => opt.Ignore());
 
-        // --- CLASSROOM PROFILE MAPPING ---
+        // --- CLASSROOM/LESSONCONTENT PROFILE MAPPING ---
         CreateMap<LessonContent, ClassroomContentDto>()
             .ForMember(dest => dest.Test, opt => opt.MapFrom(src => src.Tests.FirstOrDefault(t => t.IsActive)));
 
@@ -89,6 +89,11 @@ public class MappingProfile : Profile
             // They are destination-only properties that the Service will calculate.
             .ForMember(dest => dest.IsDone, opt => opt.Ignore())
             .ForMember(dest => dest.IsLocked, opt => opt.Ignore());
+
+
+        CreateMap<LessonContentUploadDto, LessonContent>()
+            .ForMember(dest => dest.Tests, opt => opt.Ignore())
+            .ForMember(dest => dest.Lesson, opt => opt.Ignore());
 
         CreateMap<Course, ClassroomViewDto>()
             .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Id))

@@ -240,12 +240,16 @@ const LessonContentViewer = ({ contents, lessonId, isDone, lastScore, onComplete
                             >
                                 <Box
                                     component="img"
-                                    src={block.body.startsWith('http') ? block.body : `${import.meta.env.VITE_API_URL}${block.body}`}
+                                    src={
+                                        block.body.startsWith('http') || block.body.startsWith('blob:')
+                                            ? block.body
+                                            : `${import.meta.env.VITE_API_URL}${block.body}`
+                                    }
                                     sx={{
                                         display: 'block',
                                         p: '30px',
                                         width: '100%',
-                                        maxHeight: '500px',
+                                        maxHeight: '350px',
                                         objectFit: 'contain',
                                         transition: 'transform 0.3s ease',
                                     }}

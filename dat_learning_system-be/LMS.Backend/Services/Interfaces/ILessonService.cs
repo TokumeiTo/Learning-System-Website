@@ -8,7 +8,7 @@ public interface ILessonService
     Task<ClassroomViewDto?> GetClassroomViewAsync(Guid courseId, string userId, bool isAdmin);
     Task<ClassroomLessonDto> CreateLessonAsync(CreateLessonDto dto);
     Task ReorderLessonsAsync(ReorderLessonsDto dto);
-    Task BulkSaveContentsAsync(SaveLessonContentsDto dto);
+    Task BulkSaveContentsAsync(SaveLessonContentsDto dto, List<IFormFile> files);
     Task<bool> DeleteLessonAsync(Guid id);
     Task<ClassroomLessonDto> UpdateLessonAsync(UpdateLessonDto dto);
 }

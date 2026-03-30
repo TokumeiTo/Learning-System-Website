@@ -4,6 +4,7 @@ using LMS.Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace LMS.Backend.Controllers;
 
@@ -23,7 +24,7 @@ public class ClassroomController(ILessonService lessonService) : ControllerBase
 
         var result = await lessonService.GetClassroomViewAsync(courseId, userId, isAdmin);
         if (result == null) return NotFound();
-        
+
         return Ok(result);
     }
 
@@ -40,12 +41,26 @@ public class ClassroomController(ILessonService lessonService) : ControllerBase
 
     [HttpPost("lessons/contents/bulk")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> BulkSaveContents([FromBody] SaveLessonContentsDto dto)
+    [DisableRequestSizeLimit]
+    public async Task<IActionResult> BulkSaveContents([FromForm] string jsonData)
     {
-        await lessonService.BulkSaveContentsAsync(dto);
+        // 1. Get files directly from the Request object instead of a parameter
+        var files = Request.Form.Files;
+
+        // 2. Deserialize the metadata
+        var dto = JsonSerializer.Deserialize<SaveLessonContentsDto>(jsonData, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (dto == null) return BadRequest("Invalid data");
+
+        // 3. Convert IFormFileCollection to a List for your service if needed
+        await lessonService.BulkSaveContentsAsync(dto, files.ToList());
+
         return NoContent();
     }
-
+    
     [HttpPut("lessons/reorder")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> ReorderLessons([FromBody] ReorderLessonsDto dto)

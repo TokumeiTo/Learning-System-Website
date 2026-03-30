@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import {
     Box, Stack, Paper, TextField, IconButton, Button,
     ToggleButtonGroup, ToggleButton, Typography,
@@ -14,6 +14,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import TestBuilder from './TestBuilder';
 import ReactQuill from 'react-quill-new';
+import type { Test } from '../../types_interfaces/test';
 
 const textModules = {
     toolbar: [
@@ -25,7 +26,22 @@ const textModules = {
     ],
 };
 
-const DraftBlock = ({ block, updateBlock, removeBlock }: any) => {
+interface Block {
+    tempId: string;
+    contentType: 'text' | 'chart' | 'image' | 'video' | 'file' | 'test';
+    body: string;
+    fileName?: string;
+    file?: File;
+    test?: Test;
+}
+
+interface DraftBlockProps {
+    block: Block;
+    updateBlock: (id: string, updates: Partial<Block>) => void;
+    removeBlock: (id: string) => void;
+}
+
+const DraftBlock = ({ block, updateBlock, removeBlock }: DraftBlockProps) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.tempId });
     const [inputMethod, setInputMethod] = useState<'upload' | 'link'>('link');
     const [isChartEditMode, setIsChartEditMode] = useState(false);
@@ -38,23 +54,59 @@ const DraftBlock = ({ block, updateBlock, removeBlock }: any) => {
         position: 'relative' as const,
     };
 
+    useEffect(() => {
+        // Cleanup function to revoke the blob URL when the block is removed or the body changes
+        return () => {
+            if (block.body?.startsWith('blob:')) {
+                URL.revokeObjectURL(block.body);
+            }
+        };
+    }, [block.body]);
+
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                updateBlock(block.tempId, {
-                    body: reader.result as string,
-                    fileName: file.name
-                });
+            // Revoke the old blob if user is replacing an existing upload
+            if (block.body?.startsWith('blob:')) {
+                URL.revokeObjectURL(block.body);
             }
-            reader.readAsDataURL(file);
+
+            const previewUrl = URL.createObjectURL(file);
+            updateBlock(block.tempId, {
+                body: previewUrl,
+                fileName: file.name,
+                file: file
+            });
         }
     };
 
     // Inside DraftBlock
     const isBase64 = useMemo(() => block.body?.startsWith('data:'), [block.body]);
     const isSavedFile = useMemo(() => block.body?.startsWith('/uploads/'), [block.body]);
+
+    const mediaSrc = useMemo(() => {
+        if (!block.body) return '';
+
+        // 1. If it's a blob (temporary preview) or a full external URL (YouTube/Cloudinary)
+        if (block.body.startsWith('blob:') || block.body.startsWith('http')) {
+            return block.body;
+        }
+
+        // 2. If it's a relative path from your DB (e.g., "/uploads/lesson1.png")
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        return `${baseUrl}${block.body}`;
+    }, [block.body]);
+
+    const getEmbedUrl = (url: string) => {
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11)
+                ? `https://www.youtube.com/embed/${match[2]}`
+                : url;
+        }
+        return url;
+    };
 
     return (
         <Paper
@@ -106,7 +158,12 @@ const DraftBlock = ({ block, updateBlock, removeBlock }: any) => {
 
                     {/* --- CHART / TABLE TYPE --- */}
                     {block.contentType === 'chart' && (() => {
-                        const tableData: string[][] = JSON.parse(block.body || '[[""]]');
+                        let tableData: string[][];
+                        try {
+                            tableData = JSON.parse(block.body || '[[""]]');
+                        } catch (e) {
+                            tableData = [["Error loading data"]];
+                        }
 
                         const updateCell = (rowIndex: number, colIndex: number, value: string) => {
                             const newData = [...tableData];
@@ -287,34 +344,34 @@ const DraftBlock = ({ block, updateBlock, removeBlock }: any) => {
 
                             {/* PREVIEW AREA */}
                             {block.body && (
-                                <Box sx={{ mt: 2, position: 'relative', borderRadius: 2, overflow: 'hidden', bgcolor: '#000' }}>
+                                <Box sx={{ mt: 2, position: 'relative', borderRadius: 2, overflow: 'hidden', bgcolor: '#000', border: '1px solid #334155' }}>
                                     {block.contentType === 'image' ? (
                                         <Box
                                             component="img"
-                                            src={isSavedFile ? block.body.startsWith('http') ? block.body : `${import.meta.env.VITE_API_URL}${block.body}` : block.body}
-
-                                            sx={{ width: '100%', maxHeight: 400, objectFit: 'contain' }}
+                                            src={mediaSrc}
+                                            alt="Preview"
+                                            sx={{ width: '100%', maxHeight: 400, objectFit: 'contain', display: 'block' }}
                                         />
                                     ) : (
                                         <Box sx={{ aspectRatio: '16/9' }}>
-                                            {isBase64 || isSavedFile || block.body.startsWith('blob:') ? (
-                                                <video src={block.body} controls width="100%" />
-                                            ) : (
+                                            {/* Logic to check if it's a video file or a YouTube link */}
+                                            {block.body.includes('youtube.com') || block.body.includes('youtu.be') ? (
                                                 <iframe
                                                     width="100%" height="100%"
-                                                    src={block.body.includes('youtube.com')
-                                                        ? block.body.replace("watch?v=", "embed/").split('&')[0]
-                                                        : block.body}
+                                                    src={getEmbedUrl(block.body)}
                                                     frameBorder="0" allowFullScreen
                                                 />
+                                            ) : (
+                                                <video src={mediaSrc} controls width="100%" style={{ display: 'block' }} />
                                             )}
                                         </Box>
                                     )}
 
+                                    {/* The Delete overlay stays the same */}
                                     <IconButton
                                         size="small"
-                                        onClick={() => updateBlock(block.tempId, { body: '', fileName: undefined })}
-                                        sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(0,0,0,0.6)', color: 'white' }}
+                                        onClick={() => updateBlock(block.tempId, { body: '', fileName: undefined, file: undefined })}
+                                        sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(0,0,0,0.6)', color: 'white', '&:hover': { bgcolor: '#ef4444' } }}
                                     >
                                         <Delete fontSize="small" />
                                     </IconButton>

@@ -11,7 +11,7 @@ public class LessonService(
     ILessonRepository repo,
     ITestService testService,
     IUserProgressRepository progressRepo,
-    IMediaHandlerService mediaHandler, // Injected shared handler
+    IFileService fileService,
     IMapper mapper) : ILessonService
 {
     public async Task<ClassroomLessonDto> CreateLessonAsync(CreateLessonDto dto)
@@ -87,33 +87,51 @@ public class LessonService(
         return viewDto;
     }
 
-    public async Task BulkSaveContentsAsync(SaveLessonContentsDto dto)
+    public async Task BulkSaveContentsAsync(SaveLessonContentsDto dto, List<IFormFile> files)
     {
-        foreach (var itemDto in dto.Contents)
+        await _uploadLimit.WaitAsync();
+        try
         {
-            // Clean logic using the shared MediaHandler
-            if (itemDto.ContentType == "image" || itemDto.ContentType == "video" || itemDto.ContentType == "file")
+            var mappedContents = new List<LessonContent>();
+
+            foreach (var itemDto in dto.Contents)
             {
-                if (!string.IsNullOrEmpty(itemDto.Body))
+                if (itemDto.ContentType == "image" || itemDto.ContentType == "video" || itemDto.ContentType == "file")
                 {
-                    itemDto.Body = await mediaHandler.HandleBase64MediaAsync(itemDto.Body, itemDto.ContentType);
+                    var fileData = files.FirstOrDefault(f => f.FileName == itemDto.FileName);
+                    if (fileData != null)
+                    {
+                        // Stream directly to disk! No Base64, no MemoryStream.
+                        var uploadedPath = await fileService.UploadFileAsync(fileData, GetFolder(itemDto.ContentType));
+
+                        itemDto.Body = uploadedPath;
+                    }
+                }
+
+                var entity = mapper.Map<LessonContent>(itemDto);
+                entity.Body = itemDto.Body;
+                mappedContents.Add(entity);
+            }
+
+            await repo.SaveLessonContentsAsync(dto.LessonId, mappedContents);
+
+            for (int i = 0; i < dto.Contents.Count; i++)
+            {
+                var itemDto = dto.Contents[i];
+
+                if (itemDto.ContentType == "test" && itemDto.Test != null)
+                {
+                    var contentId = mappedContents[i].Id;
+                    await testService.SaveTestToContentAsync(contentId, itemDto.Test);
                 }
             }
         }
-
-        var contents = mapper.Map<List<LessonContent>>(dto.Contents);
-        await repo.SaveLessonContentsAsync(dto.LessonId, contents);
-
-        for (int i = 0; i < dto.Contents.Count; i++)
+        finally
         {
-            var itemDto = dto.Contents[i];
-
-            if (itemDto.ContentType == "test" && itemDto.Test != null)
-            {
-                var contentId = contents[i].Id;
-                await testService.SaveTestToContentAsync(contentId, itemDto.Test);
-            }
+            // IMPORTANT: Always release the gate, even if an error occurs!
+            _uploadLimit.Release();
         }
+
     }
 
     public async Task<ClassroomLessonDto> UpdateLessonAsync(UpdateLessonDto dto)
@@ -136,4 +154,15 @@ public class LessonService(
         await repo.DeleteLessonAsync(id);
         return true;
     }
+
+    //helpers
+    private string GetFolder(string type) => type switch
+    {
+        "image" => "images",
+        "video" => "videos",
+        "file" => "documents",
+        "chart" => "data",
+        _ => "others"
+    };
+    private static readonly SemaphoreSlim _uploadLimit = new SemaphoreSlim(2, 2);
 }

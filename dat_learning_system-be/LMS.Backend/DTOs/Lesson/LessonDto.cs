@@ -44,7 +44,16 @@ public class ReorderLessonsDto
 public class SaveLessonContentsDto
 {
     public Guid LessonId { get; set; }
-    public List<UpsertLessonContentDto> Contents { get; set; } = [];
+    public List<LessonContentUploadDto> Contents { get; set; } = new();
+}
+public class LessonContentUploadDto
+{
+    public Guid? Id { get; set; }
+    public string ContentType { get; set; } = string.Empty; // "text", "image", "file", etc.
+    public string? Body { get; set; } // Will be HTML for text, or null for files
+    public string? FileName { get; set; } // The name of the attached file to match
+    public int SortOrder { get; set; }
+    public TestDto? Test { get; set; }
 }
 public class UpdateLessonDto
 {

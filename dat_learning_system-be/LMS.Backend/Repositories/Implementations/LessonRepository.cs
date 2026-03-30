@@ -126,7 +126,10 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
                     {
                         // UPDATE EXISTING (Manual Sync - prevents breaking Test links)
                         existing.ContentType = incoming.ContentType;
-                        existing.Body = incoming.Body;
+                        if (!string.IsNullOrEmpty(incoming.Body) && !incoming.Body.StartsWith("blob:"))
+                        {
+                            existing.Body = incoming.Body;
+                        }
                         existing.SortOrder = order++;
                         // We don't touch existing.Test here; that's for the TestSync logic
                     }
@@ -142,6 +145,7 @@ public class LessonRepository : BaseRepository<Lesson>, ILessonRepository
             }
         });
     }
+
     public async Task<double> GetAverageScoreForLessonAsync(Guid lessonId)
     {
         var hasAttempts = await _context.LessonAttempts.AnyAsync(a => a.LessonId == lessonId);

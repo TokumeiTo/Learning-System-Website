@@ -42,7 +42,9 @@ export interface ReOrderLessonsRequest {
 export type UpsertContentRequest = {
     id?: string;
     contentType: 'text' | 'image' | 'video' | 'test';
-    body: string;
+    body: string | null;
+    file?: File | Blob;
+    fileName?: string;
     sortOrder: number;
     test?: Test;
 };

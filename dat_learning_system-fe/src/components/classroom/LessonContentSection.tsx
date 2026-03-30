@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Stack, Typography, Paper, Button, Divider, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Box, Stack, Typography, Paper, Button, Divider, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, LinearProgress } from '@mui/material';
 import { TextFormat, Image as ImageIcon, YouTube, Save, Quiz } from '@mui/icons-material';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import { PointerSensor, useSensor, useSensors, DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core';
@@ -24,10 +24,23 @@ const LessonContentSection = ({
   const [isLocalLoading, setIsLocalLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorPopup, setErrorPopup] = useState({ open: false, message: '' });
+  const [uploadStatus, setUploadStatus] = useState<{ percent: number, timeLeft: number } | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
   );
+
+  // Prevent ta closing during upload
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isSaving) {
+        e.preventDefault();
+        e.returnValue = ''; // Shows the "Are you sure you want to leave?" browser prompt
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isSaving]);
 
   // When lesson changes, load its existing content into drafts
   useEffect(() => {
@@ -79,42 +92,56 @@ const LessonContentSection = ({
   };
 
   const handleGlobalSave = async () => {
-    if (!currentLesson) return;
+    if (!currentLesson || isSaving) return;
     setIsSaving(true);
+    setUploadStatus({ percent: 0, timeLeft: 0 });
 
     const payload: BulkSaveContentsRequest = {
       lessonId: currentLesson.id,
       contents: drafts.map((d, index) => {
         let finalBody = d.body;
 
-        // Optional: Prevent saving empty text blocks
+        const isNewFile = d.file && d.file instanceof File;
+        console.log(`Block ${index} type: ${d.contentType}, hasFile: ${!!d.file}`);
+
+        // Prevent saving empty text blocks
         if (d.contentType === 'text' && (finalBody === '<p><br></p>' || !finalBody)) {
           finalBody = "";
         }
 
-        if (['image', 'video', 'file'].includes(d.contentType) && d.body.startsWith('data:')) {
-          finalBody = JSON.stringify({
-            data: d.body,
-            name: d.fileName
-          });
+        if (isNewFile) {
+          finalBody = "";
         }
 
         return {
           id: d.id || undefined,
           contentType: d.contentType,
           body: finalBody,
+          file: d.file,
+          fileName: d.file?.name || d.fileName,
           sortOrder: index,
-          test: d.contentType === 'test' ? d.test : null
+          test: d.contentType === 'test' ? d.test : undefined
         };
       })
     };
 
     try {
-      await bulkSaveLessonContents(payload);
-      setShowSuccessModal(true);
+      await bulkSaveLessonContents(payload, (progress) => {
+        setUploadStatus(progress);
+      });
+
+      drafts.forEach(d => {
+        if (d.body && d.body.startsWith('blob:')) {
+          URL.revokeObjectURL(d.body);
+        }
+      });
+
       onSaveSuccess();
+      setShowSuccessModal(true);
+      setUploadStatus(null);
     } catch (e) {
-      setErrorPopup({ open: true, message: "Save failed." });
+      setErrorPopup({ open: true, message: "Save failed. Check server file size limit!!" });
+      //  NOTIFICATIO TO ADMIN
     } finally {
       setIsSaving(false);
     }
@@ -128,15 +155,55 @@ const LessonContentSection = ({
         <Typography variant="h5" fontWeight={800} sx={{ color: 'white' }}>
           {currentLesson?.title}
         </Typography>
+        {isSaving && uploadStatus?.percent === 0 && (
+          <Typography
+            variant="caption"
+            sx={{ color: '#fbbf24', display: 'block', mt: 1, fontWeight: 'bold' }}
+          >
+            Queueing... The server is processing other uploads. Please wait.
+          </Typography>
+        )}
         <Button
           variant="contained"
           color="success"
-          startIcon={isSaving ? <CircularProgress size={20} color="inherit" /> : <Save />}
-          onClick={handleGlobalSave}
           disabled={isSaving}
-          sx={{ borderRadius: 2, px: 3 }}
+          onClick={handleGlobalSave}
+          sx={{
+            borderRadius: 2,
+            px: 3,
+            minWidth: 180,
+            position: 'relative',
+            overflow: 'hidden' // Important for the progress background
+          }}
         >
-          {isSaving ? "Saving..." : "Save Lesson"}
+          {isSaving ? (
+            <Stack direction="row" spacing={1} alignItems="center">
+              <CircularProgress size={16} color="inherit" />
+              <Typography variant="body2">
+                {uploadStatus ? `${uploadStatus.percent}% (${uploadStatus.timeLeft}s)` : "Preparing..."}
+              </Typography>
+            </Stack>
+          ) : (
+            <>
+              <Save sx={{ mr: 1 }} />
+              Save Lesson
+            </>
+          )}
+
+          {/* Visual Progress Bar inside the button */}
+          {isSaving && uploadStatus && (
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                height: '4px',
+                bgcolor: '#fbbf24', // Amber/Gold color
+                width: `${uploadStatus.percent}%`,
+                transition: 'width 0.3s ease'
+              }}
+            />
+          )}
         </Button>
       </Stack>
 
@@ -221,9 +288,13 @@ const LessonContentSection = ({
       >
         <DialogTitle sx={{ fontWeight: 800 }}>Lesson Saved</DialogTitle>
         <DialogContent>
-          <Typography sx={{ opacity: 0.8 }}>
-            All changes to "{currentLesson?.title}" have been synchronized successfully.
-          </Typography>
+          <Stack alignItems="center" spacing={2} sx={{ pt: 2 }}>
+            <Typography variant="h6" sx={{ color: '#4ade80' }}>保存完了 (Save Complete)</Typography>
+            <Typography sx={{ opacity: 0.8, textAlign: 'center' }}>
+              Lesson <strong>{currentLesson?.title}</strong> is now synced with the server.
+              {drafts.some(d => d.file) && " Large media files have been processed."}
+            </Typography>
+          </Stack>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
           <Button
