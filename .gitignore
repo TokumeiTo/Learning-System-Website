@@ -7,6 +7,7 @@
 *.njsproj
 *.sw?
 !.vscode/extensions.json
+**/appsettings.Development.json
 
 # --- Dependency & Build Folders (Monorepo Friendly) ---
 **/node_modules/

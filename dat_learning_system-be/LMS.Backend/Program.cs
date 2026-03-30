@@ -112,7 +112,10 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 #region Helper Registration/Dependency Injections
 // Singletons
 builder.Services.AddSingleton<JwtHelper>();
-builder.Services.AddSingleton<AuditInterceptor>();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<AuditInterceptor>();
+
 // Helper Services
 builder.Services.AddApplicationServices();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
@@ -148,6 +151,9 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    var jwtKey = builder.Configuration["Jwt:Key"]
+                 ?? throw new InvalidOperationException("JWT Key is missing from configuration! Please check appsettings.Development.json.");
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -157,7 +163,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "default_secret_key_32_characters_long"))
+            Encoding.UTF8.GetBytes(jwtKey))
     };
 
     options.Events = new JwtBearerEvents
