@@ -1,0 +1,39 @@
+# --- System & IDE Files ---
+.DS_Store
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sw?
+!.vscode/extensions.json
+
+# --- Dependency & Build Folders (Monorepo Friendly) ---
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/build/
+**/bin/
+**/obj/
+**/publish/
+
+# --- Environment & Local Config ---
+*.local
+*.user
+
+# --- Logs ---
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Large Assets (Fixed Wildcards) ---
+# Use asterisks so Git finds all files ending in these extensions
+*.pdf
+*.zip
+*.mp4
+*.rar
+*.exe
