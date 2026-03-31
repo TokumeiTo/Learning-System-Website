@@ -9,7 +9,7 @@ type Props = {
 };
 
 export default function UnauthorizedPage({
-  message = "You don’t have permission to access this page.",
+  message = "You don’t have permission to access this action.",
 }: Props) {
   const navigate = useNavigate();
 

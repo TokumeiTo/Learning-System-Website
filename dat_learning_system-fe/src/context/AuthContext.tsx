@@ -12,6 +12,7 @@ type AuthUser = {
 type AuthContextType = {
   user: AuthUser | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: (companyCode: string, password: string) => Promise<void>;
   logout: () => void;
   isInitialized: boolean; // Added to track if we've finished checking storage
@@ -22,6 +23,7 @@ export const AuthContext = createContext<AuthContextType>({} as AuthContextType)
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const isAdmin = user?.position === 'Admin' || user?.position === 'SuperAdmin';
 
   // Check storage on initial mount
   useEffect(() => {
@@ -29,7 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = getToken();
       const savedUser = localStorage.getItem("lms_user");
 
-      if (token && savedUser && !isTokenExpired) {
+      if (token && savedUser && !isTokenExpired()) {
         try {
           setUser(JSON.parse(savedUser));
         } catch (e) {
@@ -68,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, isInitialized }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, login, logout, isInitialized }}>
       {/* Prevent the rest of the app from rendering until we've checked 
         localStorage, otherwise routes might redirect to login mid-load.
       */}

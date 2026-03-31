@@ -1,4 +1,3 @@
-// Data/Configurations/LessonConfiguration.cs
 using LMS.Backend.Common;
 using LMS.Backend.Data.Entities;
 using Microsoft.EntityFrameworkCore;

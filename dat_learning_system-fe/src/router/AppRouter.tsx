@@ -40,6 +40,7 @@ import RoadmapListPage from "../pages/roadmap/RoadmapListPage";
 import RoadmapDetailsPage from "../components/roadmap/RoadmapDetailsPage";
 import RoadmapEditPage from "../pages/roadmap/RoadmapEditPage";
 import AnnouncementManagementPage from "../pages/admin/AnnouncementManagementPage";
+import EditCoursePage from "../components/course/EditCourseModal";
 
 export const AppRouter = () => {
   const { user } = useAuth();

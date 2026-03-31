@@ -55,15 +55,26 @@ public class MappingProfile : Profile
         CreateMap<OrgUnit, OrgUnitResponseDto>();
         CreateMap<OrgUnit, OrgUnitSelectDto>();
 
-        // Course mapping
+        // --- COURSE MAPPING ---
         CreateMap<CreateCourseDto, Course>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
-            // Ignore these as they require Enum parsing or manual logic
             .ForMember(dest => dest.Status, opt => opt.Ignore())
             .ForMember(dest => dest.Badge, opt => opt.Ignore())
             .ForMember(dest => dest.Thumbnail, opt => opt.Ignore());
+
+        CreateMap<UpdateCourseDto, Course>()
+            .ForMember(dest => dest.Thumbnail, opt => opt.Ignore())
+            .ForMember(dest => dest.Status, opt => opt.Ignore())
+            .ForMember(dest => dest.Badge, opt => opt.Ignore());
+
+        // ADD THIS: The Lightweight Response Map
+        CreateMap<Course, CourseSummaryDto>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+            .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src.Badge ?? "GENERAL"));
+
+        // Full Details (keep for the View Page)
         CreateMap<Course, CourseDetailDto>()
-            .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src!.Badge!.ToString()))
+            .ForMember(dest => dest.Badge, opt => opt.MapFrom(src => src.Badge ?? "GENERAL"))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
 
@@ -72,6 +83,8 @@ public class MappingProfile : Profile
         CreateMap<CreateLessonDto, Lesson>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(dest => dest.Contents, opt => opt.MapFrom(_ => new List<LessonContent>()));
+
+        CreateMap<Lesson, LessonDto>();
 
         // Update mapping: ensure we don't overwrite structural data
         CreateMap<UpdateLessonDto, Lesson>()

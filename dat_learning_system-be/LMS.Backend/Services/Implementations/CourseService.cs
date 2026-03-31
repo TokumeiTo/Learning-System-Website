@@ -35,12 +35,18 @@ public class CourseService : ICourseService
         return _mapper.Map<CourseDetailDto>(course);
     }
 
-    public async Task<Course> CreateCourseAsync(CreateCourseDto dto, string creatorId)
+    public async Task<IEnumerable<CourseDetailDto>> GetAllCoursesAsync(bool isAdmin)
     {
-        // 1. Map basic fields
+        var courses = await _courseRepo.GetAllWithTopicsAsync(showDrafts: isAdmin);
+        return _mapper.Map<IEnumerable<CourseDetailDto>>(courses);
+    }
+
+    public async Task<CourseSummaryDto> CreateCourseAsync(CreateCourseDto dto, string creatorId)
+    {
+        // 1. Map basic fields from DTO to Entity
         var course = _mapper.Map<Course>(dto);
 
-        // 2. Parse Enums & Badge
+        // 2. Parse Enums & Format Badge
         course.Status = Enum.TryParse<CourseStatus>(dto.Status, true, out var status)
                         ? status : CourseStatus.Draft;
 
@@ -48,7 +54,7 @@ public class CourseService : ICourseService
                        ? "GENERAL"
                        : dto.Badge.Trim().ToUpper();
 
-        // 3. File Upload using LocalFileService
+        // 3. Handle Thumbnail Upload
         if (dto.ThumbnailFile != null && dto.ThumbnailFile.Length > 0)
         {
             course.Thumbnail = await _fileService.UploadFileAsync(dto.ThumbnailFile, "thumbnails");
@@ -58,11 +64,11 @@ public class CourseService : ICourseService
             course.Thumbnail = "/uploads/No_Thumbnial.svg";
         }
 
-        // 4. Add Course to Repo
+        // 4. Save Course to generate the ID
         await _courseRepo.AddAsync(course);
         await _courseRepo.SaveChangesAsync();
 
-        // 5. Create Default Topic (Using new ClassworkTopic entity)
+        // 5. Create Default Topic for the new course
         var defaultTopic = new ClassworkTopic
         {
             Id = Guid.NewGuid(),
@@ -70,18 +76,69 @@ public class CourseService : ICourseService
             CourseId = course.Id,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = creatorId,
-            Items = new() // Keep compiler happy (no null warnings)
+            Items = new() 
         };
 
-        // Use the new repository method we just built
         await _classworkRepo.CreateTopicAsync(defaultTopic);
 
-        return course;
+        // 6. Return the finished product as a DTO
+        return _mapper.Map<CourseSummaryDto>(course);
     }
 
-    public async Task<IEnumerable<Course>> GetAllCoursesAsync()
+    public async Task<CourseSummaryDto> UpdateCourseAsync(Guid id, UpdateCourseDto dto)
     {
-        // Use the specialized repo method we just created
-        return await _courseRepo.GetAllWithTopicsAsync();
+        var existing = await _courseRepo.GetByIdWithIgnoreFilterAsync(id);
+        if (existing == null) throw new Exception("Course not found");
+
+        // 1. Manual Sync using AutoMapper 
+        // Ensure Status and Badge are Ignored in MappingProfile to prevent null overwrites
+        _mapper.Map(dto, existing);
+
+        // 2. Handle Badge formatting
+        if (dto.Badge != null)
+        {
+            existing.Badge = string.IsNullOrWhiteSpace(dto.Badge)
+                             ? "GENERAL"
+                             : dto.Badge.Trim().ToUpper();
+        }
+
+        // 3. Handle Enum updates
+        if (!string.IsNullOrEmpty(dto.Status))
+        {
+            existing.Status = Enum.TryParse<CourseStatus>(dto.Status, true, out var status)
+                              ? status : existing.Status;
+        }
+
+        // 4. Handle Thumbnail Update
+        if (dto.ThumbnailFile != null)
+        {
+            // Note: You could call _fileService.DeleteFile(existing.Thumbnail) here if needed
+            existing.Thumbnail = await _fileService.UploadFileAsync(dto.ThumbnailFile, "thumbnails");
+        }
+
+        _courseRepo.Update(existing);
+        await _courseRepo.SaveChangesAsync();
+
+        // 5. Return the updated DTO
+        return _mapper.Map<CourseSummaryDto>(existing);
+    }
+
+    public async Task SoftDeleteCourseAsync(Guid id)
+    {
+        var course = await _courseRepo.GetByIdAsync(id);
+        if (course == null) return;
+
+        course.Status = CourseStatus.Closed;
+        _courseRepo.Update(course);
+        await _courseRepo.SaveChangesAsync();
+    }
+
+    public async Task HardDeleteCourseAsync(Guid id)
+    {
+        var course = await _courseRepo.GetByIdWithIgnoreFilterAsync(id);
+        if (course == null) return;
+
+        _courseRepo.Delete(course);
+        await _courseRepo.SaveChangesAsync();
     }
 }

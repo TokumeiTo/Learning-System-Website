@@ -10,8 +10,10 @@ const pulse = keyframes`
   100% { transform: scale(1); filter: drop-shadow(0 0 2px #00e5ff); }
 `;
 
-const GlassBanner = styled(Box)(({ isTargeted }: { isTargeted: boolean }) => ({
-    background: isTargeted 
+const GlassBanner = styled(Box, {
+    shouldForwardProp: (prop) => prop !== 'isTargeted',
+})(({ isTargeted }: { isTargeted: boolean; theme?: any }) => ({
+    background: isTargeted
         ? 'linear-gradient(90deg, rgba(255, 145, 0, 0.12) 0%, rgba(15, 15, 15, 0.9) 100%)'
         : 'linear-gradient(90deg, rgba(0, 229, 255, 0.12) 0%, rgba(15, 15, 15, 0.9) 100%)',
     backdropFilter: 'blur(12px)',
@@ -77,7 +79,7 @@ const AnnouncementBanner = () => {
                 <Fade in={fade} timeout={300}>
                     <Stack spacing={0} sx={{ flexGrow: 1 }}>
                         <Typography variant="caption" sx={{ color: isTargeted ? '#ff9100' : '#00e5ff', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.6rem', letterSpacing: 1 }}>
-                            {isTargeted ? `Priority: ${current.targetPosition}` : "Broadcast Message"} 
+                            {isTargeted ? `Priority: ${current.targetPosition}` : "Broadcast Message"}
                             {announcements.length > 1 && ` (${currentIndex + 1} of ${announcements.length})`}
                         </Typography>
                         <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#fff' }}>
@@ -97,29 +99,29 @@ const AnnouncementBanner = () => {
                             <IconButton size="small" onClick={handleNext} sx={{ color: 'rgba(255,255,255,0.3)' }}><ChevronRight /></IconButton>
                         </>
                     )}
-                    <IconButton 
-                        size="small" 
-                        onClick={() => setVisible(false)} 
+                    <IconButton
+                        size="small"
+                        onClick={() => setVisible(false)}
                         sx={{ color: 'rgba(255,255,255,0.5)', zIndex: 20, position: 'relative' }}
                     >
                         <Close fontSize="small" />
                     </IconButton>
                 </Stack>
             </GlassBanner>
-            
+
             {/* Pagination Dots */}
             {announcements.length > 1 && (
                 <Stack direction="row" justifyContent="center" spacing={1} sx={{ mt: 1 }}>
                     {announcements.map((_, i) => (
-                        <Box 
-                            key={i} 
-                            sx={{ 
-                                width: i === currentIndex ? 12 : 6, 
-                                height: 6, 
-                                borderRadius: 3, 
+                        <Box
+                            key={i}
+                            sx={{
+                                width: i === currentIndex ? 12 : 6,
+                                height: 6,
+                                borderRadius: 3,
                                 bgcolor: i === currentIndex ? (isTargeted ? '#ff9100' : '#00e5ff') : 'rgba(255,255,255,0.2)',
                                 transition: 'all 0.3s ease'
-                            }} 
+                            }}
                         />
                     ))}
                 </Stack>

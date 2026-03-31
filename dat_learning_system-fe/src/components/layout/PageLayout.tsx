@@ -84,9 +84,9 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
               >
                 {/* --- ANNOUNCEMENT AREA --- */}
                 {/* We use a Container to keep the banner aligned with your content width */}
-                <Container maxWidth="lg" sx={{ mt: 2, bgcolor:'background.paper'}}>
+                <Box sx={{ mt: 2, bgcolor:'trasparent', width:'100%', mx: 'auto'}}>
                    <AnnouncementBanner />
-                </Container>
+                </Box>
 
                 {/* --- PAGE CHILDREN --- */}
                 {children}

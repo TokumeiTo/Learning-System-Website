@@ -25,10 +25,37 @@ public class CoursesController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPut("{id}")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
+    public async Task<IActionResult> Update(Guid id, [FromForm] UpdateCourseDto dto)
+    {
+        var result = await _courseService.UpdateCourseAsync(id, dto);
+        return Ok(result);
+    }
+
+    // DELETE: api/courses/{id} (Soft Delete)
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
+    public async Task<IActionResult> SoftDelete(Guid id)
+    {
+        await _courseService.SoftDeleteCourseAsync(id);
+        return NoContent();
+    }
+
+    // DELETE: api/courses/{id}/purge (Hard Delete)
+    [HttpDelete("{id}/purge")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
+    public async Task<IActionResult> HardDelete(Guid id)
+    {
+        await _courseService.HardDeleteCourseAsync(id);
+        return NoContent();
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var courses = await _courseService.GetAllCoursesAsync();
+        bool isAdmin = User.IsInRole("Admin");
+        var courses = await _courseService.GetAllCoursesAsync(isAdmin);
         return Ok(courses);
     }
 

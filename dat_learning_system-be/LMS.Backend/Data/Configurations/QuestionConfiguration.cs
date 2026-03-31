@@ -24,8 +24,8 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
         // Essential for retrieving questions in the correct sequence for the QuizViewer
         builder.HasIndex(q => new { q.TestId, q.SortOrder });
 
-        builder.HasQueryFilter(q =>
-            q.Test!.LessonContent!.Lesson!.Course!.Status != CourseStatus.Closed); builder.HasQueryFilter(q =>
-            q.Test!.LessonContent!.Lesson!.Course!.Status != CourseStatus.Closed);
+        builder.HasQueryFilter(q => q.Test != null &&
+                                q.Test.LessonContent != null &&
+                                q.Test.LessonContent.Lesson.Course.Status != CourseStatus.Closed);
     }
 }

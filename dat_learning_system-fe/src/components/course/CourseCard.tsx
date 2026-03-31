@@ -20,6 +20,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRefresh }) => {
     const getStatusColor = () => {
         if (course.status === 'Published') return theme.palette.success.main;
         if (course.status === 'Draft') return theme.palette.warning.main;
+        if (course.status === 'Closed') return theme.palette.error.main;
         return theme.palette.info.main;
     };
 
