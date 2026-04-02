@@ -7,8 +7,8 @@ public class LessonAttempt
     // Navigation to the Identity User if needed
     // public ApplicationUser User { get; set; } = null!; 
 
-    public Guid LessonId { get; set; }
-    public Lesson Lesson { get; set; } = null!;
+    public Guid? LessonId { get; set; }
+    public Lesson? Lesson { get; set; }
 
     public Guid TestId { get; set; }
     public Test Test { get; set; } = null!;

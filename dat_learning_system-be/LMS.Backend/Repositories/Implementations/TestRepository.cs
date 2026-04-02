@@ -16,40 +16,63 @@ public class TestRepository : ITestRepository
     public async Task<Test?> GetTestByIdWithAnswersAsync(Guid testId)
     {
         return await _context.Tests
+            .IgnoreQueryFilters()
             .Include(t => t.Questions)
                 .ThenInclude(q => q.Options)
             .AsSplitQuery() // Tells Npgsql to send separate SELECT commands
-            .AsNoTracking() // Use this if you're just fetching for the initial load
+            .AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == testId);
     }
-    public async Task<Test?> GetActiveTestByContentIdAsync(Guid contentId)
+    public async Task<IEnumerable<Test>> GetGlobalQuizzesAsync(string? level, string? category)
     {
-        return await _context.Tests
+        var query = _context.Tests
             .Include(t => t.Questions)
-                .ThenInclude(q => q.Options)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.LessonContentId == contentId && t.IsActive);
+            .Where(t => t.LessonContentId == null && t.IsActive);
+
+        if (!string.IsNullOrEmpty(level))
+            query = query.Where(t => t.JlptLevel == level);
+
+        if (!string.IsNullOrEmpty(category))
+            query = query.Where(t => t.Category == category);
+
+        return await query.ToListAsync();
     }
     public async Task<Test> UpsertTestAsync(Guid lessonContentId, Test incomingTest)
     {
+        Test? existingTest = null;
+        if (lessonContentId != Guid.Empty)
+        {
+            existingTest = await _context.Tests
+            .IgnoreQueryFilters()
+            .Include(t => t.Questions).ThenInclude(q => q.Options)
+            .FirstOrDefaultAsync(t => t.LessonContentId == lessonContentId && t.IsActive);
+        }
         // 1. Load the existing test with the full tracking tree
-        var existingTest = await _context.Tests
+        else
+        {
+            existingTest = await _context.Tests
+            .IgnoreQueryFilters()
             .Include(t => t.Questions)
                 .ThenInclude(q => q.Options)
-            .FirstOrDefaultAsync(t => t.LessonContentId == lessonContentId && t.IsActive);
-
+            .FirstOrDefaultAsync(t => t.Id == incomingTest.Id && t.IsGlobal);
+        }
         // Check existing attempts
         bool hasAttempts = existingTest != null && await _context.LessonAttempts.AnyAsync(a => a.TestId == existingTest.Id);
 
         if (existingTest == null || hasAttempts)
         {
-            if (existingTest != null) existingTest.IsActive = false; // if Test is already existed, create new one and delete old one
-
-            incomingTest.Id = Guid.NewGuid();
-            incomingTest.LessonContentId = lessonContentId;
+            if (existingTest != null)
+            {
+                existingTest.IsActive = false;
+                // IMPORTANT: Ensure the incoming test gets a BRAND NEW ID 
+                // so it doesn't collide with the one which just deactivated.
+                incomingTest.Id = Guid.NewGuid();
+            }
+            incomingTest.LessonContentId = (lessonContentId == Guid.Empty) ? null : lessonContentId;
+            incomingTest.IsGlobal = lessonContentId == Guid.Empty;
             incomingTest.IsActive = true;
-            ProcessNewTestTree(incomingTest);
 
+            ProcessNewTestTree(incomingTest);
             await _context.Tests.AddAsync(incomingTest);
         }
         else
@@ -57,6 +80,9 @@ public class TestRepository : ITestRepository
             // MANUAL SYNC: Safe to update existing record
             existingTest.Title = incomingTest.Title;
             existingTest.PassingGrade = incomingTest.PassingGrade;
+            existingTest.JlptLevel = incomingTest.JlptLevel;
+            existingTest.Category = incomingTest.Category;
+            existingTest.IsGlobal = incomingTest.IsGlobal;
 
             // Sync Questions & Options
             SyncQuestionsAndOptions(existingTest, incomingTest.Questions.ToList());
@@ -77,34 +103,63 @@ public class TestRepository : ITestRepository
     {
         // Check for existing attempt by this user for this specific test
         var existing = await _context.LessonAttempts
-            .FirstOrDefaultAsync(a => a.UserId == newAttempt.UserId && a.TestId == newAttempt.TestId);
+                            .FirstOrDefaultAsync(a => a.UserId == newAttempt.UserId &&
+                                                        a.TestId == newAttempt.TestId &&
+                                                        a.LessonId == newAttempt.LessonId);
 
         if (existing == null)
         {
             // First time taking the test
             newAttempt.Attempts = 1;
+            newAttempt.AttemptedAt = DateTime.UtcNow;
             await _context.LessonAttempts.AddAsync(newAttempt);
             await _context.SaveChangesAsync();
             return newAttempt;
         }
 
-        // Returning User: Update stats
-        // Logic: Only increment Attempts if they haven't passed yet
-        if (!existing.IsPassed)
+        existing.Attempts += 1;
+        existing.AttemptedAt = DateTime.UtcNow;
+        if (newAttempt.IsPassed)
         {
-            existing.Attempts += 1;
+            existing.IsPassed = true;
         }
 
         // Always update the latest score and answers
         existing.Score = newAttempt.Score;
         existing.MaxScore = newAttempt.MaxScore;
         existing.Percentage = newAttempt.Percentage;
-        existing.IsPassed = newAttempt.IsPassed;
         existing.AnswerJson = newAttempt.AnswerJson;
-        existing.AttemptedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
         return existing;
+    }
+
+    public async Task<object> GetCategoryProgressAsync(string userId, string level)
+    {
+        // 1. Get all active global tests for this level
+        var totalTests = await _context.Tests
+            .Where(t => t.IsGlobal && t.IsActive && t.JlptLevel == level)
+            .ToListAsync();
+
+        // 2. Get the unique IDs of tests this user has passed
+        var passedTestIds = await _context.LessonAttempts
+            .Where(a => a.UserId == userId && a.IsPassed)
+            .Select(a => a.TestId)
+            .Distinct()
+            .ToListAsync();
+
+        // 3. Group by Category to get the "32%" or "100%" values
+        return totalTests
+            .GroupBy(t => t.Category)
+            .Select(g => new
+            {
+                Category = g.Key,
+                TotalCount = g.Count(),
+                PassedCount = g.Count(t => passedTestIds.Contains(t.Id)),
+                ProgressPercentage = g.Count() > 0
+                    ? (int)Math.Round((double)g.Count(t => passedTestIds.Contains(t.Id)) / g.Count() * 100)
+                    : 0
+            });
     }
 
     // Helpers
@@ -178,6 +233,8 @@ public class TestRepository : ITestRepository
                 exQ.QuestionText = inQ.QuestionText;
                 exQ.Points = inQ.Points;
                 exQ.SortOrder = i + 1;
+                exQ.Type = inQ.Type;
+                exQ.MediaUrl = inQ.MediaUrl;
 
                 // Deep Sync child Options
                 SyncOptions(exQ, inQ.Options.ToList());
@@ -218,7 +275,16 @@ public class TestRepository : ITestRepository
                 // UPDATE EXISTING OPTION
                 exOpt.OptionText = inOpt.OptionText;
                 exOpt.IsCorrect = inOpt.IsCorrect;
+                exOpt.MediaUrl = inOpt.MediaUrl;
             }
         }
+    }
+
+    public async Task<List<LessonAttempt>> GetAttemptsByLevelAsync(string userId, string level)
+    {
+        return await _context.LessonAttempts
+            .Include(a => a.Test)
+            .Where(a => a.UserId == userId && a.Test.JlptLevel == level)
+            .ToListAsync();
     }
 }

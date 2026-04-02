@@ -151,6 +151,7 @@ const TestBuilder: React.FC<TestBuilderProps> = ({ initialData, onSave }) => {
     setQuestions([...questions, {
       questionText: '',
       points: 10,
+      type: 'MultipleChoice',
       sortOrder: questions.length,
       options: [
         { optionText: '', isCorrect: true },
@@ -168,6 +169,7 @@ const TestBuilder: React.FC<TestBuilderProps> = ({ initialData, onSave }) => {
       await onSave({
         title,
         passingGrade,
+        isGlobal: false,
         questions: questions
       });
 

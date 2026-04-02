@@ -13,6 +13,8 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
 
         builder.Property(q => q.QuestionText).IsRequired().HasColumnType("text");
         builder.Property(q => q.Points).HasDefaultValue(1);
+        builder.Property(q => q.Type).HasConversion<string>().HasMaxLength(30);
+        builder.Property(q => q.MediaUrl).HasMaxLength(500).IsRequired(false);
 
         // Question -> Options (One-to-Many)
         builder.HasMany(q => q.Options)
@@ -24,8 +26,8 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
         // Essential for retrieving questions in the correct sequence for the QuizViewer
         builder.HasIndex(q => new { q.TestId, q.SortOrder });
 
-        builder.HasQueryFilter(q => q.Test != null &&
-                                q.Test.LessonContent != null &&
-                                q.Test.LessonContent.Lesson.Course.Status != CourseStatus.Closed);
+        builder.HasQueryFilter(q =>
+           q.Test.LessonContentId == null ||
+           q.Test.LessonContent!.Lesson.Course.Status != CourseStatus.Closed);
     }
 }

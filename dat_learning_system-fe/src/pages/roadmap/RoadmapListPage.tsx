@@ -10,12 +10,13 @@ import RoadmapCard from '../../components/roadmap/RoadmapCard';
 import LearningTip from '../../components/ebooks/LearningTip';
 import RoadmapForm from '../../components/roadmap/RoadmapForm';
 import PageLayout from '../../components/layout/PageLayout';
+import { useAuth } from '../../hooks/useAuth';
 
 const RoadmapListPage: React.FC = () => {
     const [roadmaps, setRoadmaps] = useState<RoadmapResponse[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [openForm, setOpenForm] = useState(false);
-    const isAdmin = true;
+    const { isAdmin } = useAuth();
 
     const loadData = async () => {
         try {

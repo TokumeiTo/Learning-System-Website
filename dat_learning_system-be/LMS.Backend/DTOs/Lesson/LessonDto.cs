@@ -72,13 +72,3 @@ public class UpsertLessonContentDto
     // This is the key! This maps to the JSON object we built in React
     public TestDto? Test { get; set; }
 }
-
-public class QuizResultDto
-{
-    public int Score { get; set; }
-    public int MaxScore { get; set; }
-    public decimal Percentage { get; set; }
-    public bool IsPassed { get; set; }
-    // You can send back which questions were wrong if you want
-    public List<Guid> CorrectOptionIds { get; set; } = new();
-}

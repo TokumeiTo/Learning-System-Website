@@ -8,9 +8,6 @@ import FlashcardsPage from "../pages/flashcards/FlashcardsPage";
 import TranslationPage from "../pages/translation/TranslationPage";
 
 import QuizSetupPage from "../pages/quiz/QuizSetupPage";
-import QuizListPage from "../pages/quiz/QuizListPage";
-import QuizPage from "../pages/quiz/QuizPage";
-import QuizResultPage from "../pages/quiz/QuizResultPage";
 import QuizReviewPage from "../pages/quiz/QuizReviewPage";
 
 import SchedulePage from "../pages/schedules/SchedulePage";
@@ -40,7 +37,9 @@ import RoadmapListPage from "../pages/roadmap/RoadmapListPage";
 import RoadmapDetailsPage from "../components/roadmap/RoadmapDetailsPage";
 import RoadmapEditPage from "../pages/roadmap/RoadmapEditPage";
 import AnnouncementManagementPage from "../pages/admin/AnnouncementManagementPage";
-import EditCoursePage from "../components/course/EditCourseModal";
+import QuizCreationPage from "../pages/quiz/QuizCreationPage";
+import QuizSelectionPage from "../pages/quiz/QuizSelectionPage";
+import QuizActivePage from "../pages/quiz/QuizActivePage";
 
 export const AppRouter = () => {
   const { user } = useAuth();
@@ -142,26 +141,21 @@ export const AppRouter = () => {
             <QuizSetupPage />
           </ProtectedRoute>
         } />
-        <Route path="/quiz/list" element={
-          <ProtectedRoute>
-            <QuizListPage />
-          </ProtectedRoute>
-        } />
 
         <Route
-          path="/quiz/start"
+          path="/quiz/selection/:level/:category"
           element={
             <ProtectedRoute>
-              <QuizPage />
+              <QuizSelectionPage />
             </ProtectedRoute>
           }
         />
 
-        <Route
-          path="/quiz/result"
+          <Route
+          path="/quiz/active/:testId"
           element={
             <ProtectedRoute>
-              <QuizResultPage />
+              <QuizActivePage />
             </ProtectedRoute>
           }
         />
@@ -310,6 +304,15 @@ export const AppRouter = () => {
           element={
             <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
               <AnnouncementManagementPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin/quiz_manage"
+          element={
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+              <QuizCreationPage />
             </ProtectedRoute>
           }
         />

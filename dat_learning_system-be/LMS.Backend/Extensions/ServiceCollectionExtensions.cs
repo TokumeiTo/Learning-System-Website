@@ -18,7 +18,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();
         services.AddScoped<IClassworkRepository, ClassworkRepository>();
         services.AddScoped<ILessonRepository, LessonRepository>();
-        services.AddScoped<ILessonAttemptRepository, LessonAttemptRepository>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<IAuditRepository, AuditRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
@@ -48,6 +47,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IUserProgressService, UserProgressService>();
         services.AddScoped<ITestService, TestService>();
+        services.AddScoped<ILessonAttemptService, LessonAttemptService>();
         services.AddScoped<IKanjiFlashcardService, KanjiFlashcardService>();
         services.AddScoped<IGrammarFlashcardService, GrammarFlashcardService>();
         services.AddScoped<IVocabularyService, VocabularyService>();

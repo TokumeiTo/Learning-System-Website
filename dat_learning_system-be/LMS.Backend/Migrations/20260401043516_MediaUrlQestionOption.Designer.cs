@@ -3,6 +3,7 @@ using System;
 using LMS.Backend.Data.Dbcontext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LMS.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260401043516_MediaUrlQestionOption")]
+    partial class MediaUrlQestionOption
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,7 +154,7 @@ namespace LMS.Backend.Migrations
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
                             CompanyCode = "00-0000",
-                            ConcurrencyStamp = "3b7319c2-1c91-4cd9-ab03-7c409c6b0166",
+                            ConcurrencyStamp = "3fee92a6-358a-4d76-ab38-692d45c9a80b",
                             Email = "admin@lms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin",
@@ -160,10 +163,10 @@ namespace LMS.Backend.Migrations
                             NormalizedEmail = "ADMIN@LMS.COM",
                             NormalizedUserName = "00-0000",
                             OrgUnitId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAEJT3wAJ572IWfBxKrY5h43yFbzh8l1971Pi0AITP5Zq8rt/lDNnRa9/wIlXlEcH1iA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAUpbqJ21z/aSBYo2L1pTZJqzeGdsOXJKHzVqujeg7wc2xl/v9u+lGf32autpwy/3g==",
                             PhoneNumberConfirmed = false,
                             Position = 0,
-                            SecurityStamp = "10a10baa-3973-4246-adb8-6f5f9ff3c782",
+                            SecurityStamp = "705a0d45-11ed-4ebc-9741-b1a67c2b7daf",
                             TwoFactorEnabled = false,
                             UserName = "00-0000"
                         });
@@ -753,7 +756,7 @@ namespace LMS.Backend.Migrations
                     b.Property<bool>("IsPassed")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid?>("LessonId")
+                    b.Property<Guid>("LessonId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("MaxScore")
@@ -778,11 +781,8 @@ namespace LMS.Backend.Migrations
 
                     b.HasIndex("TestId");
 
-                    b.HasIndex("UserId", "LessonId", "AttemptedAt")
-                        .HasDatabaseName("IX_User_Lesson_Audit");
-
-                    b.HasIndex("UserId", "TestId", "IsPassed")
-                        .HasDatabaseName("IX_User_Quiz_Completion");
+                    b.HasIndex("UserId", "LessonId", "AttemptedAt", "Percentage")
+                        .HasDatabaseName("IX_User_Lesson_Performance");
 
                     b.ToTable("LessonAttempts");
                 });
@@ -1517,9 +1517,6 @@ namespace LMS.Backend.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsGlobal")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("JlptLevel")
                         .HasColumnType("text");
 
@@ -1989,7 +1986,8 @@ namespace LMS.Backend.Migrations
                     b.HasOne("LMS.Backend.Data.Entities.Lesson", "Lesson")
                         .WithMany("Attempts")
                         .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("LMS.Backend.Data.Entities.Test", "Test")
                         .WithMany()

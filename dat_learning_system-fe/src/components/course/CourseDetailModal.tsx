@@ -18,6 +18,7 @@ import type { EnrollmentStatusResponse } from '../../types_interfaces/enrollment
 // Components
 import CourseRatingAction from './CourseRatingAction';
 import UpdateCourseModal from './EditCourseModal';
+import { useAuth } from '../../hooks/useAuth';
 
 interface CourseDetailModalProps {
     course: Course;
@@ -29,8 +30,8 @@ interface CourseDetailModalProps {
 const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onClose, onRefresh }) => {
     const theme = useTheme();
     const navigate = useNavigate();
+    const { isAdmin } = useAuth();
 
-    const isAdmin = true;
 
     // States
     const [status, setStatus] = useState<EnrollmentStatusResponse | null>(null);
@@ -141,13 +142,13 @@ const CourseDetailModal: React.FC<CourseDetailModalProps> = ({ course, open, onC
                     </IconButton>
 
                     {/* Banner Image */}
-                    <Box sx={{ width: '100%', height: 240, bgcolor: 'grey.100' }}>
+                    <Box sx={{ width: '100%', height: 240, bgcolor: 'grey.300' }}>
                         <Box
                             component="img"
                             src={imageUrl}
                             alt={course.title}
                             onError={(e: any) => { e.target.src = '/No_Thumbnail.svg'; }}
-                            sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
                         />
                     </Box>
 

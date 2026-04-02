@@ -7,6 +7,10 @@ public class TestDto
     public List<QuestionDto> Questions { get; set; } = new();
     public int PassingGrade { get; set; }
     public bool IsActive { get; set; } = true;
+
+    public string? JlptLevel { get; set; }
+    public string? Category { get; set; }
+    public bool IsGlobal { get; set; }
 }
 
 public class QuestionDto
@@ -15,6 +19,8 @@ public class QuestionDto
     public string QuestionText { get; set; } = string.Empty;
     public int Points { get; set; } = 1;
     public int SortOrder { get; set; }
+    public string Type { get; set; } = "MultipleChoice";
+    public string? MediaUrl { get; set; }
     public List<OptionDto> Options { get; set; } = new();
 }
 
@@ -28,16 +34,17 @@ public class OptionDto
     public bool? IsCorrect { get; set; }
 }
 
-public class LessonSubmissionDto
+public class QuizSubmissionDto
 {
-    public Guid LessonId { get; set; }
+    public Guid? LessonId { get; set; }
     public Guid TestId { get; set; }
-    // Key: QuestionId, Value: OptionId
     public Dictionary<Guid, Guid> Answers { get; set; } = new();
+    public int? TimeTakenSeconds { get; set; }
 }
 
-public class LessonResultDto
+public class QuizResultDto
 {
+    public Guid TestId { get; set; }
     public int Score { get; set; }           // Points earned
     public int MaxScore { get; set; }        // Total possible points
     public decimal Percentage { get; set; }    // (Score / MaxScore) * 100
@@ -48,6 +55,8 @@ public class LessonResultDto
     public Dictionary<Guid, Guid>? UserAnswers { get; set; }
     public Dictionary<Guid, Guid>? CorrectAnswers { get; set; }
 }
+
+
 
 
 public class AdminLessonStatsDto
@@ -61,16 +70,6 @@ public class AdminLessonStatsDto
 
     // Identifies if a specific quiz is "Too Hard"
     public List<QuestionAnalyticDto> DifficultQuestions { get; set; } = new();
-}
-
-public class AdminQuestionDto
-{
-    public int DisplayMode { get; set; }
-    public string Prompt { get; set; } = string.Empty;
-    public string CorrectAnswer { get; set; } = string.Empty;
-    public string Explanation { get; set; } = string.Empty;
-    public int Points { get; set; }
-    public List<string> Options { get; set; } = new();
 }
 
 public class QuestionAnalyticDto
@@ -106,12 +105,4 @@ public class LessonAttemptDto
 
     // Optional: Useful for KPIs to see if students are rushing or taking their time
     public int? TimeTakenSeconds { get; set; }
-}
-
-public class GlobalSearchResultDto
-{
-    public string Id { get; set; } = string.Empty;
-    public string DisplayText { get; set; } = string.Empty; // e.g., "私 (I, me)"
-    public string Type { get; set; } = string.Empty; // "Kanji", "Vocabulary", or "Grammar"
-    public string JlptLevel { get; set; } = string.Empty;
 }

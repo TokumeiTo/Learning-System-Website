@@ -23,14 +23,24 @@ public class TestService : ITestService
         _mapper = mapper;
     }
 
-    public async Task<bool> SaveTestToContentAsync(Guid contentId, TestDto dto)
+    public async Task<bool> SaveTestAsync(Guid? contentId, TestDto dto)
     {
         var incomingTest = _mapper.Map<Test>(dto);
-        var result = await _testRepo.UpsertTestAsync(contentId, incomingTest);
+        if (contentId == null)
+        {
+            incomingTest.IsGlobal = true;
+            incomingTest.LessonContentId = null;
+        }
+        else
+        {
+            incomingTest.IsGlobal = false;
+            incomingTest.LessonContentId = contentId;
+        }
+        var result = await _testRepo.UpsertTestAsync(contentId ?? Guid.Empty, incomingTest);
         return result != null;
     }
 
-    public async Task<LessonResultDto> GradeLessonAsync(string userId, LessonSubmissionDto submission)
+    public async Task<QuizResultDto> GradQuizAsync(string userId, QuizSubmissionDto submission)
     {
         // 1. Fetch the Test (Specific Version) with Answers
         var test = await _testRepo.GetTestByIdWithAnswersAsync(submission.TestId);
@@ -48,7 +58,7 @@ public class TestService : ITestService
             if (submission.Answers.TryGetValue(question.Id, out Guid selectedOptionId))
             {
                 var correctOption = question.Options.FirstOrDefault(o => o.IsCorrect);
-                if (correctOption != null && correctOption.Id == selectedOptionId)
+                if (selectedOptionId != Guid.Empty && correctOption != null && correctOption.Id == selectedOptionId)
                 {
                     earnedPoints += question.Points;
                 }
@@ -70,7 +80,7 @@ public class TestService : ITestService
         var attemptData = new LessonAttempt
         {
             UserId = userId,
-            LessonId = submission.LessonId,
+            LessonId = (submission.LessonId == Guid.Empty) ? null : submission.LessonId,
             TestId = test.Id,
             Score = earnedPoints,
             MaxScore = totalPoints,
@@ -83,13 +93,14 @@ public class TestService : ITestService
         var finalAttempt = await _testRepo.UpsertAttemptAsync(attemptData);
 
         // 5. Automation: Mark lesson complete
-        if (isPassed)
+        if (isPassed && submission.LessonId != Guid.Empty && submission.LessonId != null)
         {
-            await _progressRepo.MarkAsCompleteAsync(userId, submission.LessonId);
+            await _progressRepo.MarkAsCompleteAsync(userId, submission.LessonId.Value);
         }
 
-        return new LessonResultDto
+        return new QuizResultDto
         {
+            TestId = finalAttempt.TestId,
             Score = finalAttempt.Score,
             MaxScore = finalAttempt.MaxScore,
             Percentage = finalAttempt.Percentage,
@@ -99,5 +110,14 @@ public class TestService : ITestService
             UserAnswers = submission.Answers,
             CorrectAnswers = correctMapping
         };
+    }
+
+    // In LessonAttemptService.cs
+    public async Task<List<QuizResultDto>> GetMyAttemptsByLevelAsync(string userId, string level)
+    {
+        var attempts = await _testRepo.GetAttemptsByLevelAsync(userId, level);
+
+        // Map to your DTO so the frontend gets the expected structure
+        return _mapper.Map<List<QuizResultDto>>(attempts);
     }
 }

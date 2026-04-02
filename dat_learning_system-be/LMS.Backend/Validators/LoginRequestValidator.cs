@@ -9,7 +9,7 @@ public class LoginRequestValidator : AbstractValidator<LoginRequestDto>
     {
         RuleFor(x => x.CompanyCode)
             .NotEmpty().WithMessage("Company Code is required")
-            .MaximumLength(50).WithMessage("Company Code must be at most 50 characters");
+            .MaximumLength(50).WithMessage("Company Code must be at most 8 characters");
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required")

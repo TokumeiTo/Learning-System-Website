@@ -4,7 +4,6 @@ import type { CourseSummary, CourseDetail, Course } from "../types_interfaces/co
 // Returns a list of full details (or summaries, depending on your GetAll logic)
 export const getCourses = async (): Promise<CourseDetail[]> => {
     const res = await api.get("/api/courses");
-    console.log(res.data);
     return res.data;
 };
 

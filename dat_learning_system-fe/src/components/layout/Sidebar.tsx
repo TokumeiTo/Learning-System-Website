@@ -87,7 +87,18 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
   // 2. Auto-detect Mode from URL (Survives direct Navigation)
   React.useEffect(() => {
-    const managementRoutes = ["/umanage", "/org_units", "/admin", "/enrollements","/announcements", "/logs"];
+    const managementRoutes = [
+      "/dashboard",
+      "library_management",
+      "roadmaps/:id/edit",
+      "/user_management",
+      "/org_units",
+      "/admin",
+      "/enrollements",
+      "/announcements",
+      "/logs",
+      "quiz_manage",
+    ];
     const isManagementPage = managementRoutes.some(path => location.pathname.startsWith(path));
 
     if (isManagementPage) {
@@ -143,7 +154,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
           </Box>
         ) : ( */}
 
-          <BasicSelect value={category} onChange={handleCategoryChange} />
+        <BasicSelect value={category} onChange={handleCategoryChange} />
         {/* )} */}
         <IconButton onClick={onClose} disabled={isMobile}>
           {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}

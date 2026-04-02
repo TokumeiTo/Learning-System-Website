@@ -4,14 +4,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LMS.Backend.Data.Configurations;
+
 public class QuestionOptionConfiguration : IEntityTypeConfiguration<QuestionOption>
 {
     public void Configure(EntityTypeBuilder<QuestionOption> builder)
     {
         builder.HasKey(o => o.Id);
 
-        builder.Property(o=> o.Id).ValueGeneratedNever();
-        
+        builder.Property(o => o.Id).ValueGeneratedNever();
+
         builder.Property(o => o.OptionText)
                .IsRequired()
                .HasMaxLength(500);
@@ -24,6 +25,8 @@ public class QuestionOptionConfiguration : IEntityTypeConfiguration<QuestionOpti
         // it needs to grab all options for a specific Question quickly.
         builder.HasIndex(o => o.QuestionId);
 
-        builder.HasQueryFilter(o => o.Question!.Test!.LessonContent!.Lesson!.Course!.Status != CourseStatus.Closed);
+        builder.HasQueryFilter(o =>
+            o.Question.Test.LessonContentId == null ||
+            o.Question.Test.LessonContent!.Lesson.Course.Status != CourseStatus.Closed);
     }
 }

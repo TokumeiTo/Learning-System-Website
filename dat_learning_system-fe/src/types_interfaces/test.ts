@@ -1,3 +1,5 @@
+export type QuizType = "MultipleChoice" | "StarPuzzle" | "MediaOption";
+
 export interface Option {
   id?: string; // Optional for new options being created
   optionText: string;
@@ -7,6 +9,8 @@ export interface Option {
 export interface Question {
   id?: string;
   questionText: string;
+  type: QuizType;
+  mediaUrl?: string;
   points: number;
   sortOrder: number;
   options: Option[];
@@ -17,22 +21,27 @@ export interface Test {
   title?: string;
   questions: Question[];
   passingGrade: number;
+  isGlobal: boolean;
+
+  category?: string | null;
+  jlptLevel?: string | null;
 }
 
 export interface LessonSubmission {
-  lessonId: string;
+  lessonId?: string;
   testId: string;
   // TypeScript equivalent of Dictionary<Guid, Guid>
   answers: { [questionId: string]: string }; 
 }
 
 export interface LessonResult {
+  testId: string;
   score: number;
   maxScore: number;
   percentage: number;
   isPassed: boolean;
   attemptedAt: string;
-  correctOptionIds?: string[];
+  attempts?: number;
   userAnswers?: Record<string, string>;
   correctAnswers?: Record<string, string>;
 }
@@ -41,6 +50,7 @@ export interface LessonResult {
 
 export interface LessonAttempt {
   id: string;
+  testId: string;
   score: number;
   maxScore: number;
   percentage: number;
@@ -70,4 +80,11 @@ export interface StudentPerformanceKPI {
   lessonsCompleted: number;
   overallAverageScore: number;
   lastActivity?: string;
+}
+
+export interface CategoryProgress {
+    category: string;
+    totalCount: number;
+    passedCount: number;
+    progressPercentage: number;
 }

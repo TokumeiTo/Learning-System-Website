@@ -30,6 +30,7 @@ export const MANAGEMENT_NAV = [
     { label: "Manager", path: "/admin/dashboard", icon: <DashboardIcon color="secondary" /> },
     { label: "User Management", path: "/admin/user_management", icon: <PeopleIcon color="secondary" /> },
     { label: "Library Management", path: "/admin/library_management", icon: <LocalLibraryIcon color="secondary" /> },
+    { label: "Quiz Management", path: "/admin/quiz_manage", icon: <QuizIcon color="secondary" /> },
     { label: "Announcements", path: "/admin/announcements", icon: <CampaignIcon color="secondary" /> },
     { label: "Org Structure", path: "/admin/org_units", icon: <AccountTreeIcon color="secondary" /> },
     { label: "Enrollments", path: "/admin/enrollments", icon: <AddCardIcon color="secondary" /> },

@@ -162,9 +162,14 @@ public class MappingProfile : Profile
 
         // --- TESTS AND QUESTIONS ---
         // Entity -> DTO (For Reading)
-        CreateMap<Test, TestDto>();
-        CreateMap<Question, QuestionDto>();
-        CreateMap<LessonAttempt, LessonResultDto>()
+        CreateMap<Test, TestDto>()
+            .ForMember(dest => dest.IsGlobal, opt => opt.MapFrom(src => src.LessonContent == null))
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions.OrderBy(q=>q.SortOrder)));
+
+        CreateMap<Question, QuestionDto>()
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
+
+        CreateMap<LessonAttempt, QuizResultDto>()
             .ForMember(dest => dest.Percentage, opt => opt.MapFrom(src => (double)src.Percentage));
 
         CreateMap<LessonAttempt, LessonAttemptDto>();
@@ -172,9 +177,10 @@ public class MappingProfile : Profile
         // DTO -> Entity (For Admin Saving/Upserting)
         CreateMap<TestDto, Test>()
             .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions))
-            .ForMember(dest => dest.PassingGrade, opt => opt.MapFrom(src => src.PassingGrade == 0 ? 70 : src.PassingGrade));
+            .ForMember(dest => dest.PassingGrade, opt => opt.MapFrom(src => src.PassingGrade == 0 ? 40 : src.PassingGrade));
         CreateMap<QuestionDto, Question>()
-            .ForMember(dest => dest.Options, opt => opt.MapFrom(src => src.Options));
+            .ForMember(dest => dest.Options, opt => opt.MapFrom(src => src.Options))
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => Enum.Parse<QuizType>(src.Type)));
         CreateMap<OptionDto, QuestionOption>();
 
 
@@ -187,9 +193,9 @@ public class MappingProfile : Profile
                 // TryGetItems is the officially recommended way to handle this safely.
                 if (context.TryGetItems(out var items) && items.TryGetValue("IsAdmin", out var isAdmin))
                 {
-                    if (isAdmin is bool adminBool)
+                    if (isAdmin is bool adminBool && adminBool)
                     {
-                        return adminBool ? src.IsCorrect : (bool?)null;
+                        return src.IsCorrect;
                     }
                 }
 

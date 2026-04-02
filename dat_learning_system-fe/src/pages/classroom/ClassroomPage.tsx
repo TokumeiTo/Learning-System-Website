@@ -73,14 +73,12 @@ const ClassroomPage = () => {
   const handleLessonComplete = (wasPassed: boolean = true, percentage?: number) => {
     if (!currentLesson || !data || !wasPassed) return;
 
-    const updatedLessons = data.lessons.map((lesson) => {
+    const updatedLessons = data.lessons.map((lesson, index) => {
       if (lesson.id === currentLesson.id) {
-        return { ...lesson, isDone: true, lastScore: percentage ?? lesson.lastScore };
+        return { ...lesson, isDone: true, lastScore: percentage !== undefined ? percentage : lesson.lastScore };
       }
       const currentIndex = data.lessons.findIndex((l) => l.id === currentLesson.id);
-      const nextLesson = data.lessons[currentIndex + 1];
-
-      if (nextLesson && lesson.id === nextLesson.id) {
+      if (index === currentIndex + 1) {
         return { ...lesson, isLocked: false };
       }
       return lesson;

@@ -122,7 +122,7 @@ public class LessonService(
                 if (itemDto.ContentType == "test" && itemDto.Test != null)
                 {
                     var contentId = mappedContents[i].Id;
-                    await testService.SaveTestToContentAsync(contentId, itemDto.Test);
+                    await testService.SaveTestAsync(contentId, itemDto.Test);
                 }
             }
         }
