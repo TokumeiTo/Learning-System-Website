@@ -38,6 +38,10 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>()
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<SubmitEnrollmentValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<GrammarValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<EBookRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<SubmitEnrollmentValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<TestValidator>();
+
 builder.Services.AddSignalR();
 
 /* Swagger */

@@ -14,20 +14,11 @@ public class TestConfiguration : IEntityTypeConfiguration<Test>
               builder.Property(t => t.Title).HasMaxLength(200).IsRequired();
               builder.Property(t => t.PassingGrade).HasDefaultValue(40);
 
-              builder.HasOne(t => t.LessonContent)
-                     .WithMany(lc => lc.Tests)
-                     .HasForeignKey(t => t.LessonContentId)
-                     .IsRequired(false)
-                     .OnDelete(DeleteBehavior.Cascade);
-
-              // Test -> Questions (One-to-Many)
-              builder.HasMany(t => t.Questions)
-                     .WithOne(q => q.Test)
-                     .HasForeignKey(q => q.TestId)
-                     .OnDelete(DeleteBehavior.Cascade);
-
-              builder.HasQueryFilter(t =>
+              builder.HasQueryFilter(t => t.IsActive && (
                      t.LessonContentId == null ||
-                     t.LessonContent!.Lesson.Course.Status != CourseStatus.Closed);
+                     t.LessonContent!.Lesson.Course.Status != CourseStatus.Closed
+              ));
+
+              builder.HasIndex(t => new { t.Title, t.Version, t.IsGlobal }).IsUnique();
        }
 }

@@ -26,7 +26,10 @@ public class QuestionOptionConfiguration : IEntityTypeConfiguration<QuestionOpti
         builder.HasIndex(o => o.QuestionId);
 
         builder.HasQueryFilter(o =>
-            o.Question.Test.LessonContentId == null ||
-            o.Question.Test.LessonContent!.Lesson.Course.Status != CourseStatus.Closed);
+              o.Question.IsActive &&
+              o.Question.Test.IsActive &&
+              (o.Question.Test.LessonContentId == null ||
+               o.Question.Test.LessonContent!.Lesson.Course.Status != CourseStatus.Closed)
+          );
     }
 }

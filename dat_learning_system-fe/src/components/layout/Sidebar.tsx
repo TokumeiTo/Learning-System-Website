@@ -97,7 +97,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       "/enrollements",
       "/announcements",
       "/logs",
-      "quiz_manage",
+      "/quiz/create",
+      "/quizzes"
     ];
     const isManagementPage = managementRoutes.some(path => location.pathname.startsWith(path));
 

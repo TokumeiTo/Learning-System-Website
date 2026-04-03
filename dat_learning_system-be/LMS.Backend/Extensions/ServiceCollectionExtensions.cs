@@ -47,7 +47,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IUserProgressService, UserProgressService>();
         services.AddScoped<ITestService, TestService>();
-        services.AddScoped<ILessonAttemptService, LessonAttemptService>();
+        services.AddScoped<ITestAttemptService, TestAttemptService>();
         services.AddScoped<IKanjiFlashcardService, KanjiFlashcardService>();
         services.AddScoped<IGrammarFlashcardService, GrammarFlashcardService>();
         services.AddScoped<IVocabularyService, VocabularyService>();

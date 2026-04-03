@@ -1,26 +1,58 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box, Button, TextField, Typography, Paper, Stack, MenuItem, CircularProgress
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
-import { saveTestContent } from '../../api/test.api';
+import { checkTestName, fetchQuizById, saveTestContent } from '../../api/test.api';
 import { uploadMediaFile } from '../../api/filemanager.api'; // Don't forget this!
 import type { Test, Question, QuizType } from '../../types_interfaces/test';
 import QuestionCard from '../../components/quiz/QuestionCard';
 import PageLayout from '../../components/layout/PageLayout';
 import MessagePopup from '../../components/feedback/MessagePopup';
+import { useNavigate, useParams } from 'react-router-dom';
+import ConfirmModal from '../../components/feedback/ConfirmModal';
 
-const QuizCreationPage = ({ contentId = null }: { contentId?: string | null }) => {
-  const [isSaving, setIsSaving] = useState(false); // Fix 1: Added missing state
+const QuizFormPage = () => {
+  const [isSaving, setIsSaving] = useState(false);
+  const { testId } = useParams<{ testId: string }>();
   const [test, setTest] = useState<Test>({
     title: '',
     passingGrade: 50,
     isGlobal: true,
     category: 'Grammar',
     jlptLevel: 'N5',
-    questions: []
+    questions: [],
   });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [versionMessage, setVersionMessage] = useState("");
+  const navigate = useNavigate();
+
+  const [localTitle, setLocalTitle] = useState(test.title);
+
+  // EDIT MODE CHANGE
+  useEffect(() => {
+    if (testId) {
+      const loadTestData = async () => {
+        try {
+          const data = await fetchQuizById(testId);
+          // Add tempIds to questions so your Sort/Remove logic doesn't break
+          const mappedQuestions = data.questions.map(q => ({
+            ...q,
+            tempId: q.id || Date.now() + Math.random()
+          }));
+          setTest({ ...data, questions: mappedQuestions });
+        } catch (err) {
+          showMsg("Failed to load quiz data", "error");
+        }
+      };
+      loadTestData();
+    }
+  }, [testId]);
+
+  useEffect(() => {
+    setLocalTitle(test.title);
+  }, [test.title]);
 
   const [popup, setPopup] = useState<{
     open: boolean;
@@ -48,7 +80,10 @@ const QuizCreationPage = ({ contentId = null }: { contentId?: string | null }) =
   };
 
   const handleSave = async () => {
-    if (!test.title) return showMsg("Please enter a test title", "warning");
+    const finalTitle = localTitle || test.title;
+    if (!finalTitle) return showMsg("Please enter a test title", "warning");
+
+    setIsSaving(true);
 
     setIsSaving(true);
     try {
@@ -82,8 +117,8 @@ const QuizCreationPage = ({ contentId = null }: { contentId?: string | null }) =
       }));
 
       const finalPayload = { ...test, questions: uploadedQuestions };
-      await saveTestContent(contentId, finalPayload);
-      showMsg("Test Published Successfully!", "success");
+      await saveTestContent(testId || null, finalPayload);
+      showMsg(testId ? "Version Updated Successfully!" : "Test Published Successfully!", "success");
     } catch (err) {
       console.error(err);
       showMsg("Failed to save. Check your connection or file sizes.", "error");
@@ -92,24 +127,48 @@ const QuizCreationPage = ({ contentId = null }: { contentId?: string | null }) =
     }
   };
 
+  const handleCheckName = async (titleToCheck?: string) => {
+    const currentTitle = titleToCheck || test.title;
+
+    if (testId || !currentTitle) return;
+
+    try {
+      const result = await checkTestName(currentTitle, test.isGlobal);
+      if (result.exists) {
+        setVersionMessage(result.message);
+        setConfirmOpen(true);
+      }
+    } catch (err) {
+      console.error("Name check failed", err);
+    }
+  };
+
+  const handleConfirmVersion = () => {
+    setConfirmOpen(false);
+  };
+
   return (
     <PageLayout>
-      <Box sx={{ p: 4, maxWidth: 850, mx: 'auto' }}>
-        <MessagePopup {...popup} onClose={handleClosePopup} />
+      <Box sx={{ px: 4, mx: 'auto' }}>
+        <Box sx={{ p: 3, mb: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb:3 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{testId ? `Editnig: ${test.title}` : "Publishing New Test"}</Typography>
+            <Button onClick={() => navigate('/admin/quizzes')}>Back to List</Button>
+          </Box>
 
-        <Paper sx={{ p: 3, mb: 4, borderRadius: 2 }}>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>Test Configuration</Typography>
 
           <Stack spacing={3}>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
               <TextField
                 sx={{ flex: 3 }}
                 label="Test Title"
-                value={test.title}
-                onChange={(e) => setTest({ ...test, title: e.target.value })}
+                value={localTitle}
+                onChange={(e) => setLocalTitle(e.target.value)}
+                onBlur={() => handleCheckName(localTitle)}
+                helperText={testId ? "Editing existing version" : "Tab out to check availability"}
               />
               <TextField
-                sx={{ flex: 1 }}
+                sx={{ width:'80px' }}
                 type="number" label="Passing %"
                 value={test.passingGrade}
                 onChange={(e) => setTest({ ...test, passingGrade: Number(e.target.value) })}
@@ -140,7 +199,7 @@ const QuizCreationPage = ({ contentId = null }: { contentId?: string | null }) =
               </Stack>
             )}
           </Stack>
-        </Paper>
+        </Box>
 
         <Stack spacing={3}>
           {test.questions.map((q: any, idx) => (
@@ -182,8 +241,18 @@ const QuizCreationPage = ({ contentId = null }: { contentId?: string | null }) =
           {isSaving ? "Uploading Files..." : "Publish Test to Hikari Learning"}
         </Button>
       </Box>
+
+      <MessagePopup {...popup} onClose={handleClosePopup} />
+      <ConfirmModal
+        open={confirmOpen}
+        title="Existing Quiz Found"
+        message={versionMessage}
+        confirmColor="warning"
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmVersion} // The user clicked "Confirm" after the 2s wait
+      />
     </PageLayout>
   );
 };
 
-export default QuizCreationPage;
+export default QuizFormPage;

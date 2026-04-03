@@ -54,7 +54,7 @@ public class LessonService(
                     {
                         foreach (var opt in question.Options)
                         {
-                            opt.IsCorrect = null;
+                            opt.IsCorrect = false;
                         }
                     }
                 }
@@ -72,7 +72,7 @@ public class LessonService(
             var lessonEntity = course.Lessons.FirstOrDefault(l => l.Id == lessonDto.Id);
             if (lessonEntity != null)
             {
-                var bestAttempt = lessonEntity.Attempts
+                var bestAttempt = lessonEntity.TestAttempts
                     .Where(a => a.UserId == userId)
                     .OrderByDescending(a => a.Percentage)
                     .FirstOrDefault();

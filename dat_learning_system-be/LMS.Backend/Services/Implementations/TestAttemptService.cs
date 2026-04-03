@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Backend.Services.Implement;
 
-public class LessonAttemptService : ILessonAttemptService
+public class TestAttemptService : ITestAttemptService
 {
     private readonly AppDbContext _context;
     private readonly IMapper _mapper;
 
-    public LessonAttemptService(AppDbContext context, IMapper mapper)
+    public TestAttemptService(AppDbContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
@@ -20,7 +20,7 @@ public class LessonAttemptService : ILessonAttemptService
     // Fetches that 100% score and 9 attempts you showed me
     public async Task<List<QuizResultDto>> GetMyAttemptsByLessonAsync(string userId, Guid lessonId)
     {
-        var attempts = await _context.LessonAttempts
+        var attempts = await _context.TestAttempts
             .Where(a => a.UserId == userId && a.LessonId == lessonId)
             .OrderByDescending(a => a.AttemptedAt)
             .ToListAsync();
@@ -31,8 +31,19 @@ public class LessonAttemptService : ILessonAttemptService
     // 2. Matches the New Practice Center logic (By TestId instead of LessonId)
     public async Task<List<QuizResultDto>> GetMyAttemptsByTestAsync(string userId, Guid testId)
     {
-        var attempts = await _context.LessonAttempts
-            .Where(a => a.UserId == userId && a.TestId == testId)
+        var testInfo = await _context.Tests
+            .IgnoreQueryFilters()
+            .Where(t => t.Id == testId)
+            .Select(t => new { t.Title, t.IsGlobal })
+            .FirstOrDefaultAsync();
+
+        if (testInfo == null) return new List<QuizResultDto>();
+
+        var attempts = await _context.TestAttempts
+            .Include(a=>a.Test)
+            .Where(a => a.UserId == userId &&
+                        a.Test.Title == testInfo.Title &&
+                        a.Test.IsGlobal == testInfo.IsGlobal)
             .OrderByDescending(a => a.AttemptedAt)
             .ToListAsync();
         return _mapper.Map<List<QuizResultDto>>(attempts);
@@ -41,7 +52,8 @@ public class LessonAttemptService : ILessonAttemptService
     // Admin View: How many people are passing like the user above?
     public async Task<AdminLessonStatsDto> GetLessonStatsForAdminAsync(Guid lessonId)
     {
-        var attempts = await _context.LessonAttempts
+        var attempts = await _context.TestAttempts
+            .Include(a => a.Test)
             .Where(a => a.LessonId == lessonId)
             .ToListAsync();
 
@@ -51,7 +63,7 @@ public class LessonAttemptService : ILessonAttemptService
         {
             LessonId = lessonId,
             TotalAttempts = attempts.Sum(a => a.Attempts), // Total clicks
-            PassCount = attempts.Count(a => a.IsPassed),   // Unique students who passed
+            PassCount = attempts.Where(a => a.IsPassed).Select(a=>a.UserId).Distinct().Count(),   // Unique students who passed
             AveragePercentage = (double)attempts.Average(a => (decimal)a.Percentage)
         };
     }

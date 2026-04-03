@@ -1,6 +1,6 @@
 namespace LMS.Backend.Data.Entities;
 
-public class LessonAttempt
+public class TestAttempt
 {
     public Guid Id { get; set; }
     public string UserId { get; set; } = string.Empty;

@@ -13,5 +13,5 @@ public class Lesson
     public List<LessonContent> Contents { get; set; } = new();
     
     // To track how many times this student tried this lesson
-    public ICollection<LessonAttempt> Attempts { get; set; } = new List<LessonAttempt>();
+    public ICollection<TestAttempt> TestAttempts { get; set; } = new List<TestAttempt>();
 }

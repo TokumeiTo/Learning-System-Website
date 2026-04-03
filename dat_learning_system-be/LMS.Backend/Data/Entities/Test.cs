@@ -10,6 +10,7 @@ public class Test
     public int PassingGrade { get; set; } = 70;      // New: Specific to this quiz
     public bool IsActive { get; set; } = true;
     public bool IsGlobal { get; set; }
+    public int Version { get; set; } = 1;
 
     // Meta data for JLPT Quiz Engine
     public string? JlptLevel { get; set; }

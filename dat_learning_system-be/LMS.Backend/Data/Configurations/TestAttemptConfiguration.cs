@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LMS.Backend.Data.Configurations;
 
-public class LessonAttemptConfiguration : IEntityTypeConfiguration<LessonAttempt>
+public class TestAttemptConfiguration : IEntityTypeConfiguration<TestAttempt>
 {
-    public void Configure(EntityTypeBuilder<LessonAttempt> builder)
+    public void Configure(EntityTypeBuilder<TestAttempt> builder)
     {
         builder.HasKey(la => la.Id);
         builder.Property(la => la.UserId).IsRequired();
@@ -25,7 +25,7 @@ public class LessonAttemptConfiguration : IEntityTypeConfiguration<LessonAttempt
 
         // Lesson is OPTIONAL (Allow Null for Global Quizzes)
         builder.HasOne(la => la.Lesson)
-               .WithMany()
+               .WithMany(l => l.TestAttempts)
                .HasForeignKey(la => la.LessonId)
                .IsRequired(false) // This is the key change
                .OnDelete(DeleteBehavior.SetNull);

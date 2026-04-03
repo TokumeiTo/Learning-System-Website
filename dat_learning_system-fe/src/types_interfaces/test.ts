@@ -18,10 +18,11 @@ export interface Question {
 
 export interface Test {
   id?: string;
-  title?: string;
+  title: string;
   questions: Question[];
   passingGrade: number;
   isGlobal: boolean;
+  version?: number;
 
   category?: string | null;
   jlptLevel?: string | null;
@@ -46,18 +47,6 @@ export interface LessonResult {
   correctAnswers?: Record<string, string>;
 }
 
-// Attempts handling
-
-export interface LessonAttempt {
-  id: string;
-  testId: string;
-  score: number;
-  maxScore: number;
-  percentage: number;
-  isPassed: boolean;
-  attemptedAt: string;
-}
-
 export interface QuestionAnalytic {
     questionId: string;
     questionText: string;
@@ -76,9 +65,7 @@ export interface AdminLessonStats {
 export interface StudentPerformanceKPI {
   userId: string;
   fullName: string;
-  email: string;
   lessonsCompleted: number;
-  overallAverageScore: number;
   lastActivity?: string;
 }
 
@@ -87,4 +74,10 @@ export interface CategoryProgress {
     totalCount: number;
     passedCount: number;
     progressPercentage: number;
+}
+
+export interface TestNameCheck {
+  exists: boolean;
+  currentVersion: number;
+  message: string;
 }

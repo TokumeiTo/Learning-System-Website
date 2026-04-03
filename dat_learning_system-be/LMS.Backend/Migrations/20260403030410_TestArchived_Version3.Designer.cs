@@ -3,6 +3,7 @@ using System;
 using LMS.Backend.Data.Dbcontext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LMS.Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260403030410_TestArchived_Version3")]
+    partial class TestArchived_Version3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,7 +154,7 @@ namespace LMS.Backend.Migrations
                             Id = "b74ddd14-6340-4840-95c2-db12554843e5",
                             AccessFailedCount = 0,
                             CompanyCode = "00-0000",
-                            ConcurrencyStamp = "b6a9ee75-7cd4-4574-9680-64799e12ec6b",
+                            ConcurrencyStamp = "41c9bb87-f82d-427c-b102-b604077218de",
                             Email = "admin@lms.com",
                             EmailConfirmed = true,
                             FullName = "Super Admin",
@@ -160,10 +163,10 @@ namespace LMS.Backend.Migrations
                             NormalizedEmail = "ADMIN@LMS.COM",
                             NormalizedUserName = "00-0000",
                             OrgUnitId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAECkTLU2nJJdenhdXk/FN83a2BJWMnk8Ipfu2BP6AJvcxq4BKeCe+6GR7TLHQCOTUnA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAs4yaZoOhTcV5Pq8GLwc4/HhU+dz8yHt2Oc5w+pU2hFxxrbonv9e49MxrBBrfiAtw==",
                             PhoneNumberConfirmed = false,
                             Position = 0,
-                            SecurityStamp = "1e0c3498-7fd0-49cb-8d10-af699e30e524",
+                            SecurityStamp = "6dd691d8-738d-44b8-97a3-5e5ba54c1335",
                             TwoFactorEnabled = false,
                             UserName = "00-0000"
                         });
@@ -733,6 +736,58 @@ namespace LMS.Backend.Migrations
                     b.HasIndex("CourseId", "SortOrder");
 
                     b.ToTable("Lessons");
+                });
+
+            modelBuilder.Entity("LMS.Backend.Data.Entities.LessonAttempt", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AnswerJson")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("AttemptedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsPassed")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("LessonId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("MaxScore")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Percentage")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LessonId");
+
+                    b.HasIndex("TestId");
+
+                    b.HasIndex("UserId", "LessonId", "AttemptedAt")
+                        .HasDatabaseName("IX_User_Lesson_Audit");
+
+                    b.HasIndex("UserId", "TestId", "IsPassed")
+                        .HasDatabaseName("IX_User_Quiz_Completion");
+
+                    b.ToTable("LessonAttempts");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.LessonContent", b =>
@@ -1500,58 +1555,6 @@ namespace LMS.Backend.Migrations
                     b.ToTable("Tests");
                 });
 
-            modelBuilder.Entity("LMS.Backend.Data.Entities.TestAttempt", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("AnswerJson")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("AttemptedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Attempts")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsPassed")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid?>("LessonId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("MaxScore")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Percentage")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("TestId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LessonId");
-
-                    b.HasIndex("TestId");
-
-                    b.HasIndex("UserId", "LessonId", "AttemptedAt")
-                        .HasDatabaseName("IX_User_Lesson_Audit");
-
-                    b.HasIndex("UserId", "TestId", "IsPassed")
-                        .HasDatabaseName("IX_User_Quiz_Completion");
-
-                    b.ToTable("TestAttempts");
-                });
-
             modelBuilder.Entity("LMS.Backend.Data.Entities.UserBookProgress", b =>
                 {
                     b.Property<int>("Id")
@@ -1993,6 +1996,24 @@ namespace LMS.Backend.Migrations
                     b.Navigation("Course");
                 });
 
+            modelBuilder.Entity("LMS.Backend.Data.Entities.LessonAttempt", b =>
+                {
+                    b.HasOne("LMS.Backend.Data.Entities.Lesson", "Lesson")
+                        .WithMany("Attempts")
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("LMS.Backend.Data.Entities.Test", "Test")
+                        .WithMany()
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Lesson");
+
+                    b.Navigation("Test");
+                });
+
             modelBuilder.Entity("LMS.Backend.Data.Entities.LessonContent", b =>
                 {
                     b.HasOne("LMS.Backend.Data.Entities.Lesson", "Lesson")
@@ -2075,24 +2096,6 @@ namespace LMS.Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("LessonContent");
-                });
-
-            modelBuilder.Entity("LMS.Backend.Data.Entities.TestAttempt", b =>
-                {
-                    b.HasOne("LMS.Backend.Data.Entities.Lesson", "Lesson")
-                        .WithMany("TestAttempts")
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("LMS.Backend.Data.Entities.Test", "Test")
-                        .WithMany()
-                        .HasForeignKey("TestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Lesson");
-
-                    b.Navigation("Test");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.UserBookProgress", b =>
@@ -2216,9 +2219,9 @@ namespace LMS.Backend.Migrations
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.Lesson", b =>
                 {
-                    b.Navigation("Contents");
+                    b.Navigation("Attempts");
 
-                    b.Navigation("TestAttempts");
+                    b.Navigation("Contents");
                 });
 
             modelBuilder.Entity("LMS.Backend.Data.Entities.LessonContent", b =>

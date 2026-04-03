@@ -31,7 +31,7 @@ public class OptionDto
 
     // Admin: Sets true/false
     // Student: Received as null (for security)
-    public bool? IsCorrect { get; set; }
+    public bool IsCorrect { get; set; }
 }
 
 public class QuizSubmissionDto
@@ -90,7 +90,7 @@ public class StudentPerformanceDto
     public DateTime? LastActivity { get; set; }
 }
 
-public class LessonAttemptDto
+public class TestAttemptDto
 {
     public Guid Id { get; set; }
     public string UserId { get; set; } = string.Empty;
@@ -105,4 +105,11 @@ public class LessonAttemptDto
 
     // Optional: Useful for KPIs to see if students are rushing or taking their time
     public int? TimeTakenSeconds { get; set; }
+}
+
+public class TestNameCheckDto
+{
+    public bool Exists { get; set; }
+    public string? Message { get; set; }
+    public int CurrentVersion { get; set; }
 }

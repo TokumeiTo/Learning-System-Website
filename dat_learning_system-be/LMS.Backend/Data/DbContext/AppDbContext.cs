@@ -19,7 +19,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Test> Tests { get; set; }
     public DbSet<Question> Questions { get; set; }
     public DbSet<QuestionOption> QuestionOptions { get; set; }
-    public DbSet<LessonAttempt> LessonAttempts { get; set; }
+    public DbSet<TestAttempt> TestAttempts { get; set; }
     // ------------------------------
     public DbSet<AuditLog> AuditLogs { get; set; }
     public DbSet<ClassworkTopic> ClassworkTopic { get; set; }

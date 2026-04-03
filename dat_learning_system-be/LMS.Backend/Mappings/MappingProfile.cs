@@ -169,10 +169,10 @@ public class MappingProfile : Profile
         CreateMap<Question, QuestionDto>()
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
 
-        CreateMap<LessonAttempt, QuizResultDto>()
+        CreateMap<TestAttempt, QuizResultDto>()
             .ForMember(dest => dest.Percentage, opt => opt.MapFrom(src => (double)src.Percentage));
 
-        CreateMap<LessonAttempt, LessonAttemptDto>();
+        CreateMap<TestAttempt, TestAttemptDto>();
 
         // DTO -> Entity (For Admin Saving/Upserting)
         CreateMap<TestDto, Test>()

@@ -1,61 +1,55 @@
-import React, { useState } from 'react';
-import { TextField, Stack, Typography, Button } from '@mui/material';
+import React from 'react';
+import { TextField, Stack, Typography } from '@mui/material';
 import type { RoadmapRequest } from '../../types_interfaces/roadmap';
 
 interface RoadmapFormProps {
-    onSubmit: (payload: RoadmapRequest) => void;
-    initialData?: RoadmapRequest;
+    /** The current roadmap data from the parent state */
+    data: RoadmapRequest;
+    /** Callback to update the parent state in real-time */
+    onChange: (updatedFields: Partial<RoadmapRequest>) => void;
 }
 
-const RoadmapForm: React.FC<RoadmapFormProps> = ({ onSubmit, initialData }) => {
-    // Internal state initialized with initialData or defaults
-    const [formData, setFormData] = useState<RoadmapRequest>(initialData || {
-        title: '',
-        targetRole: '',
-        description: '',
-    });
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        onSubmit(formData);
+const RoadmapForm: React.FC<RoadmapFormProps> = ({ data, onChange }) => {
+    
+    // Helper to reduce boilerplate on change events
+    const handleChange = (field: keyof RoadmapRequest) => (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        onChange({ [field]: e.target.value });
     };
 
     return (
-        <Stack component="form" onSubmit={handleSubmit} spacing={3} sx={{ mt: 2 }}>
-            <Typography variant="h6" fontWeight={800}>General Information</Typography>
-            
+        <Stack spacing={3} sx={{ mt: 2 }}>
+            <Typography variant="h6" fontWeight={800} color="primary.main">
+                General Information
+            </Typography>
+
             <TextField
                 label="RoadMap Title"
                 fullWidth
                 required
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                value={data.title}
+                onChange={handleChange('title')}
+                placeholder="e.g., N5 Japanese Mastery"
             />
 
             <TextField
                 label="Target Role"
                 fullWidth
-                value={formData.targetRole}
-                onChange={(e) => setFormData({ ...formData, targetRole: e.target.value })}
+                value={data.targetRole || ''}
+                onChange={handleChange('targetRole')}
+                placeholder="e.g., Junior Developer / Student"
             />
 
             <TextField
                 label="Description"
                 fullWidth
                 multiline
-                rows={3}
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={4}
+                value={data.description}
+                onChange={handleChange('description')}
+                placeholder="Describe the learning path..."
             />
-
-            <Button 
-                type="submit" 
-                variant="contained" 
-                size="large" 
-                sx={{ fontWeight: 800, borderRadius: 2, py: 1.5 }}
-            >
-                Save Roadmap
-            </Button>
         </Stack>
     );
 };

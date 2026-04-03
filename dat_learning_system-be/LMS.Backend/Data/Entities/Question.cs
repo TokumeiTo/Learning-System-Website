@@ -16,6 +16,7 @@ public class Question
 
     public QuizType Type {get;set;} = QuizType.MultipleChoice;
     public string? MediaUrl {get; set;} = null;
+    public bool IsActive { get; set; } = true;
 
     public ICollection<QuestionOption> Options { get; set; } = new List<QuestionOption>();
 }

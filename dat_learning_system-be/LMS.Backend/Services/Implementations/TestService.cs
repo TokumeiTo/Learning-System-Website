@@ -1,4 +1,5 @@
 using AutoMapper;
+using LMS.Backend.Data.Dbcontext;
 using LMS.Backend.Data.Entities;
 using LMS.Backend.DTOs.Test_Quest;
 using LMS.Backend.Repo.Interface;
@@ -25,18 +26,19 @@ public class TestService : ITestService
 
     public async Task<bool> SaveTestAsync(Guid? contentId, TestDto dto)
     {
+        // 1. Map DTO to Entity
         var incomingTest = _mapper.Map<Test>(dto);
-        if (contentId == null)
-        {
-            incomingTest.IsGlobal = true;
-            incomingTest.LessonContentId = null;
-        }
-        else
-        {
-            incomingTest.IsGlobal = false;
-            incomingTest.LessonContentId = contentId;
-        }
+
+        // 2. Identify if this is a Global Test or Lesson Test
+        bool isGlobal = contentId == null || contentId == Guid.Empty;
+
+        incomingTest.IsGlobal = isGlobal;
+        incomingTest.LessonContentId = isGlobal ? null : contentId;
+
+        // 3. Delegate to Repository (The Repo now handles finding 
+        // duplicates, archiving old versions, and incrementing Version numbers)
         var result = await _testRepo.UpsertTestAsync(contentId ?? Guid.Empty, incomingTest);
+
         return result != null;
     }
 
@@ -77,7 +79,7 @@ public class TestService : ITestService
         bool isPassed = percentage >= test.PassingGrade;
 
         // 4. Record the specific attempt
-        var attemptData = new LessonAttempt
+        var attemptData = new TestAttempt
         {
             UserId = userId,
             LessonId = (submission.LessonId == Guid.Empty) ? null : submission.LessonId,
@@ -112,12 +114,30 @@ public class TestService : ITestService
         };
     }
 
-    // In LessonAttemptService.cs
     public async Task<List<QuizResultDto>> GetMyAttemptsByLevelAsync(string userId, string level)
     {
         var attempts = await _testRepo.GetAttemptsByLevelAsync(userId, level);
 
         // Map to your DTO so the frontend gets the expected structure
         return _mapper.Map<List<QuizResultDto>>(attempts);
+    }
+
+    public async Task<TestNameCheckDto> CheckTestNameAsync(string title, bool isGlobal)
+    {
+        // CALL THE REPO instead of _context
+        var existingTest = await _testRepo.GetActiveTestByTitleAsync(title, isGlobal);
+
+        if (existingTest != null)
+        {
+            return new TestNameCheckDto
+            {
+                Exists = true,
+                CurrentVersion = existingTest.Version,
+                Message = $"A test named '{title}' is currently active (Version {existingTest.Version}). " +
+                          "Saving this will Archive the current version and create Version " + (existingTest.Version + 1) + "."
+            };
+        }
+
+        return new TestNameCheckDto { Exists = false };
     }
 }

@@ -14,11 +14,11 @@ namespace LMS.Backend.Controllers;
 public class TestController : ControllerBase
 {
     private readonly ITestService _testService;
-    private readonly ILessonAttemptService _attemptService;
+    private readonly ITestAttemptService _attemptService;
     private readonly ITestRepository _testRepo;
     private readonly IMapper _mapper;
 
-    public TestController(ITestService testService, ILessonAttemptService attemptService, ITestRepository testRepo, IMapper mapper)
+    public TestController(ITestService testService, ITestAttemptService attemptService, ITestRepository testRepo, IMapper mapper)
     {
         _testRepo = testRepo;
         _testService = testService;
@@ -30,9 +30,12 @@ public class TestController : ControllerBase
     [Authorize(Roles = "SuperAdmin,Admin")]
     public async Task<IActionResult> SaveTest(Guid? contentId, [FromBody] TestDto dto)
     {
-        // Service handles the "Sync" logic (check if ID exists -> Update; if not -> Add)
-        var result = await _testService.SaveTestAsync(contentId, dto);
-        return result ? Ok(new { message = "Test updated relationally." }) : BadRequest("Failed to save test.");
+        // The service now handles versioning logic
+        var success = await _testService.SaveTestAsync(contentId, dto);
+
+        if (!success) return BadRequest("Failed to save test.");
+
+        return Ok(new { message = "Test saved successfully. If a version existed, it has been archived." });
     }
 
     [HttpPost("quiz")]
@@ -62,32 +65,36 @@ public class TestController : ControllerBase
         var test = await _testRepo.GetTestByIdWithAnswersAsync(testId);
         if (test == null) return NotFound();
 
-        // Security: We do NOT pass "IsAdmin" to the mapper here.
-        // The OptionDto.IsCorrect will be null in the JSON result.
-        var testDto = _mapper.Map<TestDto>(test);
+        // Check if the current user has an Admin or SuperAdmin role
+        // This assumes you are using Identity or JWT claims
+        bool isAdmin = User.IsInRole("Admin") || User.IsInRole("SuperAdmin");
+
+        // Pass the 'isAdmin' flag into the Mapping context
+        var testDto = _mapper.Map<TestDto>(test, opt => opt.Items["IsAdmin"] = isAdmin);
+
         return Ok(testDto);
     }
-
+    
     // --- KPI & HISTORY ENDPOINTS ---
 
-  [HttpGet("my-history")]
-public async Task<ActionResult<List<QuizResultDto>>> GetHistory(
-    [FromQuery] Guid? lessonId,
-    [FromQuery] Guid? testId,
-    [FromQuery] string? level) // Add this!
-{
-    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (string.IsNullOrEmpty(userId)) return Unauthorized();
+    [HttpGet("my-history")]
+    public async Task<ActionResult<List<QuizResultDto>>> GetHistory(
+      [FromQuery] Guid? lessonId,
+      [FromQuery] Guid? testId,
+      [FromQuery] string? level) // Add this!
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-    if (lessonId.HasValue) return Ok(await _attemptService.GetMyAttemptsByLessonAsync(userId, lessonId.Value));
-    if (testId.HasValue) return Ok(await _attemptService.GetMyAttemptsByTestAsync(userId, testId.Value));
-    
-    // NEW: Fetch all history for a level to light up the dashboard
-    if (!string.IsNullOrEmpty(level)) 
-        return Ok(await _testService.GetMyAttemptsByLevelAsync(userId, level)); 
+        if (lessonId.HasValue) return Ok(await _attemptService.GetMyAttemptsByLessonAsync(userId, lessonId.Value));
+        if (testId.HasValue) return Ok(await _attemptService.GetMyAttemptsByTestAsync(userId, testId.Value));
 
-    return BadRequest("Must provide lessonId, testId, or level");
-}
+        // NEW: Fetch all history for a level to light up the dashboard
+        if (!string.IsNullOrEmpty(level))
+            return Ok(await _testService.GetMyAttemptsByLevelAsync(userId, level));
+
+        return BadRequest("Must provide lessonId, testId, or level");
+    }
 
     [HttpGet("admin/stats/{lessonId}")]
     [Authorize(Roles = "SuperAdmin,Admin")]
@@ -123,5 +130,23 @@ public async Task<ActionResult<List<QuizResultDto>>> GetHistory(
         // Calling the new Repo method
         var stats = await _testRepo.GetCategoryProgressAsync(userId, level);
         return Ok(stats);
+    }
+
+    [HttpGet("check-name")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
+    public async Task<IActionResult> CheckName([FromQuery] string title, [FromQuery] bool isGlobal)
+    {
+        if (string.IsNullOrWhiteSpace(title)) return BadRequest("Title is required.");
+
+        var result = await _testService.CheckTestNameAsync(title, isGlobal);
+        return Ok(result);
+    }
+
+    [HttpGet("admin/versions/{title}")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
+    public async Task<IActionResult> GetTestVersions(string title, [FromQuery] bool isGlobal)
+    {
+        var versions = await _testRepo.GetTestVersionsAsync(title, isGlobal);
+        return Ok(_mapper.Map<List<TestDto>>(versions));
     }
 }

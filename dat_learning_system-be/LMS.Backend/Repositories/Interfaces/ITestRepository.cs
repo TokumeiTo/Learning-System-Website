@@ -14,8 +14,12 @@ public interface ITestRepository
     Task<object> GetCategoryProgressAsync(string userId, string level);
 
     // Track attempt
-    Task<LessonAttempt> UpsertAttemptAsync(LessonAttempt newAttempt);
+    Task<TestAttempt> UpsertAttemptAsync(TestAttempt newAttempt);
     Task<int> GetTotalPointsForLessonAsync(Guid lessonId);
     Task<Test?> GetTestByIdWithAnswersAsync(Guid testId);
-    Task<List<LessonAttempt>> GetAttemptsByLevelAsync(string userId, string level);
+    Task<List<TestAttempt>> GetAttemptsByLevelAsync(string userId, string level);
+
+    Task<Test?> GetActiveTestByTitleAsync(string title, bool isGlobal);
+
+    Task<List<Test>> GetTestVersionsAsync(string title, bool isGlobal);
 }

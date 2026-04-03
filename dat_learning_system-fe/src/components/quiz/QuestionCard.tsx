@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import {
   Box, Card, CardContent, CardHeader, Divider, IconButton, Radio,
   Stack, TextField, Typography, Button, Paper, Tooltip
@@ -35,6 +35,8 @@ const SmoothTextField = ({ value, label, onSave, placeholder, endAdornment }: an
 
 const QuestionCard = ({ question, index, onUpdate, onRemove }: any) => {
 
+  console.log(question);
+
   const fastUpdate = (fields: any) => onUpdate({ ...question, ...fields });
 
   const handleMainFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,8 +69,8 @@ const QuestionCard = ({ question, index, onUpdate, onRemove }: any) => {
     newOptions[oIdx] = {
       ...newOptions[oIdx],
       isImageOption: !isCurrentlyImage,
-      optionText: '', 
-      pendingFile: null 
+      optionText: '',
+      pendingFile: null
     };
     fastUpdate({ options: newOptions });
   };
@@ -91,9 +93,9 @@ const QuestionCard = ({ question, index, onUpdate, onRemove }: any) => {
       <Divider />
       <CardContent>
         <Stack spacing={3}>
-          
+
           {/* SMOOTH QUESTION TEXT */}
-          <SmoothTextField 
+          <SmoothTextField
             label="Question Text"
             value={question.questionText}
             onSave={(val: string) => fastUpdate({ questionText: val })}
@@ -122,12 +124,13 @@ const QuestionCard = ({ question, index, onUpdate, onRemove }: any) => {
 
           {/* ANSWER OPTIONS SECTION */}
           <Box>
-            <Typography variant="caption" fontWeight="bold" color="text.secondary">ANSWER OPTIONS</Typography>
             <Stack spacing={2} sx={{ mt: 1 }}>
+              <Typography variant="caption" fontWeight="bold" color="text.secondary">ANSWER OPTIONS</Typography>
               {question.options.map((opt: any, oIdx: number) => (
                 <Stack key={oIdx} direction="row" spacing={1} alignItems="flex-start">
-                  <Radio 
-                    checked={!!opt.isCorrect} 
+                  <Radio
+                    name={`question-${index}-radio`}
+                    checked={!!opt.isCorrect}
                     sx={{ mt: 0.5 }}
                     onChange={() => {
                       const newOps = question.options.map((o: any, i: number) => ({ ...o, isCorrect: i === oIdx }));
@@ -159,7 +162,7 @@ const QuestionCard = ({ question, index, onUpdate, onRemove }: any) => {
                         </Stack>
                       </Paper>
                     ) : (
-                      <SmoothTextField 
+                      <SmoothTextField
                         placeholder={`Option ${oIdx + 1} (Text)`}
                         value={opt.optionText}
                         onSave={(val: string) => {
@@ -187,4 +190,4 @@ const QuestionCard = ({ question, index, onUpdate, onRemove }: any) => {
   );
 };
 
-export default QuestionCard;
+export default memo(QuestionCard);

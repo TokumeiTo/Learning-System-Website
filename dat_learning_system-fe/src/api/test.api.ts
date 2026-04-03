@@ -5,7 +5,8 @@ import type {
     LessonResult,
     AdminLessonStats,
     StudentPerformanceKPI,
-    CategoryProgress
+    CategoryProgress,
+    TestNameCheck
 } from "../types_interfaces/test";
 
 /**
@@ -13,7 +14,8 @@ import type {
  */
 export const saveTestContent = async (contentId: string | null, data: Test): Promise<void> => {
     const url = contentId ? `/api/Test/content/${contentId}` : `/api/Test/quiz`;
-    await api.post(url, data);
+    const res = await api.post(url, data);
+    return res.data;
 };
 
 /**
@@ -78,5 +80,25 @@ export const fetchDepartmentKPI = async (orgUnitId: string): Promise<StudentPerf
  */
 export const fetchGlobalStats = async (level: string): Promise<CategoryProgress[]> => {
     const res = await api.get<CategoryProgress[]>(`/api/Test/stats/${level}`);
+    return res.data;
+};
+
+/**
+ * ADMIN: Check if a test name already exists to warn about versioning
+ */
+export const checkTestName = async (title: string, isGlobal: boolean): Promise<TestNameCheck> => {
+    const res = await api.get<TestNameCheck>("/api/Test/check-name", {
+        params: { title, isGlobal }
+    });
+    return res.data;
+};
+
+/**
+ * ADMIN: Fetch all archived and active versions of a specific test
+ */
+export const fetchTestVersions = async (title: string, isGlobal: boolean): Promise<Test[]> => {
+    const res = await api.get<Test[]>(`/api/Test/admin/versions/${encodeURIComponent(title)}`, {
+        params: { isGlobal }
+    });
     return res.data;
 };

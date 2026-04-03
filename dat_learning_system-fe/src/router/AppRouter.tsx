@@ -37,9 +37,10 @@ import RoadmapListPage from "../pages/roadmap/RoadmapListPage";
 import RoadmapDetailsPage from "../components/roadmap/RoadmapDetailsPage";
 import RoadmapEditPage from "../pages/roadmap/RoadmapEditPage";
 import AnnouncementManagementPage from "../pages/admin/AnnouncementManagementPage";
-import QuizCreationPage from "../pages/quiz/QuizCreationPage";
+import QuizFormPage from "../pages/quiz/QuizFormPage";
 import QuizSelectionPage from "../pages/quiz/QuizSelectionPage";
 import QuizActivePage from "../pages/quiz/QuizActivePage";
+import QuizManagementPage from "../pages/quiz/QuizManagementPage";
 
 export const AppRouter = () => {
   const { user } = useAuth();
@@ -151,7 +152,7 @@ export const AppRouter = () => {
           }
         />
 
-          <Route
+        <Route
           path="/quiz/active/:testId"
           element={
             <ProtectedRoute>
@@ -309,12 +310,29 @@ export const AppRouter = () => {
         />
 
         <Route
-          path="admin/quiz_manage"
+          path="admin/quiz/create"
           element={
             <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
-              <QuizCreationPage />
+              <QuizFormPage />
             </ProtectedRoute>
           }
+        />
+
+        <Route
+          path="admin/quizzes"
+          element={
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+              <QuizManagementPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin/quiz/edit/:testId"
+          element={
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+              <QuizFormPage />
+            </ProtectedRoute>}
         />
 
         <Route

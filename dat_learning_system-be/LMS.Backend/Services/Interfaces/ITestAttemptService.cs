@@ -1,7 +1,7 @@
 namespace LMS.Backend.Services.Interfaces;
 using LMS.Backend.DTOs.Test_Quest;
 
-public interface ILessonAttemptService
+public interface ITestAttemptService
 {
     // For the Student: See their own history
     Task<List<QuizResultDto>> GetMyAttemptsByLessonAsync(string userId, Guid lessonId);

@@ -10,4 +10,5 @@ public interface ITestService
     // Student: Grades the entire lesson based on multiple choice selections
     Task<QuizResultDto> GradQuizAsync(string userId, QuizSubmissionDto submission);
     Task<List<QuizResultDto>> GetMyAttemptsByLevelAsync(string userId, string level);
+    Task<TestNameCheckDto> CheckTestNameAsync(string title, bool isGlobal);
 }

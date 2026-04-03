@@ -26,8 +26,8 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
                .HasForeignKey(c => c.LessonId)
                .OnDelete(DeleteBehavior.Cascade);
 
-        // Lesson -> Attempts (CRITICAL for KPI tracking)
-        builder.HasMany(l => l.Attempts)
+        // Lesson -> TestAttempts (CRITICAL for KPI tracking)
+        builder.HasMany(l => l.TestAttempts)
                .WithOne(a => a.Lesson)
                .HasForeignKey(a => a.LessonId)
                .OnDelete(DeleteBehavior.Cascade);

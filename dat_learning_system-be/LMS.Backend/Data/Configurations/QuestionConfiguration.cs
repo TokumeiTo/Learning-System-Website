@@ -22,12 +22,13 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
                .HasForeignKey(o => o.QuestionId)
                .OnDelete(DeleteBehavior.Cascade);
 
-        // Optimization: Index TestId + SortOrder
-        // Essential for retrieving questions in the correct sequence for the QuizViewer
-        builder.HasIndex(q => new { q.TestId, q.SortOrder });
-
         builder.HasQueryFilter(q =>
-           q.Test.LessonContentId == null ||
-           q.Test.LessonContent!.Lesson.Course.Status != CourseStatus.Closed);
+               q.IsActive &&
+               q.Test.IsActive &&
+               (q.Test.LessonContentId == null ||
+                q.Test.LessonContent!.Lesson.Course.Status != CourseStatus.Closed)
+           );
+
+        builder.HasIndex(q => new { q.TestId, q.SortOrder });
     }
 }

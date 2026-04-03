@@ -39,37 +39,48 @@ public class TestRepository : ITestRepository
     }
     public async Task<Test> UpsertTestAsync(Guid lessonContentId, Test incomingTest)
     {
-        Test? existingTest = null;
-        if (lessonContentId != Guid.Empty)
+        Test? existingActiveTest = null;
+        bool isGlobal = lessonContentId == Guid.Empty;
+
+        if (!isGlobal)
         {
-            existingTest = await _context.Tests
-            .IgnoreQueryFilters()
-            .Include(t => t.Questions).ThenInclude(q => q.Options)
-            .FirstOrDefaultAsync(t => t.LessonContentId == lessonContentId && t.IsActive);
+            existingActiveTest = await _context.Tests
+                .IgnoreQueryFilters()
+                .Include(t => t.Questions).ThenInclude(q => q.Options)
+                .FirstOrDefaultAsync(t => t.LessonContentId == lessonContentId && t.IsActive);
         }
         // 1. Load the existing test with the full tracking tree
         else
         {
-            existingTest = await _context.Tests
+            existingActiveTest = await _context.Tests
             .IgnoreQueryFilters()
             .Include(t => t.Questions)
                 .ThenInclude(q => q.Options)
-            .FirstOrDefaultAsync(t => t.Id == incomingTest.Id && t.IsGlobal);
+            .FirstOrDefaultAsync(t => t.Title == incomingTest.Title && t.IsGlobal && t.IsActive);
         }
         // Check existing attempts
-        bool hasAttempts = existingTest != null && await _context.LessonAttempts.AnyAsync(a => a.TestId == existingTest.Id);
+        bool hasAttempts = existingActiveTest != null && await _context.TestAttempts.AnyAsync(a => a.TestId == existingActiveTest.Id);
 
-        if (existingTest == null || hasAttempts)
+        if (existingActiveTest == null || hasAttempts)
         {
-            if (existingTest != null)
+            if (existingActiveTest != null)
             {
-                existingTest.IsActive = false;
-                // IMPORTANT: Ensure the incoming test gets a BRAND NEW ID 
-                // so it doesn't collide with the one which just deactivated.
-                incomingTest.Id = Guid.NewGuid();
+                existingActiveTest.IsActive = false;
+                incomingTest.Version = existingActiveTest.Version + 1;
             }
-            incomingTest.LessonContentId = (lessonContentId == Guid.Empty) ? null : lessonContentId;
-            incomingTest.IsGlobal = lessonContentId == Guid.Empty;
+            else if (isGlobal)
+            {
+                var maxVersion = await _context.Tests
+                    .IgnoreQueryFilters()
+                    .Where(t => t.Title == incomingTest.Title && t.IsGlobal)
+                    .MaxAsync(t => (int?)t.Version) ?? 0;
+
+                incomingTest.Version = maxVersion + 1;
+            }
+
+            incomingTest.Id = Guid.NewGuid();
+            incomingTest.LessonContentId = isGlobal ? null : lessonContentId;
+            incomingTest.IsGlobal = isGlobal;
             incomingTest.IsActive = true;
 
             ProcessNewTestTree(incomingTest);
@@ -78,31 +89,31 @@ public class TestRepository : ITestRepository
         else
         {
             // MANUAL SYNC: Safe to update existing record
-            existingTest.Title = incomingTest.Title;
-            existingTest.PassingGrade = incomingTest.PassingGrade;
-            existingTest.JlptLevel = incomingTest.JlptLevel;
-            existingTest.Category = incomingTest.Category;
-            existingTest.IsGlobal = incomingTest.IsGlobal;
+            existingActiveTest.Title = incomingTest.Title;
+            existingActiveTest.PassingGrade = incomingTest.PassingGrade;
+            existingActiveTest.JlptLevel = incomingTest.JlptLevel;
+            existingActiveTest.Category = incomingTest.Category;
+            existingActiveTest.IsGlobal = incomingTest.IsGlobal;
 
             // Sync Questions & Options
-            SyncQuestionsAndOptions(existingTest, incomingTest.Questions.ToList());
+            SyncQuestionsAndOptions(existingActiveTest, incomingTest.Questions.ToList());
         }
 
         await _context.SaveChangesAsync();
-        return existingTest ?? incomingTest;
+        return existingActiveTest ?? incomingTest;
     }
 
     public async Task<int> GetTotalPointsForLessonAsync(Guid lessonId)
     {
         return await _context.Questions
-            .Where(q => q.Test.IsActive && q.Test!.LessonContent!.LessonId == lessonId)
+            .Where(q => q.Test!.LessonContent!.LessonId == lessonId)
             .SumAsync(q => q.Points);
     }
 
-    public async Task<LessonAttempt> UpsertAttemptAsync(LessonAttempt newAttempt)
+    public async Task<TestAttempt> UpsertAttemptAsync(TestAttempt newAttempt)
     {
         // Check for existing attempt by this user for this specific test
-        var existing = await _context.LessonAttempts
+        var existing = await _context.TestAttempts
                             .FirstOrDefaultAsync(a => a.UserId == newAttempt.UserId &&
                                                         a.TestId == newAttempt.TestId &&
                                                         a.LessonId == newAttempt.LessonId);
@@ -112,7 +123,7 @@ public class TestRepository : ITestRepository
             // First time taking the test
             newAttempt.Attempts = 1;
             newAttempt.AttemptedAt = DateTime.UtcNow;
-            await _context.LessonAttempts.AddAsync(newAttempt);
+            await _context.TestAttempts.AddAsync(newAttempt);
             await _context.SaveChangesAsync();
             return newAttempt;
         }
@@ -142,7 +153,7 @@ public class TestRepository : ITestRepository
             .ToListAsync();
 
         // 2. Get the unique IDs of tests this user has passed
-        var passedTestIds = await _context.LessonAttempts
+        var passedTestIds = await _context.TestAttempts
             .Where(a => a.UserId == userId && a.IsPassed)
             .Select(a => a.TestId)
             .Distinct()
@@ -280,11 +291,27 @@ public class TestRepository : ITestRepository
         }
     }
 
-    public async Task<List<LessonAttempt>> GetAttemptsByLevelAsync(string userId, string level)
+    public async Task<List<TestAttempt>> GetAttemptsByLevelAsync(string userId, string level)
     {
-        return await _context.LessonAttempts
+        return await _context.TestAttempts
             .Include(a => a.Test)
             .Where(a => a.UserId == userId && a.Test.JlptLevel == level)
+            .ToListAsync();
+    }
+
+    public async Task<Test?> GetActiveTestByTitleAsync(string title, bool isGlobal)
+    {
+        return await _context.Tests
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(t => t.Title == title && t.IsGlobal == isGlobal && t.IsActive);
+    }
+
+    public async Task<List<Test>> GetTestVersionsAsync(string title, bool isGlobal)
+    {
+        return await _context.Tests
+            .IgnoreQueryFilters()
+            .Where(t => t.Title == title && t.IsGlobal == isGlobal)
+            .OrderByDescending(t => t.Version)
             .ToListAsync();
     }
 }
