@@ -183,7 +183,7 @@ export default function QuizManagementPage() {
                                     key={v.id}
                                     divider={index !== selectedHistory.length - 1}
                                     secondaryAction={
-                                        <Button
+                                         <Button
                                             size="small"
                                             variant="outlined"
                                             onClick={() => navigate(`/admin/quiz/edit/${v.id}`)}

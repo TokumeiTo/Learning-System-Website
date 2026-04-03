@@ -23,6 +23,7 @@ export interface Test {
   passingGrade: number;
   isGlobal: boolean;
   version?: number;
+  hasAttempts?: boolean;
 
   category?: string | null;
   jlptLevel?: string | null;

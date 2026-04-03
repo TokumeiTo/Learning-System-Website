@@ -22,4 +22,5 @@ public interface ITestRepository
     Task<Test?> GetActiveTestByTitleAsync(string title, bool isGlobal);
 
     Task<List<Test>> GetTestVersionsAsync(string title, bool isGlobal);
+    Task<bool> HasAttemptsAsync(Guid testId);
 }

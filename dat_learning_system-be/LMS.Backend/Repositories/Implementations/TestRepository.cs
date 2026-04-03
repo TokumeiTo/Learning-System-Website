@@ -39,33 +39,36 @@ public class TestRepository : ITestRepository
     }
     public async Task<Test> UpsertTestAsync(Guid lessonContentId, Test incomingTest)
     {
+        // 1. Clear tracker at the start to avoid identity conflicts with previous scoped operations
+        _context.ChangeTracker.Clear();
+
         Test? existingActiveTest = null;
         bool isGlobal = lessonContentId == Guid.Empty;
 
-        if (!isGlobal)
-        {
-            existingActiveTest = await _context.Tests
-                .IgnoreQueryFilters()
-                .Include(t => t.Questions).ThenInclude(q => q.Options)
-                .FirstOrDefaultAsync(t => t.LessonContentId == lessonContentId && t.IsActive);
-        }
-        // 1. Load the existing test with the full tracking tree
-        else
-        {
-            existingActiveTest = await _context.Tests
+        var query = _context.Tests
             .IgnoreQueryFilters()
             .Include(t => t.Questions)
-                .ThenInclude(q => q.Options)
-            .FirstOrDefaultAsync(t => t.Title == incomingTest.Title && t.IsGlobal && t.IsActive);
+                .ThenInclude(q => q.Options);
+
+        if (!isGlobal)
+        {
+            existingActiveTest = await query.FirstOrDefaultAsync(t => t.LessonContentId == lessonContentId && t.IsActive);
         }
-        // Check existing attempts
+        else
+        {
+            existingActiveTest = await query.FirstOrDefaultAsync(t => t.Title == incomingTest.Title && t.IsGlobal && t.IsActive);
+        }
+
         bool hasAttempts = existingActiveTest != null && await _context.TestAttempts.AnyAsync(a => a.TestId == existingActiveTest.Id);
 
         if (existingActiveTest == null || hasAttempts)
         {
             if (existingActiveTest != null)
             {
+                // Update the existing record to inactive
                 existingActiveTest.IsActive = false;
+                _context.Tests.Update(existingActiveTest); // Explicitly track for update
+
                 incomingTest.Version = existingActiveTest.Version + 1;
             }
             else if (isGlobal)
@@ -78,24 +81,35 @@ public class TestRepository : ITestRepository
                 incomingTest.Version = maxVersion + 1;
             }
 
+            // 2. IMPORTANT: Generate brand new IDs for the entire tree
+            // This prevents the "Instance already tracked" error 100%
             incomingTest.Id = Guid.NewGuid();
-            incomingTest.LessonContentId = isGlobal ? null : lessonContentId;
+            incomingTest.LessonContentId = isGlobal ? (Guid?)null : lessonContentId;
             incomingTest.IsGlobal = isGlobal;
             incomingTest.IsActive = true;
 
-            ProcessNewTestTree(incomingTest);
+            foreach (var q in incomingTest.Questions)
+            {
+                q.Id = Guid.NewGuid();
+                q.TestId = incomingTest.Id;
+                foreach (var opt in q.Options)
+                {
+                    opt.Id = Guid.NewGuid();
+                    opt.QuestionId = q.Id;
+                }
+            }
+
             await _context.Tests.AddAsync(incomingTest);
         }
         else
         {
-            // MANUAL SYNC: Safe to update existing record
+            // MANUAL SYNC: Update existing record
             existingActiveTest.Title = incomingTest.Title;
             existingActiveTest.PassingGrade = incomingTest.PassingGrade;
             existingActiveTest.JlptLevel = incomingTest.JlptLevel;
             existingActiveTest.Category = incomingTest.Category;
             existingActiveTest.IsGlobal = incomingTest.IsGlobal;
 
-            // Sync Questions & Options
             SyncQuestionsAndOptions(existingActiveTest, incomingTest.Questions.ToList());
         }
 
@@ -313,5 +327,9 @@ public class TestRepository : ITestRepository
             .Where(t => t.Title == title && t.IsGlobal == isGlobal)
             .OrderByDescending(t => t.Version)
             .ToListAsync();
+    }
+    public async Task<bool> HasAttemptsAsync(Guid testId)
+    {
+        return await _context.TestAttempts.AnyAsync(a => a.TestId == testId);
     }
 }

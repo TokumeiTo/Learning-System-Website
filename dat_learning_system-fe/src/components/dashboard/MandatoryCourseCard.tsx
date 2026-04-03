@@ -50,7 +50,7 @@ const MandatoryCourseCard: React.FC<Props> = ({ course, onView }) => {
                         </Stack>
                         <Stack direction="row" alignItems="center" spacing={0.5}>
                             <MenuBook sx={{ fontSize: 16 }} />
-                            <Typography variant="caption" fontWeight={700}>{course.topics?.length || 0} Topics</Typography>
+                            <Typography variant="caption" fontWeight={700}>{course.classworkTopics?.length || 0} Topics</Typography>
                         </Stack>
                     </Stack>
 

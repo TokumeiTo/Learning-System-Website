@@ -65,7 +65,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRefresh }) => {
                     />
 
                     {/* Badge Overlay */}
-                    <Stack direction="row" spacing={1} sx={{ position: 'absolute', top: 12, left: 12 }}>
+                    <Stack direction="row" spacing={1} >
                         <Chip
                             label={course.badge}
                             size="small"
@@ -76,7 +76,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRefresh }) => {
                                 fontSize: '0.65rem',
                                 color: 'primary.main',
                                 border: `1px solid ${theme.palette.primary.main}`,
-                                height: 24
+                                height: 24,
+                                position: 'absolute', top: 12, left: 12
                             }}
                         />
                         {course.isMandatory && (
@@ -84,7 +85,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onRefresh }) => {
                                 label="MANDATORY"
                                 color="error"
                                 size="small"
-                                sx={{ fontWeight: 900, fontSize: '0.6rem', height: 24 }}
+                                sx={{ fontWeight: 900, fontSize: '0.6rem', height: 24, position: 'absolute', top: 12, right: 12 }}
                             />
                         )}
                     </Stack>

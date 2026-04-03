@@ -49,7 +49,7 @@ export default function QuizResultSummary({ test, results, onRetry, onBackToList
 
                                 <Box sx={{ display: 'flex', gap: 3 }}>
                                     <Box>
-                                        <Typography variant="caption" display="block" color="#a0aec0">Your Choice</Typography>
+                                        <Typography variant="caption" display="block" color="#a0aec0">Your Answer</Typography>
                                         <Typography color={isCorrect ? '#2ecc71' : '#ff7675'} fontWeight="bold">{userOptText}</Typography>
                                     </Box>
                                     {!isCorrect && (

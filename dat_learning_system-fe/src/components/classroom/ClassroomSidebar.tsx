@@ -76,7 +76,7 @@ const ClassroomSidebar = memo(({
       >
         <Tab label="Curriculum" />
         <Tab label="Classwork" />
-        <Tab label="Chat" />
+        <Tab label="Students" />
       </Tabs>
 
       <Box sx={{ p: 1, minHeight: 400 }}>
@@ -120,7 +120,7 @@ const ClassroomSidebar = memo(({
               }}
             >
               <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>
-                Study group chat is currently disabled.
+                Student tab is disable for now.
               </Typography>
             </Box>
           </Fade>

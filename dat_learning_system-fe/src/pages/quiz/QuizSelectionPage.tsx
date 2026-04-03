@@ -69,7 +69,6 @@ export default function QuizSelectionPage() {
                     {tests.map((test) => {
                         const attempt = history.find(h => h.testId === test.id);
                         const isPassed = attempt?.isPassed ?? false;
-                        console.log(test);
 
                         return (
                             <Paper

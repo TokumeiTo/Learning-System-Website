@@ -10,8 +10,6 @@ import type {
 
 export const fetchClassroomData = async (courseId: string): Promise<ClassroomView> => {
     const res = await api.get(`/api/classroom/${courseId}`);
-
-    console.log(res)
     return res.data;
 };
 
@@ -58,7 +56,6 @@ export const bulkSaveLessonContents = async (
             };
         }
 
-        console.log(`📄 Block is text/metadata (Order: ${content.sortOrder})`);
         return content;
     });
 

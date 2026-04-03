@@ -102,7 +102,6 @@ const LessonContentSection = ({
         let finalBody = d.body;
 
         const isNewFile = d.file && d.file instanceof File;
-        console.log(`Block ${index} type: ${d.contentType}, hasFile: ${!!d.file}`);
 
         // Prevent saving empty text blocks
         if (d.contentType === 'text' && (finalBody === '<p><br></p>' || !finalBody)) {

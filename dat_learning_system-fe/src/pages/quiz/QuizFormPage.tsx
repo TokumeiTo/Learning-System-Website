@@ -23,8 +23,10 @@ const QuizFormPage = () => {
     category: 'Grammar',
     jlptLevel: 'N5',
     questions: [],
+    hasAttempts: false,
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [attemptExistConfirm, setAttemptExistConfirm] = useState(false);
   const [versionMessage, setVersionMessage] = useState("");
   const navigate = useNavigate();
 
@@ -32,16 +34,24 @@ const QuizFormPage = () => {
 
   // EDIT MODE CHANGE
   useEffect(() => {
+    console.log ("i am here!");
+    console.log(testId);
     if (testId) {
       const loadTestData = async () => {
         try {
           const data = await fetchQuizById(testId);
-          // Add tempIds to questions so your Sort/Remove logic doesn't break
+
           const mappedQuestions = data.questions.map(q => ({
             ...q,
             tempId: q.id || Date.now() + Math.random()
           }));
           setTest({ ...data, questions: mappedQuestions });
+          console.log(data.hasAttempts);
+
+          if (data.hasAttempts) {
+            setVersionMessage("This test already has student attempts. Saving changes will automatically create a New Version and archive the current one.");
+            setConfirmOpen(true);
+          }
         } catch (err) {
           showMsg("Failed to load quiz data", "error");
         }
@@ -83,45 +93,73 @@ const QuizFormPage = () => {
     const finalTitle = localTitle || test.title;
     if (!finalTitle) return showMsg("Please enter a test title", "warning");
 
-    setIsSaving(true);
+    if (test.hasAttempts && !attemptExistConfirm) {
+      setVersionMessage("This test has student attempts. Saving will create a NEW version and archive the old one. Are you sure you want to proceed?");
+      setConfirmOpen(true);
+      return;
+    }
 
     setIsSaving(true);
+
     try {
-      const uploadedQuestions = await Promise.all(test.questions.map(async (q: any) => {
-        let mediaUrl = q.mediaUrl;
+      // 1. Process and Upload Media for Questions/Options
+      const uploadedQuestions = await Promise.all(
+        test.questions.map(async (q: any) => {
+          let mediaUrl = q.mediaUrl;
 
-        // Upload main question media
-        if (q.pendingFile instanceof File) {
-          const folder = q.pendingFile.type.startsWith('audio/') ? 'audio' : 'images';
-          mediaUrl = await uploadMediaFile(q.pendingFile, folder);
-        }
-
-        // Upload option media
-        const updatedOptions = await Promise.all(q.options.map(async (opt: any) => {
-          if (opt.pendingFile instanceof File) {
-            const optUrl = await uploadMediaFile(opt.pendingFile, 'images');
-            // Clean up: return object without the local File/Blob
-            const { pendingFile, ...rest } = opt;
-            return { ...rest, optionText: optUrl };
+          // Upload main question media (Audio/Image)
+          if (q.pendingFile instanceof File) {
+            const folder = q.pendingFile.type.startsWith('audio/') ? 'audio' : 'images';
+            mediaUrl = await uploadMediaFile(q.pendingFile, folder);
           }
-          return opt;
-        }));
 
-        // Clean up: remove temp properties before sending to backend
-        const { pendingFile, tempId, ...cleanQuestion } = q;
-        return {
-          ...cleanQuestion,
-          mediaUrl,
-          options: updatedOptions
-        };
-      }));
+          // Upload option media
+          const updatedOptions = await Promise.all(
+            q.options.map(async (opt: any) => {
+              if (opt.pendingFile instanceof File) {
+                const optUrl = await uploadMediaFile(opt.pendingFile, 'images');
+                // Destructure to remove the local File object before sending to API
+                const { pendingFile, ...rest } = opt;
+                return { ...rest, optionText: optUrl };
+              }
+              return opt;
+            })
+          );
 
-      const finalPayload = { ...test, questions: uploadedQuestions };
-      await saveTestContent(testId || null, finalPayload);
-      showMsg(testId ? "Version Updated Successfully!" : "Test Published Successfully!", "success");
+          // 2. Clean up Frontend-only properties (tempId, pendingFile)
+          const { pendingFile, tempId, ...cleanQuestion } = q;
+          return {
+            ...cleanQuestion,
+            mediaUrl,
+            options: updatedOptions,
+          };
+        })
+      );
+
+      // 3. Prepare Final Payload
+      const finalPayload = {
+        ...test,
+        title: finalTitle, // Ensure the latest title from the text field is used
+        questions: uploadedQuestions
+      };
+
+
+      const targetContentId = null;
+
+      await saveTestContent(targetContentId, finalPayload);
+
+      showMsg(
+        testId ? "Version Updated Successfully!" : "Test Published Successfully!",
+        "success"
+      );
+
+      if (!testId) {
+        navigate('/admin/quizzes');
+      }
+
     } catch (err) {
-      console.error(err);
-      showMsg("Failed to save. Check your connection or file sizes.", "error");
+      console.error("Save Error:", err);
+      showMsg("Failed to save. Ensure all fields are valid and files are not too large.", "error");
     } finally {
       setIsSaving(false);
     }
@@ -145,14 +183,15 @@ const QuizFormPage = () => {
 
   const handleConfirmVersion = () => {
     setConfirmOpen(false);
+    setAttemptExistConfirm(true);
   };
 
   return (
     <PageLayout>
       <Box sx={{ px: 4, mx: 'auto' }}>
         <Box sx={{ p: 3, mb: 4 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb:3 }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{testId ? `Editnig: ${test.title}` : "Publishing New Test"}</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{testId ? `Modifying: ${test.title}` : "Publishing New Test"}</Typography>
             <Button onClick={() => navigate('/admin/quizzes')}>Back to List</Button>
           </Box>
 
@@ -165,10 +204,10 @@ const QuizFormPage = () => {
                 value={localTitle}
                 onChange={(e) => setLocalTitle(e.target.value)}
                 onBlur={() => handleCheckName(localTitle)}
-                helperText={testId ? "Editing existing version" : "Tab out to check availability"}
+                helperText={testId ? "Existing version Title! Updating the data will be saved as New Version!" : "Tab out to check availability"}
               />
               <TextField
-                sx={{ width:'80px' }}
+                sx={{ width: '80px' }}
                 type="number" label="Passing %"
                 value={test.passingGrade}
                 onChange={(e) => setTest({ ...test, passingGrade: Number(e.target.value) })}
@@ -238,7 +277,11 @@ const QuizFormPage = () => {
           sx={{ mt: 6, py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
           onClick={handleSave}
         >
-          {isSaving ? "Uploading Files..." : "Publish Test to Hikari Learning"}
+          {isSaving 
+          ? "Uploading Files..." 
+          : (test.hasAttempts && !attemptExistConfirm) 
+              ? "Confirm & Create New Version" 
+              : "Publish Test to Hikari Learning"}
         </Button>
       </Box>
 

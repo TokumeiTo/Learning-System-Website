@@ -8,7 +8,6 @@ import FlashcardsPage from "../pages/flashcards/FlashcardsPage";
 import TranslationPage from "../pages/translation/TranslationPage";
 
 import QuizSetupPage from "../pages/quiz/QuizSetupPage";
-import QuizReviewPage from "../pages/quiz/QuizReviewPage";
 
 import SchedulePage from "../pages/schedules/SchedulePage";
 import LessonPage from "../pages/lessons/LessonPage";
@@ -157,15 +156,6 @@ export const AppRouter = () => {
           element={
             <ProtectedRoute>
               <QuizActivePage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/quiz/review"
-          element={
-            <ProtectedRoute>
-              <QuizReviewPage />
             </ProtectedRoute>
           }
         />

@@ -30,7 +30,7 @@ public class TestService : ITestService
         var incomingTest = _mapper.Map<Test>(dto);
 
         // 2. Identify if this is a Global Test or Lesson Test
-        bool isGlobal = contentId == null || contentId == Guid.Empty;
+        bool isGlobal = !contentId.HasValue || contentId == Guid.Empty;
 
         incomingTest.IsGlobal = isGlobal;
         incomingTest.LessonContentId = isGlobal ? null : contentId;
@@ -139,5 +139,17 @@ public class TestService : ITestService
         }
 
         return new TestNameCheckDto { Exists = false };
+    }
+
+    // Inside your TestService or wherever you fetch the test for the form
+    public async Task<TestDto> GetTestForEditAsync(Guid testId)
+    {
+        var test = await _testRepo.GetTestByIdWithAnswersAsync(testId);
+        var dto = _mapper.Map<TestDto>(test);
+
+        // Call the repo instead of the context
+        dto.HasAttempts = await _testRepo.HasAttemptsAsync(testId);
+
+        return dto;
     }
 }

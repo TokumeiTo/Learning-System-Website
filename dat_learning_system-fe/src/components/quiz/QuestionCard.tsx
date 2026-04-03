@@ -35,8 +35,6 @@ const SmoothTextField = ({ value, label, onSave, placeholder, endAdornment }: an
 
 const QuestionCard = ({ question, index, onUpdate, onRemove }: any) => {
 
-  console.log(question);
-
   const fastUpdate = (fields: any) => onUpdate({ ...question, ...fields });
 
   const handleMainFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

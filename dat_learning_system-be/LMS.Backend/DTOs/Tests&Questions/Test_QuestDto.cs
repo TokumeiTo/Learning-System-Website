@@ -11,6 +11,8 @@ public class TestDto
     public string? JlptLevel { get; set; }
     public string? Category { get; set; }
     public bool IsGlobal { get; set; }
+    public int Version {get; set;}
+    public bool HasAttempts {get; set;}
 }
 
 public class QuestionDto

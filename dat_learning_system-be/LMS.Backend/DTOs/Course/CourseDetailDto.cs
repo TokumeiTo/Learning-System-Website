@@ -6,6 +6,7 @@ public class CourseDetailDto
 {
     public Guid Id { get; set; }
     public string Category { get; set; } = string.Empty;
+    public bool IsMandatory { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Thumbnail { get; set; } = string.Empty;
