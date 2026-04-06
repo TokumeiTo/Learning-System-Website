@@ -26,12 +26,13 @@ export default function QuizManagementPage() {
     // Filters
     const [level, setLevel] = useState("N5");
     const [category, setCategory] = useState("Vocabulary");
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         const load = async () => {
             try {
                 setLoading(true);
-                const data = await fetchPracticeQuizzes(level, category);
+                const data = await fetchPracticeQuizzes(level, category, searchTerm);
                 setQuizzes(data);
             } catch (error) {
                 console.error("Failed to load quizzes", error);
@@ -39,8 +40,11 @@ export default function QuizManagementPage() {
                 setLoading(false);
             }
         };
-        load();
-    }, [level, category]); // Re-fetch whenever filters change
+
+        const handler = setTimeout(load, 300);
+        return () => clearTimeout(handler);
+
+    }, [level, category, searchTerm]);
 
     const handleViewHistory = async (title: string, isGlobal: boolean) => {
         try {
@@ -79,7 +83,17 @@ export default function QuizManagementPage() {
 
                 {/* Filters Row */}
                 <Paper sx={{ p: 2, mb: 3, borderRadius: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <Search color="action" />
+                    <TextField
+                        size="small"
+                        placeholder="Search by quiz title..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        sx={{ flexGrow: 1 }} // Takes up remaining space
+                        InputProps={{
+                            startAdornment: <Search color="action" sx={{ mr: 1 }} />,
+                        }}
+                    />
+                    
                     <TextField
                         select
                         size="small"
@@ -161,7 +175,7 @@ export default function QuizManagementPage() {
                     </Table>
                 </TableContainer>
             </Box>
-            
+
             {/* HISTORY VERSION MODAL */}
             <Modal open={historyOpen} onClose={() => setHistoryOpen(false)}>
                 <Box sx={{
@@ -182,8 +196,9 @@ export default function QuizManagementPage() {
                                 <ListItem
                                     key={v.id}
                                     divider={index !== selectedHistory.length - 1}
+                                    sx={{ display: 'flex', justifyContent: 'space-between' }}
                                     secondaryAction={
-                                         <Button
+                                        <Button
                                             size="small"
                                             variant="outlined"
                                             onClick={() => navigate(`/admin/quiz/edit/${v.id}`)}
@@ -195,7 +210,7 @@ export default function QuizManagementPage() {
                                     <ListItemText
                                         primary={`Version ${v.version || '?'}`}
                                     />
-                                    {index === 0 && <Chip label="Active" color="success" size="small" sx={{ mr: 2 }} />}
+                                    {index === 0 && <Chip label="Active" color="success" size="small" sx={{ mr: '100px' }} />}
                                 </ListItem>
                             ))}
                         </List>

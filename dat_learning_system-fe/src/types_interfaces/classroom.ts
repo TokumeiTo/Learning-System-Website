@@ -59,3 +59,13 @@ export interface UpdateLessonRequest {
     title: string;
     time: string;  // Defaults to "-:--" or "5:00"
 }
+
+export interface CourseStudent {
+    userId: string;
+    fullName: string;
+    companyCode: string;
+    email: string;
+    progressPercentage: number;
+    isCompleted: boolean;
+    approvedAt: string | null;
+}

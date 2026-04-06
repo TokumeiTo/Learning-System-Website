@@ -2,6 +2,7 @@ import api from "../hooks/useApi";
 import type {
     BulkSaveContentsRequest,
     ClassroomView,
+    CourseStudent,
     CreateLessonRequest,
     Lesson,
     ReOrderLessonsRequest,
@@ -87,4 +88,9 @@ export const bulkSaveLessonContents = async (
             }
         }
     });
+};
+
+export const fetchEnrolledStudents = async (courseId: string): Promise<CourseStudent[]> => {
+    const res = await api.get(`/api/classroom/${courseId}/students`);
+    return res.data;
 };

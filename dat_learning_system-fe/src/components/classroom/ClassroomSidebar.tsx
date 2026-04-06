@@ -1,8 +1,10 @@
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { Paper, Tabs, Tab, Box, Typography, Fade } from '@mui/material';
-import type { ClassroomView } from '../../types_interfaces/classroom';
+import type { ClassroomView, CourseStudent } from '../../types_interfaces/classroom';
 import CurriculumTab from './CurriculumTab';
 import ClassworkTab from './ClassworkTab';
+import { fetchEnrolledStudents } from '../../api/classroom.api';
+import StudentListTab from './StudentListTab';
 
 interface Props {
   data: ClassroomView;
@@ -20,16 +22,29 @@ const ClassroomSidebar = memo(({
   isEditMode
 }: Props) => {
   const [activeTab, setActiveTab] = useState(0);
+  const [students, setStudents] = useState<CourseStudent[]>([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
 
-  /**
-   * Guarded navigation:
-   * Prevents students from clicking into locked lessons, 
-   * while allowing Admins full access during Edit Mode.
-   */
+  useEffect(() => {
+    if (activeTab === 2 && data.courseId) {
+      const loadStudents = async () => {
+        setLoadingStudents(true);
+        try {
+          const studentList = await fetchEnrolledStudents(data.courseId);
+          setStudents(studentList);
+        } catch (error) {
+          console.error("Failed to fetch students", error);
+        } finally {
+          setLoadingStudents(false);
+        }
+      };
+      loadStudents();
+    }
+  }, [activeTab, data.courseId]);
+
   const handleLessonChange = useCallback((lessonId: string) => {
     if (lessonId === currentLessonId) return;
 
-    // Find the lesson in our current data to check its status
     const targetLesson = data.lessons.find(l => l.id === lessonId);
 
     if (!targetLesson) return;
@@ -107,21 +122,11 @@ const ClassroomSidebar = memo(({
           </Fade>
         )}
 
-        {/* Tab Panel: Chat */}
+        {/* Tab Panel: Students' Review */}
         {activeTab === 2 && (
           <Fade in={activeTab === 2}>
-            <Box
-              sx={{
-                p: 4,
-                textAlign: 'center',
-                bgcolor: 'rgba(255,255,255,0.02)',
-                borderRadius: 3,
-                border: '1px dashed rgba(255,255,255,0.1)'
-              }}
-            >
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 500 }}>
-                Student tab is disable for now.
-              </Typography>
+            <Box sx={{ p: 1 }}>
+              <StudentListTab courseId={data.courseId} />
             </Box>
           </Fade>
         )}

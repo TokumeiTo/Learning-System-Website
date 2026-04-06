@@ -3,7 +3,6 @@ import CastForEducationIcon from '@mui/icons-material/CastForEducation';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import StyleIcon from '@mui/icons-material/Style';
 import QuizIcon from '@mui/icons-material/Quiz';
-import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import BookIcon from '@mui/icons-material/Book';
 import TranslateIcon from '@mui/icons-material/Translate';
@@ -13,11 +12,12 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import AddCardIcon from '@mui/icons-material/AddCard';
 import DvrIcon from '@mui/icons-material/Dvr';
 import CampaignIcon from '@mui/icons-material/Campaign';
+import CalendarMonthSharpIcon from '@mui/icons-material/CalendarMonthSharp';
 
 export const LEARNING_NAV = [
     { label: "Roadmap", path: "/roadmaps", icon: <FollowTheSignsIcon color="primary" /> },
     { label: "Courses", path: "/courses", icon: <CastForEducationIcon color="primary" /> },
-    { label: "Schedule", path: "/schedule", icon: <EditCalendarIcon color="primary" /> },
+    { label: "Schedule", path: "/schedule", icon: <CalendarMonthSharpIcon color="primary" /> },
     { label: "Flashcards", path: "/flashcards", icon: <StyleIcon color="primary" /> },
     { label: "Quizzes & Practice", path: "/quiz", icon: <QuizIcon color="primary" /> },
     // { label: "Mock test", path: "/mock_test", icon: <HistoryEduIcon color="primary" />, },
@@ -31,6 +31,7 @@ export const MANAGEMENT_NAV = [
     { label: "User Management", path: "/admin/user_management", icon: <PeopleIcon color="secondary" /> },
     { label: "Library Management", path: "/admin/library_management", icon: <LocalLibraryIcon color="secondary" /> },
     { label: "Quiz Management", path: "/admin/quizzes", icon: <QuizIcon color="secondary" /> },
+    { label: "Schedule Management", path: "/admin/schedule_manage", icon: <EditCalendarIcon color="secondary" /> },
     { label: "Announcements", path: "/admin/announcements", icon: <CampaignIcon color="secondary" /> },
     { label: "Org Structure", path: "/admin/org_units", icon: <AccountTreeIcon color="secondary" /> },
     { label: "Enrollments", path: "/admin/enrollments", icon: <AddCardIcon color="secondary" /> },

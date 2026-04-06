@@ -9,7 +9,7 @@ import TranslationPage from "../pages/translation/TranslationPage";
 
 import QuizSetupPage from "../pages/quiz/QuizSetupPage";
 
-import SchedulePage from "../pages/schedules/SchedulePage";
+import LMSSchedulePage from "../pages/schedule/SchedulePage";
 import LessonPage from "../pages/lessons/LessonPage";
 
 /* System pages */
@@ -40,6 +40,7 @@ import QuizFormPage from "../pages/quiz/QuizFormPage";
 import QuizSelectionPage from "../pages/quiz/QuizSelectionPage";
 import QuizActivePage from "../pages/quiz/QuizActivePage";
 import QuizManagementPage from "../pages/quiz/QuizManagementPage";
+import AdminScheduleDashboard from "../pages/schedule/AdminScheduleDashboard";
 
 export const AppRouter = () => {
   const { user } = useAuth();
@@ -100,7 +101,7 @@ export const AppRouter = () => {
           path="/schedule"
           element={
             <ProtectedRoute>
-              <SchedulePage />
+              <LMSSchedulePage />
             </ProtectedRoute>
           }
         />
@@ -268,6 +269,15 @@ export const AppRouter = () => {
           element={
             <ProtectedRoute allowedPositions={["Admin", "SuperAdmin", "ProjectManager", "DivHead", "DepHead", "SecHead"]}>
               <UserManagementPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin/schedule_manage"
+          element={
+            <ProtectedRoute allowedPositions={["Admin", "SuperAdmin"]}>
+              <AdminScheduleDashboard />
             </ProtectedRoute>
           }
         />
