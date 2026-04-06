@@ -143,7 +143,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Resources, opt => opt.Ignore());
 
         // --- PROGRESS MAPPING ---
-        CreateMap<UserLessonProgress, LessonProgressDto>();
+        CreateMap<UserLessonProgress, LessonProgressDto>()
+            .ForMember(dest => dest.LessonTitle, opt => opt.MapFrom(src => src.Lesson.Title));
         CreateMap<UpsertLessonContentDto, LessonContent>()
             .ForMember(dest => dest.Tests, opt => opt.Ignore())
             // If Body is null (which it will be for a Test), ensure we don't crash

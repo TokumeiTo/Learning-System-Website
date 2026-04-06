@@ -40,7 +40,7 @@ public class TestAttemptService : ITestAttemptService
         if (testInfo == null) return new List<QuizResultDto>();
 
         var attempts = await _context.TestAttempts
-            .Include(a=>a.Test)
+            .Include(a => a.Test)
             .Where(a => a.UserId == userId &&
                         a.Test.Title == testInfo.Title &&
                         a.Test.IsGlobal == testInfo.IsGlobal)
@@ -63,7 +63,7 @@ public class TestAttemptService : ITestAttemptService
         {
             LessonId = lessonId,
             TotalAttempts = attempts.Sum(a => a.Attempts), // Total clicks
-            PassCount = attempts.Where(a => a.IsPassed).Select(a=>a.UserId).Distinct().Count(),   // Unique students who passed
+            PassCount = attempts.Where(a => a.IsPassed).Select(a => a.UserId).Distinct().Count(),   // Unique students who passed
             AveragePercentage = (double)attempts.Average(a => (decimal)a.Percentage)
         };
     }
@@ -84,5 +84,21 @@ public class TestAttemptService : ITestAttemptService
                     .Max(p => p.LastAccessedAt)
             })
             .ToListAsync();
+    }
+
+    public async Task<List<QuizResultDto>> GetAttemptsByCourseAsync(string targetUserId, Guid courseId)
+    {
+        var attempts = await _context.TestAttempts
+            .Include(a => a.Test)
+            // 1. Filter by the specific student
+            // 2. Only include attempts that have a LessonId (Course related)
+            // 3. Ensure that Lesson belongs to the specific Course
+            .Where(a => a.UserId == targetUserId &&
+                        a.LessonId != null &&
+                        _context.Lessons.Any(l => l.Id == a.LessonId && l.CourseId == courseId))
+            .OrderByDescending(a => a.AttemptedAt)
+            .ToListAsync();
+
+        return _mapper.Map<List<QuizResultDto>>(attempts);
     }
 }

@@ -60,4 +60,10 @@ public class UserProgressService : IUserProgressService
     {
         await _repo.MarkAsCompleteAsync(userId, lessonId);
     }
+
+    public async Task<List<LessonProgressDto>> GetCourseProgressForUserAsync(string userId, Guid courseId)
+    {
+        var progressList = await _repo.GetUserProgressForCourseAsync(userId, courseId);
+        return _mapper.Map<List<LessonProgressDto>>(progressList);
+    }
 }

@@ -50,4 +50,15 @@ public class LessonProgressController : ControllerBase
 
         return Ok(progress);
     }
+
+    [HttpGet("course/{courseId}/user/{userId}")]
+    // Optionally: [Authorize(Roles = "Admin,SuperAdmin")] 
+    public async Task<IActionResult> GetStudentCourseProgress(Guid courseId, string userId)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (currentUserId != userId && !User.IsInRole("Admin")) return Forbid();
+
+        var progress = await _progressService.GetCourseProgressForUserAsync(userId, courseId);
+        return Ok(progress);
+    }
 }

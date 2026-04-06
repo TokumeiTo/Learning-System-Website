@@ -6,6 +6,7 @@ public interface ITestAttemptService
     // For the Student: See their own history
     Task<List<QuizResultDto>> GetMyAttemptsByLessonAsync(string userId, Guid lessonId);
     Task<List<QuizResultDto>> GetMyAttemptsByTestAsync(string userId, Guid testId);
+    Task<List<QuizResultDto>> GetAttemptsByCourseAsync(string targetUserId, Guid courseId);
     
     // For the Admin: KPI Reporting
     Task<AdminLessonStatsDto> GetLessonStatsForAdminAsync(Guid lessonId);

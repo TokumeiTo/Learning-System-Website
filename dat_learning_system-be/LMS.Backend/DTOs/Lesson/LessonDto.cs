@@ -33,7 +33,8 @@ public record LessonProgressDto(
     Guid LessonId,
     int TimeSpentSeconds,
     bool IsCompleted,
-    DateTime LastAccessedAt
+    DateTime LastAccessedAt,
+    string LessonTitle
 );
 
 public class ReorderLessonsDto

@@ -74,7 +74,7 @@ public class TestController : ControllerBase
 
         return Ok(testDto);
     }
-    
+
     // --- KPI & HISTORY ENDPOINTS ---
 
     [HttpGet("my-history")]
@@ -116,8 +116,8 @@ public class TestController : ControllerBase
     [HttpGet("practice")]
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<TestDto>>> GetPracticeQuizzes(
-        [FromQuery] string? level, 
-        [FromQuery] string? category, 
+        [FromQuery] string? level,
+        [FromQuery] string? category,
         [FromQuery] string? title
     )
     {
@@ -152,5 +152,13 @@ public class TestController : ControllerBase
     {
         var versions = await _testRepo.GetTestVersionsAsync(title, isGlobal);
         return Ok(_mapper.Map<List<TestDto>>(versions));
+    }
+
+    [HttpGet("admin/course/{courseId}/student/{studentId}/history")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
+    public async Task<ActionResult<List<QuizResultDto>>> GetStudentCourseHistory(Guid courseId, string studentId)
+    {
+        var history = await _attemptService.GetAttemptsByCourseAsync(studentId, courseId);
+        return Ok(history);
     }
 }
