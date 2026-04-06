@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILibraryRepository, LibraryRepository>();
         services.AddScoped<IRoadmapRepository, RoadmapRepository>();
         services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
+        services.AddScoped<IScheduleRepository, ScheduleRepository>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
@@ -55,6 +56,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILibraryService, LibraryService>();
         services.AddScoped<IRoadmapService, RoadmapService>();
         services.AddScoped<IAnnouncementService, AnnouncementService >();
+        services.AddScoped<IScheduleService, ScheduleService >();
 
         // Helpers
         services.AddSingleton<JwtHelper>();

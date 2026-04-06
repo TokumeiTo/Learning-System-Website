@@ -115,9 +115,13 @@ public class TestController : ControllerBase
     // Global Fetch
     [HttpGet("practice")]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<TestDto>>> GetPracticeQuizzes([FromQuery] string level, [FromQuery] string category)
+    public async Task<ActionResult<IEnumerable<TestDto>>> GetPracticeQuizzes(
+        [FromQuery] string? level, 
+        [FromQuery] string? category, 
+        [FromQuery] string? title
+    )
     {
-        var tests = await _testRepo.GetGlobalQuizzesAsync(level, category);
+        var tests = await _testRepo.GetGlobalQuizzesAsync(level, category, title);
         return Ok(_mapper.Map<IEnumerable<TestDto>>(tests));
     }
 

@@ -48,6 +48,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     // --- ROADMAP TABLES ---
     public DbSet<RoadMap> RoadMaps { get; set; }
     public DbSet<RoadmapStep> RoadMapSteps { get; set; }
+    // --- SCHEDULE TABLES ---
+    public DbSet<SchedulePlan> SchedulePlans { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

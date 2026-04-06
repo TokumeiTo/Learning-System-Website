@@ -60,7 +60,7 @@ public class ClassroomController(ILessonService lessonService) : ControllerBase
 
         return NoContent();
     }
-    
+
     [HttpPut("lessons/reorder")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> ReorderLessons([FromBody] ReorderLessonsDto dto)
@@ -84,5 +84,13 @@ public class ClassroomController(ILessonService lessonService) : ControllerBase
     {
         var deleted = await lessonService.DeleteLessonAsync(id);
         return deleted ? NoContent() : NotFound();
+    }
+
+    [HttpGet("{courseId}/students")]
+    [Authorize(Roles = "Admin")] // Only Admins should see the full student list
+    public async Task<ActionResult<IEnumerable<CourseStudentDto>>> GetEnrolledStudents(Guid courseId)
+    {
+        var students = await lessonService.GetEnrolledStudentsAsync(courseId);
+        return Ok(students);
     }
 }

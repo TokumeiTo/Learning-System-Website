@@ -50,19 +50,19 @@ public class UserProgressRepository : IUserProgressRepository
     public async Task MarkAsCompleteAsync(string userId, Guid lessonId)
     {
         var progress = await GetProgressAsync(userId, lessonId);
-        
+
         if (progress == null)
         {
             // If they passed the quiz before the timer-sync happened, create the record
-            _context.UserLessonProgresses.Add(new UserLessonProgress
+            progress = new UserLessonProgress
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 LessonId = lessonId,
                 IsCompleted = true,
-                TimeSpentSeconds = 0,
                 LastAccessedAt = DateTime.UtcNow
-            });
+            };
+            _context.UserLessonProgresses.Add(progress);
         }
         else
         {
@@ -71,6 +71,37 @@ public class UserProgressRepository : IUserProgressRepository
         }
 
         await _context.SaveChangesAsync();
+
+        var courseId = await _context.Lessons
+            .Where(l => l.Id == lessonId)
+            .Select(l => l.CourseId)
+            .FirstOrDefaultAsync();
+
+        if (courseId != Guid.Empty)
+        {
+            // 4. Calculate New Progress
+            var totalLessons = await _context.Lessons.CountAsync(l => l.CourseId == courseId);
+
+            var completedLessons = await _context.UserLessonProgresses
+                .CountAsync(p => p.UserId == userId && p.IsCompleted &&
+                            _context.Lessons.Any(l => l.Id == p.LessonId && l.CourseId == courseId));
+
+            int percentage = totalLessons > 0
+                ? (int)Math.Round((double)completedLessons / totalLessons * 100)
+                : 0;
+
+            // 5. Update Enrollment
+            var enrollment = await _context.Enrollments
+                .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == courseId);
+
+            if (enrollment != null)
+            {
+                enrollment.ProgressPercentage = percentage;
+                enrollment.IsCompleted = percentage >= 100;
+            }
+
+            await _context.SaveChangesAsync();
+        }
     }
 
     public async Task<List<UserLessonProgress>> GetUserProgressForCourseAsync(string userId, Guid courseId)

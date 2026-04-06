@@ -3,8 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Backend.Services.Background;
 
-public class AnnouncementCleanupWorker(IServiceScopeFactory scopeFactory, ILogger<AnnouncementCleanupWorker> logger) 
-    : BackgroundService
+public class AnnouncementCleanupWorker(IServiceScopeFactory scopeFactory, ILogger<AnnouncementCleanupWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

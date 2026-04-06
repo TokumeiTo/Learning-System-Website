@@ -1,5 +1,4 @@
 using LMS.Backend.Data.Entities;
-using LMS.Backend.Repo.Interface;
 
 namespace LMS.Backend.Repo.Interface;
 

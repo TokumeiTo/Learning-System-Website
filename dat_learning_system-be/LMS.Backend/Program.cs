@@ -19,6 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 /////////////////////Builder Created/////////////////////////////////
 
@@ -41,6 +42,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<GrammarValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<EBookRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<SubmitEnrollmentValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<TestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<SchedulePlanValidator>();
 
 builder.Services.AddSignalR();
 
@@ -125,6 +127,8 @@ builder.Services.AddApplicationServices();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddHostedService<NotificationCleanupWorker>();
 builder.Services.AddHostedService<AnnouncementCleanupWorker>();
+builder.Services.AddHostedService<ScheduleCleanupWorker>();
+
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 420_000_000; // 400 MB

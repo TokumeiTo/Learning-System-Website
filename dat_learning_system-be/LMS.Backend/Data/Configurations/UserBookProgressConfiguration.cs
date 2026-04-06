@@ -2,7 +2,7 @@ using LMS.Backend.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace LMS.Bakcend.Data.Configurations;
+namespace LMS.Backend.Data.Configurations;
 
 public class UserBookProgressConfiguration : IEntityTypeConfiguration<UserBookProgress>
 {

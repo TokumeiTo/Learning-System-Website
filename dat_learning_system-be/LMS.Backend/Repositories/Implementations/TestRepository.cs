@@ -23,7 +23,7 @@ public class TestRepository : ITestRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == testId);
     }
-    public async Task<IEnumerable<Test>> GetGlobalQuizzesAsync(string? level, string? category)
+    public async Task<IEnumerable<Test>> GetGlobalQuizzesAsync(string? level, string? category, string? title)
     {
         var query = _context.Tests
             .Include(t => t.Questions)
@@ -34,6 +34,9 @@ public class TestRepository : ITestRepository
 
         if (!string.IsNullOrEmpty(category))
             query = query.Where(t => t.Category == category);
+
+        if (!string.IsNullOrEmpty(title))
+            query = query.Where(t => t.Title.Contains(title));
 
         return await query.ToListAsync();
     }

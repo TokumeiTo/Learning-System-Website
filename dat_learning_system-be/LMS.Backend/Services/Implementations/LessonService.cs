@@ -1,14 +1,17 @@
 using AutoMapper;
+using LMS.Backend.Data.Dbcontext;
 using LMS.Backend.Data.Entities;
 using LMS.Backend.DTOs.Classroom;
 using LMS.Backend.DTOs.Lesson;
 using LMS.Backend.Repo.Interface;
 using LMS.Backend.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Backend.Services.Implement;
 
 public class LessonService(
     ILessonRepository repo,
+    AppDbContext context,
     ITestService testService,
     IUserProgressRepository progressRepo,
     IFileService fileService,
@@ -153,6 +156,26 @@ public class LessonService(
 
         await repo.DeleteLessonAsync(id);
         return true;
+    }
+
+    public async Task<IEnumerable<CourseStudentDto>> GetEnrolledStudentsAsync(Guid courseId)
+    {
+        return await context.Enrollments
+            .Where(e => e.CourseId == courseId && e.Status == "Approved")
+            .Join(context.Users,
+                enrollment => enrollment.UserId,
+                user => user.Id,
+                (enrollment, user) => new CourseStudentDto
+                {
+                    UserId = user.Id,
+                    FullName = user.FullName,
+                    CompanyCode = user.CompanyCode,
+                    Email = user.Email ?? "",
+                    ProgressPercentage = (int)enrollment.ProgressPercentage,
+                    IsCompleted = enrollment.IsCompleted,
+                    ApprovedAt = enrollment.ApprovedAt
+                })
+            .ToListAsync();
     }
 
     //helpers

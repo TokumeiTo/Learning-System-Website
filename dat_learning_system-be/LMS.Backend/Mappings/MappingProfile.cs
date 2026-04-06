@@ -16,6 +16,7 @@ using LMS.Backend.Data;
 using LMS.Backend.DTOs.Classwork;
 using LMS.Backend.DTOs.Library;
 using LMS.Backend.DTOs.RoadMap;
+using LMS.Backend.DTOs.Schedule;
 
 namespace LMS.Backend.Helpers;
 
@@ -164,7 +165,7 @@ public class MappingProfile : Profile
         // Entity -> DTO (For Reading)
         CreateMap<Test, TestDto>()
             .ForMember(dest => dest.IsGlobal, opt => opt.MapFrom(src => src.LessonContent == null))
-            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions.OrderBy(q=>q.SortOrder)));
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions.OrderBy(q => q.SortOrder)));
 
         CreateMap<Question, QuestionDto>()
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
@@ -310,5 +311,17 @@ public class MappingProfile : Profile
 
         CreateMap<RoadmapStep, RoadmapStepDto>();
         CreateMap<RoadmapRequestDto, RoadMap>();
+
+        // --- SCHEDULE MAPPING ---
+        CreateMap<SchedulePlan, SchedulePlanDto>()
+            .ForMember(dest => dest.TargetPositions, opt => opt.MapFrom(src =>
+                string.IsNullOrEmpty(src.TargetPositions)
+                ? new List<Position>()
+                : src.TargetPositions.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(p => Enum.Parse<Position>(p)).ToList()))
+            .ForMember(dest => dest.TargetUserCodes, opt => opt.MapFrom(src =>
+                string.IsNullOrEmpty(src.TargetUserCodes)
+                ? new List<string>()
+                : src.TargetUserCodes.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()));
     }
 }

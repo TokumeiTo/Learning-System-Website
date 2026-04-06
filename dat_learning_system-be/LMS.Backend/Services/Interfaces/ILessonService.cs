@@ -11,4 +11,5 @@ public interface ILessonService
     Task BulkSaveContentsAsync(SaveLessonContentsDto dto, List<IFormFile> files);
     Task<bool> DeleteLessonAsync(Guid id);
     Task<ClassroomLessonDto> UpdateLessonAsync(UpdateLessonDto dto);
+    Task<IEnumerable<CourseStudentDto>> GetEnrolledStudentsAsync(Guid courseId);
 }

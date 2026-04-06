@@ -10,7 +10,7 @@ public interface ITestRepository
     // For Student: Get all correct OptionIds for a lesson to grade it
     // Using a List<Guid> is memory efficient for grading
     Task<List<Guid>> GetCorrectOptionIdsForLessonAsync(Guid lessonId);
-    Task<IEnumerable<Test>> GetGlobalQuizzesAsync(string? level, string? category);
+    Task<IEnumerable<Test>> GetGlobalQuizzesAsync(string? level, string? category, string? title);
     Task<object> GetCategoryProgressAsync(string userId, string level);
 
     // Track attempt
