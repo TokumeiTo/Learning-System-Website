@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Stack, CircularProgress, Button, Paper } from '@mui/material';
 import { Edit, Visibility } from '@mui/icons-material';
@@ -12,6 +12,7 @@ import LessonContentSection from '../../components/classroom/LessonContentSectio
 import LessonContentViewer from '../../components/classroom/LessonContentViewer';
 import ClassroomSidebar from '../../components/classroom/ClassroomSidebar';
 import AppLoader from '../../components/feedback/AppLoader';
+import StudentDetailViewer from '../../components/classroom/StudentDetailViewer';
 
 const ClassroomPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +28,14 @@ const ClassroomPage = () => {
   const [currentLessonId, setCurrentLessonId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLessonLoading, setIsLessonLoading] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+  const lessonMap = useMemo(() => {
+    const map: { [id: string]: string } = {};
+    data?.lessons.forEach(lesson => {
+      map[lesson.id] = lesson.title;
+    });
+    return map;
+  }, [data?.lessons]);
 
   /**
    * Derived State: Always find the current lesson from the fresh data array.
@@ -90,6 +99,7 @@ const ClassroomPage = () => {
   const handleLessonSelection = (lessonId: string) => {
     if (lessonId === currentLessonId) return;
 
+    setSelectedStudentId(null);
     setIsLessonLoading(true);
     setCurrentLessonId(lessonId);
 
@@ -183,23 +193,36 @@ const ClassroomPage = () => {
               p: 3,
               bgcolor: (isEditMode && canEdit) ? 'transparent' : '#1e293b',
               borderRadius: 3,
+              minHeight: '70vh',
               border: (isEditMode && canEdit) ? 'none' : '1px solid rgba(255,255,255,0.05)'
             }}
           >
-            {(isEditMode && canEdit) ? (
-              <LessonContentSection
-                currentLesson={currentLesson}
-                onSaveSuccess={() => loadClassroom(true)} // Trigger background refresh to get new IDs
-              />
+            {selectedStudentId ? (
+              /* --- SHOW STUDENT PROGRESS DETAIL --- */
+              <Box>
+                <Typography variant="h6">Student Progress Detail</Typography>
+                <StudentDetailViewer
+                  userId={selectedStudentId}
+                  courseId={id!}
+                  lessonMap={lessonMap}
+                />
+              </Box>
             ) : (
-              <LessonContentViewer
-                contents={currentLesson?.contents || []}
-                lessonId={currentLesson?.id}
-                isDone={currentLesson?.isDone}
-                lastScore={currentLesson?.lastScore}
-                onComplete={handleLessonComplete}
-                isLoading={isLessonLoading}
-              />
+              (isEditMode && canEdit) ? (
+                <LessonContentSection
+                  currentLesson={currentLesson}
+                  onSaveSuccess={() => loadClassroom(true)} // Trigger background refresh to get new IDs
+                />
+              ) : (
+                <LessonContentViewer
+                  contents={currentLesson?.contents || []}
+                  lessonId={currentLesson?.id}
+                  isDone={currentLesson?.isDone}
+                  lastScore={currentLesson?.lastScore}
+                  onComplete={handleLessonComplete}
+                  isLoading={isLessonLoading}
+                />
+              )
             )}
           </Paper>
         </Box>
@@ -212,6 +235,7 @@ const ClassroomPage = () => {
             currentLessonId={currentLessonId}
             setCurrentLessonId={handleLessonSelection}
             isEditMode={isEditMode && canEdit}
+            onStudentSelect={(userId) => setSelectedStudentId(userId)}
           />
         </Box>
       </Box>

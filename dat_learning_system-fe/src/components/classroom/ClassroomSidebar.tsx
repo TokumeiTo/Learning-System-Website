@@ -12,6 +12,7 @@ interface Props {
   currentLessonId: string | null;
   setCurrentLessonId: (id: string) => void;
   isEditMode: boolean;
+  onStudentSelect: (userId: string) => void;
 }
 
 const ClassroomSidebar = memo(({
@@ -19,28 +20,10 @@ const ClassroomSidebar = memo(({
   setData,
   currentLessonId,
   setCurrentLessonId,
-  isEditMode
+  isEditMode,
+  onStudentSelect
 }: Props) => {
   const [activeTab, setActiveTab] = useState(0);
-  const [students, setStudents] = useState<CourseStudent[]>([]);
-  const [loadingStudents, setLoadingStudents] = useState(false);
-
-  useEffect(() => {
-    if (activeTab === 2 && data.courseId) {
-      const loadStudents = async () => {
-        setLoadingStudents(true);
-        try {
-          const studentList = await fetchEnrolledStudents(data.courseId);
-          setStudents(studentList);
-        } catch (error) {
-          console.error("Failed to fetch students", error);
-        } finally {
-          setLoadingStudents(false);
-        }
-      };
-      loadStudents();
-    }
-  }, [activeTab, data.courseId]);
 
   const handleLessonChange = useCallback((lessonId: string) => {
     if (lessonId === currentLessonId) return;
@@ -126,7 +109,7 @@ const ClassroomSidebar = memo(({
         {activeTab === 2 && (
           <Fade in={activeTab === 2}>
             <Box sx={{ p: 1 }}>
-              <StudentListTab courseId={data.courseId} />
+              <StudentListTab courseId={data.courseId} onSelect={onStudentSelect} />
             </Box>
           </Fade>
         )}

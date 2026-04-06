@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
     Box, Typography, List, ListItem, ListItemAvatar,
     ListItemText, Avatar, Chip, LinearProgress,
-    IconButton, Tooltip, CircularProgress, Button
+    IconButton, Tooltip, CircularProgress, Button, ListItemButton
 } from '@mui/material';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import PersonIcon from '@mui/icons-material/Person';
@@ -11,9 +11,10 @@ import type { CourseStudent } from '../../types_interfaces/classroom';
 
 interface Props {
     courseId: string;
+    onSelect: (id: string) => void
 }
 
-const StudentListTab = ({ courseId }: Props) => {
+const StudentListTab = ({ courseId, onSelect }: Props) => {
     const [students, setStudents] = useState<CourseStudent[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -48,11 +49,13 @@ const StudentListTab = ({ courseId }: Props) => {
             {students.map((student) => (
                 <ListItem
                     key={student.userId}
+                    disablePadding // Important: removes default padding to let the button fill the space
                     sx={{
                         mb: 1,
                         borderRadius: 2,
                         bgcolor: 'rgba(255,255,255,0.03)',
                         border: '1px solid rgba(255,255,255,0.05)',
+                        overflow: 'hidden', // Ensures the button ripple stays inside the border radius
                         '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' }
                     }}
                     secondaryAction={
@@ -62,7 +65,10 @@ const StudentListTab = ({ courseId }: Props) => {
                                     edge="end"
                                     color="primary"
                                     disabled={!student.isCompleted}
-                                    onClick={() => console.log("Generating cert for:", student.userId)}
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevents onSelect from firing when clicking the icon
+                                        console.log("Generating cert for:", student.userId);
+                                    }}
                                 >
                                     <CardMembershipIcon />
                                 </IconButton>
@@ -70,52 +76,63 @@ const StudentListTab = ({ courseId }: Props) => {
                         </Tooltip>
                     }
                 >
-                    <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: '#334155' }}>
-                            <PersonIcon />
-                        </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                        primary={
-                            <Box sx={{  gap: 1 }}>
-                                <Box sx={{display: 'flex',flexDirection:'row', alignItems: 'center', gap:2}}>
-                                    <Typography variant="subtitle2" sx={{ color: '#f8fafc' }}>
-                                        {student.fullName}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>
-                                        ({student.companyCode})
-                                    </Typography>
-                                </Box>
-                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>
-                                    {student.email}
-                                </Typography>
-                            </Box>
-                        }
-                        secondary={
-                            <Box sx={{ mt: 0.5 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                                        Progress
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ color: student.isCompleted ? '#4ade80' : '#818cf8' }}>
-                                        {student.progressPercentage}%
+                    <ListItemButton
+                        onClick={() => onSelect(student.userId)}
+                        sx={{ px: 2, py: 1 }} // Move your internal spacing here
+                    >
+                        <ListItemAvatar>
+                            <Avatar sx={{ bgcolor: '#334155' }}>
+                                <PersonIcon />
+                            </Avatar>
+                        </ListItemAvatar>
+
+                        <ListItemText
+                            // Tell the primary container to be a div
+                            primaryTypographyProps={{ component: 'div' }}
+                            primary={
+                                <Box>
+                                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                                        {/* Variant subtitle2 is usually a <h6> or <p>, changing to div makes it safe */}
+                                        <Typography variant="subtitle2" component="div" sx={{ color: '#f8fafc' }}>
+                                            {student.fullName}
+                                        </Typography>
+                                        <Typography variant="caption" component="div" sx={{ color: 'rgba(255,255,255,0.3)' }}>
+                                            ({student.companyCode})
+                                        </Typography>
+                                    </Box>
+                                    <Typography variant="caption" component="div" sx={{ color: 'rgba(255,255,255,0.3)' }}>
+                                        {student.email}
                                     </Typography>
                                 </Box>
-                                <LinearProgress
-                                    variant="determinate"
-                                    value={student.progressPercentage}
-                                    sx={{
-                                        height: 4,
-                                        borderRadius: 2,
-                                        bgcolor: 'rgba(255,255,255,0.1)',
-                                        '& .MuiLinearProgress-bar': {
-                                            bgcolor: student.isCompleted ? '#4ade80' : '#6366f1'
-                                        }
-                                    }}
-                                />
-                            </Box>
-                        }
-                    />
+                            }
+                            // Tell the secondary container to be a div
+                            secondaryTypographyProps={{ component: 'div' }}
+                            secondary={
+                                <Box sx={{ mt: 0.5 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                        <Typography variant="caption" component="div" sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                                            Progress
+                                        </Typography>
+                                        <Typography variant="caption" component="div" sx={{ color: student.isCompleted ? '#4ade80' : '#818cf8' }}>
+                                            {student.progressPercentage}%
+                                        </Typography>
+                                    </Box>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={student.progressPercentage}
+                                        sx={{
+                                            height: 4,
+                                            borderRadius: 2,
+                                            bgcolor: 'rgba(255,255,255,0.1)',
+                                            '& .MuiLinearProgress-bar': {
+                                                bgcolor: student.isCompleted ? '#4ade80' : '#6366f1'
+                                            }
+                                        }}
+                                    />
+                                </Box>
+                            }
+                        />
+                    </ListItemButton>
                 </ListItem>
             ))}
         </List>
