@@ -88,7 +88,7 @@ const RoadmapListPage: React.FC = () => {
                     fullWidth
                     PaperProps={{ sx: { borderRadius: 5, p: 2 } }}
                 >
-                    <DialogTitle sx={{ fontWeight: 900, pb: 0 }}>Create New RoadMap</DialogTitle>
+                    <DialogTitle sx={{ fontWeight: 900 }}>Create New RoadMap</DialogTitle>
                     <DialogContent>
                         <RoadmapForm onSubmit={handleCreateSubmit} />
                     </DialogContent>

@@ -97,7 +97,7 @@ const TranslationPage: React.FC = () => {
 
     return (
         <PageLayout>
-            <Box sx={{ minHeight: 'calc(100vh - 65px)', bgcolor: 'background.default', p: { xs: 2, md: 6 } }}>
+            <Box sx={{ p: { xs: 2, md: 4 } }}>
 
                 {/* Header */}
                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>

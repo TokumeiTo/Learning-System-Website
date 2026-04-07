@@ -9,13 +9,17 @@ import { POSITIONS } from '../utils/positions';
 export const getUsersList = async (
   search?: string,
   unitId?: number | string,
-  position?: number | string
+  position?: number | string,
+  page: number = 1,
+  pageSize: number = 10
 ) => {
-  const response = await api.get<UserListItem[]>('api/User/list', {
+  const response = await api.get<{ items: UserListItem[], totalCount: number }>('api/User/list', {
     params: {
       search: search || undefined,
       unitId: unitId || undefined,
-      position: position || undefined
+      position: position || undefined,
+      page,
+      pageSize
     }
   });
   return response.data;

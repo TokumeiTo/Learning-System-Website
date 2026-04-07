@@ -166,6 +166,9 @@ const EBookFormDialog: React.FC<EBookFormProps> = ({
                                 <Typography variant="caption" noWrap sx={{ maxWidth: '100%', mt: 1, fontWeight: 600, color: 'text.default' }}>
                                     {pdfFile ? pdfFile.name : (initialData?.fileName || "No file selected")}
                                 </Typography>
+                                <Typography variant="caption" noWrap sx={{ maxWidth: '100%', color: 'text.default' }}>
+                                    {pdfFile ? pdfFile.name : (initialData?.fileUrl || "No file selected")}
+                                </Typography>
                             </Box>
                             <Button variant='outlined' component="label" size="small" color={errors.EBookFile ? 'error' : 'primary'} startIcon={<CloudUpload />} disabled={isUploading}>
                                 {pdfFile ? "Change PDF" : "Select PDF"}

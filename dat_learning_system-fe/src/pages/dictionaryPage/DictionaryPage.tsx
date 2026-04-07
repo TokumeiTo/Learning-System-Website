@@ -43,8 +43,7 @@ const DictionaryPage: React.FC = () => {
 
     return (
         <PageLayout>
-            <Box sx={{ minHeight: 'calc(100vh - 65px)', bgcolor: 'background.default', p: { xs: 2, md: 6 } }}>
-
+            <Box sx={{ px: { xs: 2, md: 4 } }}>
                 {/* Header Section */}
                 <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 4 }}>
                     <Box sx={{ bgcolor: 'primary.main', color: 'white', p: 1, borderRadius: 2 }}>

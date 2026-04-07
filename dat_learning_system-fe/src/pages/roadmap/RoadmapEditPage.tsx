@@ -24,7 +24,7 @@ const RoadmapEditPage: React.FC = () => {
             if (!id) return;
             try {
                 setLoading(true);
-                const data = await fetchRoadmapById(Number(id));
+                const data: RoadmapResponse = await fetchRoadmapById(Number(id));
                 setRoadmap(data);
             } catch (err) {
                 console.error("Failed to load roadmap details");

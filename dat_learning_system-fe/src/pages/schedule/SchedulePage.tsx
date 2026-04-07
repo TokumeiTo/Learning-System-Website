@@ -72,7 +72,7 @@ export default function LMSSchedulePage() {
                                 />
                             </Paper>
 
-                            <Box sx={{ mt: 4, p: 3, bgcolor: '#1e293b', borderRadius: 4, color: 'white' }}>
+                            <Box sx={{ mt: 4, p: 3, bgcolor: 'primary.light', borderRadius: 4, color: 'white' }}>
                                 <Typography variant="h6" fontWeight={700} gutterBottom>Status</Typography>
                                 <Typography variant="body2" sx={{ opacity: 0.8, mb: 2 }}>
                                     {activities.length > 0

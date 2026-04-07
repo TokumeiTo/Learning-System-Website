@@ -20,13 +20,27 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("list")]
-    public async Task<IActionResult> GetUsers([FromQuery] int? unitId, [FromQuery] Position? position)
+    public async Task<IActionResult> GetUsers(
+        [FromQuery] string? search,
+        [FromQuery] int? unitId,
+        [FromQuery] Position? position,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10
+    )
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(currentUserId)) return Unauthorized();
 
-        var users = await _userService.GetUsersByScopeAsync(currentUserId, unitId, position);
-        return Ok(users);
+        var result = await _userService.GetUsersByScopeAsync(
+            currentUserId,
+            unitId,
+            position,
+            search,
+            page,
+            pageSize
+        );
+
+        return Ok(result);
     }
 
     [HttpPut("{id}")]

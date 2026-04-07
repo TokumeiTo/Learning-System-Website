@@ -28,9 +28,9 @@ export interface UserUpdateFields {
   fullName: string;
   position: number;     // Changed to number for ID selection
   orgUnitId: number;    // Changed to number for ID selection
-  updatedReason: string; // Matches Backend DTO
+  updatedReason: string;
 }
 
 export interface UserDeleteFields {
-  deletedReason: string; // Matches Backend DTO
+  deletedReason: string;
 }

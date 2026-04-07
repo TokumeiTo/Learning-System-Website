@@ -46,7 +46,11 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({
             direction="row"
             spacing={1.5}
             alignItems="center"
-            sx={{ padding: '5px' }}
+            sx={{ 
+                padding: '5px', 
+                maxWidth: '100%', // Ensure the stack doesn't exceed its container
+                overflow: 'hidden' 
+            }}
         >
             <StyledBadge
                 overlap="circular"
@@ -56,23 +60,44 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({
                 <Avatar alt={name} src={avatarUrl} />
             </StyledBadge>
 
-            <Box sx={{ flexGrow: 1 }}>
-                <Typography variant="body2" fontSize={10} fontWeight={1000} color="success">
+            {/* minWidth: 0 is the secret to making ellipsis work inside Flexbox */}
+            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                <Typography 
+                    variant="body2" 
+                    fontSize={10} 
+                    fontWeight={1000} 
+                    color="success.main"
+                    noWrap // MUI helper for ellipsis
+                >
                     {position}
                 </Typography>
-                <Typography variant="body2" fontWeight={500}>
+                
+                <Typography 
+                    variant="body2" 
+                    fontWeight={500} 
+                    noWrap // Truncates name: "Thant Ht..."
+                >
                     {name}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                
+                <Typography 
+                    variant="caption" 
+                    color="text.secondary" 
+                    noWrap // Truncates email
+                    display="block" // Ensures it takes its own line properly
+                >
                     {email}
                 </Typography>
             </Box>
 
-            <Badge color="error" variant="dot" invisible>
-                <IconButton size="small" onClick={handleOpen}>
-                    <MoreVertIcon />
-                </IconButton>
-            </Badge>
+            {/* This keeps the More icon fixed at the end */}
+            <Box>
+                <Badge color="error" variant="dot" invisible>
+                    <IconButton size="small" onClick={handleOpen}>
+                        <MoreVertIcon />
+                    </IconButton>
+                </Badge>
+            </Box>
 
             <Menu
                 anchorEl={anchorEl}
@@ -82,10 +107,10 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
                 <MenuItem onClick={handleClose}>
-                    <AccountCircleIcon fontSize="small"/> | Profile
+                    <AccountCircleIcon fontSize="small" sx={{ mr: 1 }}/> Profile
                 </MenuItem>
                 <MenuItem onClick={handleClose}>
-                    <SettingsIcon fontSize="small"/> | Settings
+                    <SettingsIcon fontSize="small" sx={{ mr: 1 }}/> Settings
                 </MenuItem>
                 <MenuItem
                     onClick={() => {
@@ -93,11 +118,10 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({
                         onLogout?.();
                     }}
                 >
-                    <LogoutIcon fontSize="small" /> | Logout
+                    <LogoutIcon fontSize="small" sx={{ mr: 1 }} /> Logout
                 </MenuItem>
             </Menu>
         </Stack>
     );
 };
-
 export default UserProfileMenu;

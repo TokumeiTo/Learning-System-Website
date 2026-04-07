@@ -195,6 +195,7 @@ const LibraryAdminPage: React.FC = () => {
                                     <TableCell align="center" sx={{ fontWeight: 800, color: '#475569' }}>Description</TableCell>
                                     <TableCell align="center" sx={{ fontWeight: 800, color: '#475569' }}>Visibility</TableCell>
                                     <TableCell align="center" sx={{ fontWeight: 800, color: '#475569' }}>Engagement</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 800, color: '#475569' }}>File Location</TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 800, color: '#475569' }}>Manage</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -215,6 +216,7 @@ const LibraryAdminPage: React.FC = () => {
                                                 </Box>
                                             </Stack>
                                         </TableCell>
+
                                         <TableCell>
                                             <Stack direction="row" spacing={2} justifyContent="center">
                                                 <Typography variant="caption" color="text.secondary" display="block">{book.description}</Typography>
@@ -234,18 +236,24 @@ const LibraryAdminPage: React.FC = () => {
 
                                         <TableCell align="center">
                                             <Stack direction="row" spacing={1} justifyContent="center">
-                                                <Tooltip title="Readers">
+                                                <Tooltip title="Read counts">
                                                     <Stack direction="row" alignItems="center" sx={{ color: '#64748b' }}>
                                                         <Visibility sx={{ fontSize: 14, mr: 0.5 }} />
                                                         <Typography variant="caption" fontWeight={700}>{book.totalReaderCount}</Typography>
                                                     </Stack>
                                                 </Tooltip>
-                                                <Tooltip title="Downloads">
+                                                <Tooltip title="Download counts">
                                                     <Stack direction="row" alignItems="center" sx={{ color: '#64748b' }}>
                                                         <FileDownload sx={{ fontSize: 14, mr: 0.5 }} />
                                                         <Typography variant="caption" fontWeight={700}>{book.totalDownloadCount}</Typography>
                                                     </Stack>
                                                 </Tooltip>
+                                            </Stack>
+                                        </TableCell>
+
+                                        <TableCell>
+                                            <Stack direction="row" spacing={2} justifyContent="center">
+                                                <Typography variant="caption" color="text.secondary" display="block">{book.fileUrl}</Typography>
                                             </Stack>
                                         </TableCell>
 
@@ -275,7 +283,7 @@ const LibraryAdminPage: React.FC = () => {
                             onPageChange={handleChangePage}
                             rowsPerPage={rowsPerPage}
                             onRowsPerPageChange={handleChangeRowsPerPage}
-                            rowsPerPageOptions={[5, 10, 25, 50]}
+                            rowsPerPageOptions={[5, 10, 25, 30, 50]}
                             sx={{
                                 borderTop: '1px solid cyan',
                                 bgcolor: 'background.default',

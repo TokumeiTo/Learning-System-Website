@@ -6,7 +6,7 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem, TablePagination
 } from "@mui/material";
 import { PersonAdd, Search, Edit, Delete } from "@mui/icons-material";
 
@@ -22,9 +22,12 @@ import { register as registerApi } from '../../api/auth.api';
 import { getUsersList, updateUser, deleteUser } from "../../api/user.api";
 import type { UserListItem, UserUpdateFields, UserDeleteFields } from "../../types_interfaces/user";
 import type { RegisterRequest } from "../../types_interfaces/auth";
+import { useAuth } from "../../hooks/useAuth";
 
 const UserManagementPage = () => {
   const theme = useTheme();
+  // Extract isAdmin from useAuth
+  const { user: currentUser, isAdmin } = useAuth();
 
   // State Management
   const [users, setUsers] = useState<UserListItem[]>([]);
@@ -34,6 +37,9 @@ const UserManagementPage = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [filterUnitId, setFilterUnitId] = useState<number | "">("");
   const [filterPosition, setFilterPosition] = useState<number | "">("");
+  const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   // Targets for Modals
   const [editTarget, setEditTarget] = useState<UserListItem | null>(null);
@@ -43,16 +49,18 @@ const UserManagementPage = () => {
     open: false, message: "", severity: "success",
   });
 
-  // 1. Fetch Users
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const data = await getUsersList(
         searchTerm,
         filterUnitId === "" ? undefined : filterUnitId,
-        filterPosition === "" ? undefined : filterPosition
+        filterPosition === "" ? undefined : filterPosition,
+        page + 1,
+        pageSize
       );
-      setUsers(data);
+      setUsers(data.items);
+      setTotalCount(data.totalCount);
     } catch (err) {
       setPopup({ open: true, message: "Could not load users", severity: "error" });
     } finally {
@@ -63,19 +71,28 @@ const UserManagementPage = () => {
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       fetchUsers();
-    }, 300); // 300ms debounce prevents hitting the server too hard while typing
-
+    }, 300);
     return () => clearTimeout(delayDebounce);
+  }, [searchTerm, filterUnitId, filterPosition, page, pageSize]);
+
+  useEffect(() => {
+    setPage(0);
   }, [searchTerm, filterUnitId, filterPosition]);
+
+  const handleChangePage = (_: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const handleAddUser = async (data: RegisterRequest) => {
     try {
       setProcessing(true);
-
       const res = await registerApi(data);
-
       if (res.isSuccess) {
-        // Use the message from the backend: e.g., "User registered successfully!"
         setPopup({ open: true, message: res.message, severity: "success" });
         setShowAddForm(false);
         fetchUsers();
@@ -83,12 +100,8 @@ const UserManagementPage = () => {
         setPopup({ open: true, message: res.message || "Registration failed", severity: "error" });
       }
     } catch (err: any) {
-      // 3. Handle actual HTTP errors (400 BadRequest, 401 Unauthorized, etc.)
-      // We pull the error message sent by .NET (like ModelState validation errors)
       const errorMsg = err.response?.data?.message || "Server error during registration";
       setPopup({ open: true, message: errorMsg, severity: "error" });
-
-      console.error("Registration Error:", err);
     } finally {
       setProcessing(false);
     }
@@ -97,14 +110,11 @@ const UserManagementPage = () => {
   const handleUpdateUser = async (id: string, data: UserUpdateFields) => {
     try {
       setProcessing(true);
-      // Call API and capture the result (Ok(new { message = "..." }))
       const res = await updateUser(id, data);
-
       setPopup({ open: true, message: res.message, severity: "success" });
       setEditTarget(null);
       fetchUsers();
     } catch (err: any) {
-      // Pull the specific error message from the backend if it exists
       const errorMsg = err.response?.data?.message || "Update failed";
       setPopup({ open: true, message: errorMsg, severity: "error" });
     } finally {
@@ -115,9 +125,7 @@ const UserManagementPage = () => {
   const handleDeleteUser = async (id: string, data: UserDeleteFields) => {
     try {
       setProcessing(true);
-      // Same pattern: Capture the backend response message
       const res = await deleteUser(id, data);
-
       setPopup({ open: true, message: res.message, severity: "success" });
       setDeleteTarget(null);
       fetchUsers();
@@ -134,13 +142,7 @@ const UserManagementPage = () => {
 
   return (
     <PageLayout>
-      <Box sx={{
-        p: 4,
-        bgcolor: "background.default",
-        minHeight: "calc(100vh - 65px)",
-        display: 'flex',
-        flexDirection: 'column'
-      }}>
+      <Box sx={{ px: 4, display: 'flex', flexDirection: 'column' }}>
 
         {/* Header Section */}
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
@@ -148,17 +150,21 @@ const UserManagementPage = () => {
             <Typography variant="h4" fontWeight={900} color="text.primary">User Management</Typography>
             <Typography variant="body2" color="text.secondary">Manage system access and organization hierarchy</Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={showAddForm ? null : <PersonAdd />}
-            onClick={() => setShowAddForm(!showAddForm)}
-            sx={{ borderRadius: 2, px: 3, fontWeight: 700, transition: 'all 0.2s' }}
-          >
-            {showAddForm ? "Back to User List" : "Add New User"}
-          </Button>
+          
+          {/* 1. HIDE ADD BUTTON IF NOT ADMIN */}
+          {isAdmin && (
+            <Button
+              variant="contained"
+              startIcon={showAddForm ? null : <PersonAdd />}
+              onClick={() => setShowAddForm(!showAddForm)}
+              sx={{ borderRadius: 2, px: 3, fontWeight: 700, transition: 'all 0.2s' }}
+            >
+              {showAddForm ? "Back to User List" : "Add New User"}
+            </Button>
+          )}
         </Stack>
 
-        {showAddForm ? (
+        {showAddForm && isAdmin ? (
           <UserAddForm
             onSuccess={handleAddUser}
             onCancel={() => setShowAddForm(false)}
@@ -174,7 +180,7 @@ const UserManagementPage = () => {
               display: 'flex', gap: 2
             }}>
               <TextField
-                placeholder="Search by name or email..."
+                placeholder="Name, Email, UserId"
                 size="small"
                 sx={{ flex: 1 }}
                 value={searchTerm}
@@ -183,6 +189,7 @@ const UserManagementPage = () => {
                   startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment>
                 }}
               />
+              {/* Position and Team Filters remain visible to all for directory purposes */}
               <FormControl size="small" sx={{ flex: 1 }}>
                 <InputLabel id="position-filter-label">Position</InputLabel>
                 <Select
@@ -192,9 +199,13 @@ const UserManagementPage = () => {
                   onChange={(e) => setFilterPosition(e.target.value as number | "")}
                 >
                   <MenuItem value="">All Positions</MenuItem>
-                  <MenuItem value={1}>Division Head</MenuItem>
-                  <MenuItem value={2}>Department Head</MenuItem>
+                  <MenuItem value={1}>Division Heads</MenuItem>
+                  <MenuItem value={2}>Department Heads</MenuItem>
+                  <MenuItem value={3}>Section Heads</MenuItem>
+                  <MenuItem value={4}>Project Managers</MenuItem>
                   <MenuItem value={5}>Employee</MenuItem>
+                  <MenuItem value={6}>Admin</MenuItem>
+                  <MenuItem value={7}>Auditors</MenuItem>
                 </Select>
               </FormControl>
 
@@ -207,41 +218,17 @@ const UserManagementPage = () => {
                   onChange={(e) => setFilterUnitId(e.target.value as number | "")}
                 >
                   <MenuItem value="">All Units</MenuItem>
-                  {/* --- Offshore & Development Units --- */}
                   <MenuItem value={11}>Translator Team</MenuItem>
                   <MenuItem value={9}>Other Local System Team</MenuItem>
                   <MenuItem value={21}>Exchange System Team</MenuItem>
                   <MenuItem value={22}>Common Application Infrastructure Team</MenuItem>
                   <MenuItem value={23}>JICA BPO Team</MenuItem>
                   <MenuItem value={24}>MAJA JLPT System Development Team</MenuItem>
-
-                  {/* --- System & Infrastructure Teams --- */}
                   <MenuItem value={26}>System Team</MenuItem>
                   <MenuItem value={27}>Network Team</MenuItem>
                   <MenuItem value={28}>Service Desk Team</MenuItem>
                   <MenuItem value={29}>OMG Team</MenuItem>
                   <MenuItem value={31}>Aeon Infra Team</MenuItem>
-
-                  {/* --- Project & Development Teams --- */}
-                  <MenuItem value={30}>Local Project Team 1</MenuItem>
-                  <MenuItem value={33}>Mark Team</MenuItem>
-                  <MenuItem value={34}>SNR-MF Team</MenuItem>
-                  <MenuItem value={36}>FPD Team</MenuItem>
-                  <MenuItem value={37}>DBP Team</MenuItem>
-                  <MenuItem value={39}>TDB, D-Base Team</MenuItem>
-                  <MenuItem value={40}>CstNavi Team</MenuItem>
-                  <MenuItem value={41}>Delta Team</MenuItem>
-                  <MenuItem value={42}>OSS Team</MenuItem>
-                  <MenuItem value={43}>MODOS Team</MenuItem>
-                  <MenuItem value={44}>Block Chain Team</MenuItem>
-                  <MenuItem value={45}>WB4 Team</MenuItem>
-                  <MenuItem value={46}>SONAR-FR Team</MenuItem>
-                  <MenuItem value={47}>FAIMS-IT Team</MenuItem>
-                  <MenuItem value={48}>KOSMO-Network21 Team</MenuItem>
-                  <MenuItem value={49}>WEB Team</MenuItem>
-                  <MenuItem value={50}>KOSMO-NEXT Team</MenuItem>
-                  <MenuItem value={51}>HIME Team</MenuItem>
-                  <MenuItem value={52}>SoftPhone Team</MenuItem>
                 </Select>
               </FormControl>
 
@@ -255,97 +242,85 @@ const UserManagementPage = () => {
               </Button>
             </Paper>
 
-            {/* Main Table */}
             <TableContainer component={Paper} elevation={0} sx={{
               borderRadius: 4,
               border: `1px solid ${theme.palette.divider}`,
-              maxHeight: 'calc(100vh - 300px)' // Sticky header support
+              maxHeight: 'calc(100vh - 300px)'
             }}>
               <Table stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 800, bgcolor: 'action.hover' }}>Full Name</TableCell>
-                    <TableCell sx={{ fontWeight: 800, bgcolor: 'action.hover' }}>Contact</TableCell>
-                    <TableCell sx={{ fontWeight: 800, bgcolor: 'action.hover' }}>Position</TableCell>
-                    <TableCell sx={{ fontWeight: 800, bgcolor: 'action.hover' }}>Unit</TableCell>
-                    <TableCell sx={{ fontWeight: 800, bgcolor: 'action.hover' }} align="right">Actions</TableCell>
+                    <TableCell sx={{ fontWeight: 800 }}>Full Name</TableCell>
+                    <TableCell sx={{ fontWeight: 800 }}>Contact</TableCell>
+                    <TableCell sx={{ fontWeight: 800 }}>Position</TableCell>
+                    <TableCell sx={{ fontWeight: 800 }}>Unit</TableCell>
+                    {/* 2. ONLY SHOW ACTIONS HEADER IF ADMIN */}
+                    {isAdmin && <TableCell sx={{ fontWeight: 800 }} align="right">Actions</TableCell>}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={5} align="center" sx={{ py: 10 }}>
+                      <TableCell colSpan={isAdmin ? 5 : 4} align="center" sx={{ py: 10 }}>
                         <CircularProgress size={30} thickness={4} />
-                        <Typography sx={{ mt: 2 }} variant="body2" color="text.secondary">Loading directory...</Typography>
-                      </TableCell>
-                    </TableRow>
-                  ) : users.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} align="center" sx={{ py: 10 }}>
-                        <Typography variant="body1" color="text.secondary">No users found matching your criteria.</Typography>
                       </TableCell>
                     </TableRow>
                   ) : users.map((user) => (
-                    <TableRow key={user.id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    <TableRow key={user.id} hover>
                       <TableCell>
                         <Stack direction="row" spacing={2} alignItems="center">
-                          <Badge overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant="dot" color="success">
-                            <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main', fontWeight: 700, fontSize: '0.9rem' }}>
-                              {getInitials(user.fullName)}
-                            </Avatar>
-                          </Badge>
+                          <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main', fontSize: '0.9rem' }}>
+                            {getInitials(user.fullName)}
+                          </Avatar>
                           <Box>
-                            <Typography variant="subtitle2" fontWeight={700} sx={{ lineHeight: 1.2 }}>{user.fullName}</Typography>
+                            <Typography variant="subtitle2" fontWeight={700}>{user.fullName}</Typography>
                             <Typography variant="caption" color="text.secondary">{user.companyCode}</Typography>
                           </Box>
                         </Stack>
                       </TableCell>
+                      <TableCell>{user.email}</TableCell>
                       <TableCell>
-                        <Typography variant="body2" color="text.primary">{user.email}</Typography>
+                        <Chip label={user.positionName} size="small" color="primary" variant="outlined" />
                       </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={user.positionName}
-                          size="small"
-                          sx={{
-                            fontWeight: 700,
-                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.1)' : 'rgba(25, 118, 210, 0.05)',
-                            color: 'primary.main',
-                            border: '1px solid rgba(25, 118, 210, 0.1)'
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" color="text.secondary">{user.orgUnitName || "—"}</Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Stack direction="row" spacing={1} justifyContent="flex-end">
-                          <IconButton
-                            size="small"
-                            onClick={() => setEditTarget(user)}
-                            sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'rgba(25, 118, 210, 0.05)' } }}
-                          >
-                            <Edit fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => setDeleteTarget(user)}
-                            sx={{ '&:hover': { bgcolor: 'rgba(211, 47, 47, 0.05)' } }}
-                          >
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </Stack>
-                      </TableCell>
+                      <TableCell>{user.orgUnitName || "—"}</TableCell>
+                      
+                      {/* 3. CONDITIONALLY RENDER ACTION BUTTONS */}
+                      {isAdmin && (
+                        <TableCell align="right">
+                          {user.id !== currentUser?.id ? (
+                            <Stack direction="row" spacing={1} justifyContent="flex-end">
+                              <IconButton size="small" onClick={() => setEditTarget(user)}>
+                                <Edit fontSize="small" />
+                              </IconButton>
+                              <IconButton size="small" color="error" onClick={() => setDeleteTarget(user)}>
+                                <Delete fontSize="small" />
+                              </IconButton>
+                            </Stack>
+                          ) : (
+                            <Chip label="You" size="small" variant="outlined" sx={{ opacity: 0.6 }} />
+                          )}
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+
+              <TablePagination
+                component="div"
+                count={totalCount}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={pageSize}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 25]}
+                sx={{ borderTop: `1px solid ${theme.palette.divider}` }}
+              />
             </TableContainer>
           </Box>
         )}
 
-        {/* Action Dialogs */}
+        {/* Dialogs remain for state management, but won't trigger if targets are null */}
         <UserEditDialog
           open={!!editTarget}
           user={editTarget}
@@ -353,7 +328,6 @@ const UserManagementPage = () => {
           onConfirm={handleUpdateUser}
           loading={processing}
         />
-
         <UserDeleteDialog
           open={!!deleteTarget}
           user={deleteTarget}
@@ -361,7 +335,6 @@ const UserManagementPage = () => {
           onConfirm={handleDeleteUser}
           loading={processing}
         />
-
         <MessagePopup
           open={popup.open} message={popup.message} severity={popup.severity}
           onClose={() => setPopup({ ...popup, open: false })}

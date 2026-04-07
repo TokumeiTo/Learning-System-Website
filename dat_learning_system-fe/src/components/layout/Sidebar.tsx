@@ -22,7 +22,7 @@ import UserProfileMenu from "../user/UserProfileMenu";
 import { useAuth } from "../../hooks/useAuth";
 import { LEARNING_NAV, MANAGEMENT_NAV } from "../../config/Navigation";
 
-const drawerWidth = 240;
+const drawerWidth = 250;
 
 /* ---------------- Drawer Mixins ---------------- */
 

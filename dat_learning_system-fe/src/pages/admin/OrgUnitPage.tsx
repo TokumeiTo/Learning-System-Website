@@ -34,8 +34,7 @@ const OrgPage: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 3,
-                p: 4,
-                bgcolor: 'background.default',
+                px: 4,
                 minHeight: '100vh',
                 transition: 'background-color 0.3s'
             }}>

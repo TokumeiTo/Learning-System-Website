@@ -25,7 +25,7 @@ interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
 
-const drawerWidth = 240;
+const drawerWidth = 250;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open' && prop !== 'isMobile'
@@ -75,8 +75,8 @@ const Navbar: React.FC<NavbarProps> = ({ open, onToggle }) => {
           <MenuIcon />
         </IconButton>
 
-        <Box sx={{ width: '100%' }}>
-          <img src="/dat_logo.png" width={60} alt="logo" />
+        <Box sx={{ display:'flex', width: '100%', alignItems:'center', mb:'-5px' }}>
+          <img src="/dat_logo.png" width={80} alt="logo" />
         </Box>
 
         <ButtonGroup>

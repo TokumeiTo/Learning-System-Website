@@ -1,44 +1,55 @@
-import React from 'react';
-import { TextField, Stack, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { TextField, Stack, Typography, Button } from '@mui/material';
+import { Save } from '@mui/icons-material';
 import type { RoadmapRequest } from '../../types_interfaces/roadmap';
 
 interface RoadmapFormProps {
-    /** The current roadmap data from the parent state */
-    data: RoadmapRequest;
-    /** Callback to update the parent state in real-time */
-    onChange: (updatedFields: Partial<RoadmapRequest>) => void;
+    data?: RoadmapRequest; // Optional for "Create" mode
+    onChange?: (updatedFields: Partial<RoadmapRequest>) => void;
+    onSubmit?: (payload: RoadmapRequest) => void; // For the List Page Dialog
 }
 
-const RoadmapForm: React.FC<RoadmapFormProps> = ({ data, onChange }) => {
-    
-    // Helper to reduce boilerplate on change events
+const EMPTY_ROADMAP: RoadmapRequest = {
+    title: '',
+    description: '',
+    targetRole: '',
+    linkedResourceId: null
+};
+
+const RoadmapForm: React.FC<RoadmapFormProps> = ({ data, onChange, onSubmit }) => {
+    // Local state for when we are creating from the List Page Dialog
+    const [localData, setLocalData] = useState<RoadmapRequest>(data || EMPTY_ROADMAP);
+
     const handleChange = (field: keyof RoadmapRequest) => (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
-        onChange({ [field]: e.target.value });
+        const val = e.target.value;
+        if (onChange) {
+            onChange({ [field]: val });
+        } else {
+            setLocalData(prev => ({ ...prev, [field]: val }));
+        }
     };
+
+    // Use either the passed data (Edit Page) or local state (List Page)
+    const activeData = data || localData;
 
     return (
         <Stack spacing={3} sx={{ mt: 2 }}>
-            <Typography variant="h6" fontWeight={800} color="primary.main">
-                General Information
-            </Typography>
-
             <TextField
                 label="RoadMap Title"
                 fullWidth
                 required
-                value={data.title}
+                value={activeData.title}
                 onChange={handleChange('title')}
-                placeholder="e.g., N5 Japanese Mastery"
             />
 
             <TextField
                 label="Target Role"
                 fullWidth
-                value={data.targetRole || ''}
+                value={activeData.targetRole || ''}
                 onChange={handleChange('targetRole')}
-                placeholder="e.g., Junior Developer / Student"
+                placeholder="e.g., Junior Developer"
             />
 
             <TextField
@@ -46,10 +57,22 @@ const RoadmapForm: React.FC<RoadmapFormProps> = ({ data, onChange }) => {
                 fullWidth
                 multiline
                 rows={4}
-                value={data.description}
+                value={activeData.description}
                 onChange={handleChange('description')}
-                placeholder="Describe the learning path..."
             />
+
+            {/* Only show the submit button if an onSubmit handler is provided (Dialog mode) */}
+            {onSubmit && (
+                <Button 
+                    variant="contained" 
+                    onClick={() => onSubmit(activeData)}
+                    fullWidth
+                    sx={{ mt: 2, borderRadius: 3, py: 1.5, fontWeight: 800 }}
+                    startIcon={<Save />}
+                >
+                    Create Blueprint
+                </Button>
+            )}
         </Stack>
     );
 };

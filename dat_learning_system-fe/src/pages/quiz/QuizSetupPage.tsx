@@ -73,12 +73,12 @@ export default function QuizSetupPage() {
                                     cursor: "pointer", 
                                     minWidth: '160px',
                                     borderRadius: '24px',
-                                    bgcolor: '#2d3748', 
+                                    bgcolor: 'background.paper', 
                                     border: '1px solid #4a5568',
                                     transition: 'all 0.2s ease-in-out',
                                     '&:hover': { 
                                         transform: 'scale(1.03)',
-                                        bgcolor: '#334155'
+                                        bgcolor: 'background.gray'
                                     }
                                 }}
                             >

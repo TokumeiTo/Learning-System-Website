@@ -16,6 +16,7 @@ import { useLibraryTracker } from '../../hooks/useLibraryTracker';
 import type { EBook, LibraryStatsData } from '../../types_interfaces/library';
 import { fetchLibraryStats } from '../../api/library.api';
 import { JAPANESE_STUDY_TIPS } from '../../utils/learningTips';
+import JapaneseTabLoader from '../../components/feedback/TabLoader';
 
 const LibraryPage: React.FC = () => {
     // 1. Destructure all pagination controls from our updated hook
@@ -85,7 +86,7 @@ const LibraryPage: React.FC = () => {
 
     return (
         <PageLayout>
-            <Box sx={{ minHeight: 'calc(100vh - 65px)', bgcolor: 'background.default', p: { xs: 2, md: 6 } }}>
+            <Box sx={{ px: { xs: 2, md: 6 } }}>
 
                 <Stack spacing={1} sx={{ mb: 4 }}>
                     <Typography variant="h3" fontWeight={900}>Knowledge Base</Typography>
@@ -129,29 +130,25 @@ const LibraryPage: React.FC = () => {
                     {!loading && books.length === 0 && (
                         <Stack alignItems="center" sx={{ width: '100%', mt: 10 }}>
                             <Typography variant="h6" color="text.secondary">
-                                No resources found for "{searchTerm}"
+                                No resources found
                             </Typography>
-                            <Button
-                                onClick={() => setSearchTerm('')}
-                                sx={{ mt: 2, fontWeight: 700 }}
-                            >
-                                View all books
-                            </Button>
                         </Stack>
                     )}
                     {loading ? (
                         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                            <CircularProgress size={60} thickness={5} />
+                            <JapaneseTabLoader />
                         </Box>
                     ) : (
                         <AnimatePresence mode="popLayout">
-                            {books.map((book) => (
-                                <LibraryBookCard
-                                    key={book.id}
-                                    book={book}
-                                    onRead={() => setSelectedBook(book)}
-                                />
-                            ))}
+                            {books
+                                .filter((book) => book.isActive !== false)
+                                .map((book) => (
+                                    <LibraryBookCard
+                                        key={book.id}
+                                        book={book}
+                                        onRead={() => setSelectedBook(book)}
+                                    />
+                                ))}
                         </AnimatePresence>
                     )}
                 </Box>
