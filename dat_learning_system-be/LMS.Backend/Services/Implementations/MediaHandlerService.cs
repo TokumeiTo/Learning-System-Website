@@ -1,5 +1,5 @@
 using LMS.Backend.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace LMS.Backend.Services.Implement;
@@ -7,10 +7,12 @@ namespace LMS.Backend.Services.Implement;
 public class MediaHandlerService : IMediaHandlerService
 {
     private readonly IFileService _fileService;
+    private readonly ILogger<MediaHandlerService> _logger;
 
-    public MediaHandlerService(IFileService fileService)
+    public MediaHandlerService(IFileService fileService, ILogger<MediaHandlerService> logger)
     {
         _fileService = fileService;
+        _logger = logger;
     }
 
     public async Task<string> HandleBase64MediaAsync(string body, string contentType)
@@ -24,9 +26,9 @@ public class MediaHandlerService : IMediaHandlerService
 
             if (body.Trim().StartsWith("{"))
             {
-                var mediaData = JsonSerializer.Deserialize<MediaUploadJson>(body, new JsonSerializerOptions 
-                { 
-                    PropertyNameCaseInsensitive = true 
+                var mediaData = JsonSerializer.Deserialize<MediaUploadJson>(body, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
                 });
                 base64Data = mediaData?.Data ?? string.Empty;
                 fileName = mediaData?.Name ?? "upload";
@@ -68,7 +70,11 @@ public class MediaHandlerService : IMediaHandlerService
 
             return await _fileService.UploadFileAsync(formFile, folderName);
         }
-        catch { return body; }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to parse Base64 media. Falling back to raw string.");
+            return body;
+        }
     }
 
     private string GetExtensionFromMimeType(string mimeType) => mimeType switch

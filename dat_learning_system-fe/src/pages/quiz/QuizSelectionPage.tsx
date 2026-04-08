@@ -1,18 +1,28 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, IconButton, Paper, Button } from '@mui/material';
+import {
+    Box, Typography, Paper, Button,
+    Skeleton, Stack, Chip, useTheme,
+    IconButton,
+    alpha
+} from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+
 import { fetchPracticeQuizzes, fetchMyAttemptHistory } from '../../api/test.api';
 import type { LessonResult, Test } from '../../types_interfaces/test';
 import PageLayout from '../../components/layout/PageLayout';
 
 export default function QuizSelectionPage() {
     const { level, category } = useParams<{ level: string; category: string }>();
+    const theme = useTheme();
+    const navigate = useNavigate();
 
     const [tests, setTests] = useState<Test[]>([]);
     const [history, setHistory] = useState<LessonResult[]>([]);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+    const [searchTerm] = useState(""); // Placeholder for future search functionality
 
     useEffect(() => {
         if (!level || !category) return;
@@ -21,10 +31,10 @@ export default function QuizSelectionPage() {
             try {
                 setLoading(true);
                 const [testsData, historyData] = await Promise.all([
-                    fetchPracticeQuizzes(level, category),
+                    // Now correctly passing searchTerm to the API
+                    fetchPracticeQuizzes(level, category, searchTerm),
                     fetchMyAttemptHistory(undefined, undefined, level)
                 ]);
-
                 setTests(testsData);
                 setHistory(historyData);
             } catch (err) {
@@ -34,92 +44,151 @@ export default function QuizSelectionPage() {
             }
         };
         fetchData();
-    }, [level, category]);
+    }, [level, category, searchTerm]); // Added searchTerm to dependencies
 
     const handleCardClick = (testId: string, isPassed: boolean) => {
-        if (isPassed) {
-            navigate(`/quiz/active/${testId}`, { state: { showResultOnly: true } });
-        } else {
-            navigate(`/quiz/active/${testId}`);
-        }
+        navigate(`/quiz/active/${testId}`, {
+            state: { showResultOnly: isPassed }
+        });
     };
-
-
 
     return (
         <PageLayout>
-            <Box sx={{ px: 4 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, gap: 2, justifyContent:'space-between' }}>
+            <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1200, mx: 'auto' }}>
+                {/* Header Section */}
+                <Stack direction="row" alignItems="center" spacing={2} mb={6}>
+                    {/* Clean, high-visibility Back Button */}
+                    <IconButton
+                        onClick={() => navigate(-1)}
+                        sx={{
+                            color: 'text.primary',
+                            bgcolor: 'action.hover', // Subtle background so it's not "invisible"
+                            borderRadius: '12px',
+                            p: 1.5,
+                            transition: '0.2s',
+                            '&:hover': {
+                                bgcolor: 'primary.main',
+                                color: 'white',
+                                transform: 'translateX(-4px)' // Physical feedback on hover
+                            }
+                        }}
+                    >
+                        <ArrowBackIosNewIcon sx={{ fontSize: 32 }} />
+                    </IconButton>
+
                     <Box>
-                        <Typography variant="h4" sx={{ fontWeight: 900, color: '#f6ad55', textTransform: 'uppercase' }}>
-                            {level} {category}
+                        <Typography
+                            variant="overline"
+                            color="primary"
+                            fontWeight="bold"
+                            sx={{ letterSpacing: 2, lineHeight: 1 }}
+                        >
+                            {level} Level
+                        </Typography>
+                        <Typography
+                            variant="h3"
+                            fontWeight={900}
+                            sx={{
+                                textTransform: 'capitalize',
+                                lineHeight: 1.2,
+                                fontSize: { xs: '2rem', md: '3rem' } // Responsive font sizing
+                            }}
+                        >
+                            {category} Quizzes
                         </Typography>
                     </Box>
-                    <Button onClick={() => navigate(-1)} sx={{ color: 'white' }}>
-                        Back to List
-                    </Button>
-                </Box>
+                </Stack>
 
+                {/* Content Container (Flex Version) */}
                 <Box sx={{
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: 3,
-                    justifyContent: { xs: 'center' }
+                    justifyContent: { xs: 'center', sm: 'flex-start' },
                 }}>
-                    {tests.map((test) => {
-                        const attempt = history.find(h => h.testId === test.id);
-                        const isPassed = attempt?.isPassed ?? false;
+                    {loading ? (
+                        Array.from(new Array(6)).map((_, i) => (
+                            <Skeleton
+                                key={i}
+                                variant="rectangular"
+                                width={320}
+                                height={160}
+                                sx={{ borderRadius: '24px', flexGrow: { xs: 1, sm: 0 } }}
+                            />
+                        ))
+                    ) : (
+                        tests.map((test) => {
+                            const attempt = history.find(h => h.testId === test.id);
+                            const isPassed = attempt?.isPassed ?? false;
 
-                        return (
-                            <Paper
-                                key={test.id}
-                                onClick={() => handleCardClick(test.id!, isPassed)}
-                                elevation={isPassed ? 4 : 0}
-                                sx={{
-                                    width: { xs: '100%', sm: '300px' }, // Wider to fit the Title
-                                    p: 3,
-                                    borderRadius: '24px',
-                                    bgcolor: isPassed ? '#2ecc71' : '#2d3748',
-                                    border: '2px solid',
-                                    borderColor: isPassed ? '#27ae60' : '#4a5568',
-                                    cursor: 'pointer',
-                                    transition: '0.2s ease-in-out',
-                                    position: 'relative',
-                                    overflow: 'hidden',
-                                    '&:hover': {
-                                        transform: 'translateY(-5px)',
-                                        boxShadow: isPassed ? '0 10px 20px rgba(46, 204, 113, 0.3)' : '0 10px 20px rgba(0,0,0,0.3)'
-                                    }
-                                }}
-                            >
-                                {/* Pass Badge */}
-                                {isPassed && (
-                                    <Typography variant="caption" sx={{
-                                        position: 'absolute', top: 4, right: 10,
-                                        bgcolor: 'white', color: '#27ae60', px: 1,
-                                        borderRadius: '8px', fontWeight: '900', fontSize: '0.65rem'
-                                    }}>
-                                        PASSED
-                                    </Typography>
-                                )}
+                            return (
+                                <Paper
+                                    key={test.id}
+                                    onClick={() => handleCardClick(test.id!, isPassed)}
+                                    sx={{
+                                        p: 3,
+                                        width: { xs: '100%', sm: 'calc(50% - 24px)', md: 'calc(33.33% - 24px)' },
+                                        minWidth: { sm: '300px' },
+                                        borderRadius: '24px',
+                                        cursor: 'pointer',
+                                        position: 'relative',
+                                        transition: 'all 0.3s ease',
+                                        border: '2px solid',
+                                        borderColor: isPassed ? 'success.main' : 'divider',
+                                        bgcolor: isPassed
+                                            ? (theme.palette.mode === 'dark' ? 'rgba(46, 204, 113, 0.1)' : 'rgba(46, 204, 113, 0.05)')
+                                            : 'background.paper',
+                                        '&:hover': {
+                                            transform: 'translateY(-8px)',
+                                            borderColor: 'primary.main',
+                                            boxShadow: `0 20px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
+                                            '& .arrow-icon': { opacity: 1, transform: 'translateX(0)' }
+                                        }
+                                    }}
+                                >
+                                    <Box sx={{ position: 'absolute', bottom: 20, right: 16 }}>
+                                        {isPassed ? (
+                                            <Chip
+                                                icon={<CheckCircleIcon style={{ color: 'inherit' }} />}
+                                                label="PASSED"
+                                                size="small"
+                                                color="success"
+                                                sx={{ fontWeight: 'bold' }}
+                                            />
+                                        ) : (
+                                            <Chip
+                                                icon={<PlayArrowIcon />}
+                                                label="START"
+                                                size="small"
+                                                variant="outlined"
+                                                sx={{ fontWeight: 'bold' }}
+                                            />
+                                        )}
+                                    </Box>
 
-                                <Typography variant="h6" sx={{ fontWeight: 900, mb: 1, color: isPassed ? 'white' : '#f6ad55', lineHeight: 1.2 }}>
-                                    {test.title || "Untitled Quiz"}
-                                </Typography>
-
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                                    <Typography variant="caption" sx={{ color: isPassed ? 'rgba(255,255,255,0.8)' : '#a0aec0', fontWeight: 'bold' }}>
-                                        {test.questions.length} Questions
-                                    </Typography>
-                                    {attempt && (
-                                        <Typography variant="body2" sx={{ fontWeight: 900, color: 'white' }}>
-                                            Last Progress - {Math.round(attempt.percentage)}%
+                                    <Stack spacing={3}>
+                                        <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2 }}>
+                                            {test.title || "Untitled Quiz"}
                                         </Typography>
-                                    )}
-                                </Box>
-                            </Paper>
-                        );
-                    })}
+
+                                        <Stack direction="row" alignItems="center" spacing={1}>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {test.questions.length} Questions
+                                            </Typography>
+                                            {attempt && (
+                                                <>
+                                                    <Typography variant="body2" color="text.secondary">•</Typography>
+                                                    <Typography variant="body2" fontWeight="bold" color={isPassed ? "success.main" : "primary"}>
+                                                        {Math.round(attempt.percentage)}%
+                                                    </Typography>
+                                                </>
+                                            )}
+                                        </Stack>
+                                    </Stack>
+                                </Paper>
+                            )
+                        })
+                    )}
                 </Box>
             </Box>
         </PageLayout>

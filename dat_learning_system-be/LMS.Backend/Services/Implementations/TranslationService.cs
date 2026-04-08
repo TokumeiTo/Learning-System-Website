@@ -12,55 +12,63 @@ public class TranslationService : ITranslationService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _config;
+    ILogger<TranslationService> _logger;
 
     private static readonly string _dicPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IpaDic");
     private static readonly KawazuConverter _kawazu = new KawazuConverter(_dicPath);
 
-    public TranslationService(IHttpClientFactory httpClientFactory, IConfiguration config)
+    public TranslationService(IHttpClientFactory httpClientFactory, IConfiguration config, ILogger<TranslationService> logger)
     {
         _httpClientFactory = httpClientFactory;
         _config = config;
+        _logger = logger;
     }
 
     public async Task<TranslationResponseDto> TranslateAsync(TranslationRequestDto dto)
     {
         var client = _httpClientFactory.CreateClient();
 
-        // 1. Resolve Source Language (Handle "auto" for Myanmar/Japanese/English)
+        // 1. Resolve languages and context
         string sourceLang = ResolveLanguage(dto.SourceLanguage, dto.Text);
-
         string contentToTranslate = dto.IsItContext
             ? $"[Technical IT Context]: {dto.Text}"
             : dto.Text;
 
+        // 2. Build URL with optional Email for higher rate limits
         var baseUrl = _config["Translation:ApiUrl"] ?? "https://api.mymemory.translated.net/get";
-        var encodedText = WebUtility.UrlEncode(contentToTranslate);
+        var contactEmail = _config["Translation:ContactEmail"];
 
-        // langPair is now guaranteed to be valid ISO codes like "my|en" or "ja|en"
-        var langPair = $"{sourceLang}|{dto.TargetLanguage}";
-        var url = $"{baseUrl}?q={encodedText}&langpair={langPair}";
+        var url = $"{baseUrl}?q={WebUtility.UrlEncode(contentToTranslate)}&langpair={sourceLang}|{dto.TargetLanguage}";
 
-        var response = await client.GetAsync(url);
-
-        if (!response.IsSuccessStatusCode)
+        if (!string.IsNullOrEmpty(contactEmail))
         {
-            throw new Exception($"Translation API returned {response.StatusCode}");
+            url += $"&de={WebUtility.UrlEncode(contactEmail)}";
         }
+
+        // 3. Execute Request
+        // EnsureSuccessStatusCode throws an exception caught by ExceptionMiddleware if the API is down
+        var response = await client.GetAsync(url);
+        response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<MyMemoryResponse>();
         string translatedText = result?.ResponseData?.TranslatedText ?? "Translation failed.";
 
-        // 2. Japanese Romaji Logic
+        // 4. Handle Romaji with local fallback
         string romaji = string.Empty;
-        bool isJapanese = dto.TargetLanguage.ToLower() is "ja" or "jp";
+        bool isJapaneseTarget = dto.TargetLanguage.ToLower() is "ja" or "jp";
 
-        if (isJapanese && !string.IsNullOrEmpty(translatedText))
+        if (isJapaneseTarget && !string.IsNullOrEmpty(translatedText))
         {
             try
             {
                 romaji = await _kawazu.Convert(translatedText, To.Romaji, Mode.Spaced);
             }
-            catch { romaji = string.Empty; }
+            catch (Exception ex)
+            {
+                // We log the warning to your new .txt files, but return the translation anyway
+                _logger.LogWarning(ex, "Romaji conversion failed for: {Text}", translatedText);
+                romaji = string.Empty;
+            }
         }
 
         return new TranslationResponseDto

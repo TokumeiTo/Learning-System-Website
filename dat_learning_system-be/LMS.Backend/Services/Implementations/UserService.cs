@@ -133,10 +133,17 @@ public class UserService : IUserService
 
         // 4. Update core fields
         targetUser.FullName = dto.FullName;
-        targetUser.OrgUnitId = dto.OrgUnitId;
 
         // 5. Update Position
         targetUser.Position = EnumMappingHelper.MapPosition(dto.Position, targetUser.Position);
+        if (targetUser.Position == Position.Admin)
+        {
+            targetUser.OrgUnitId = 1; // Force Management Division ID
+        }
+        else
+        {
+            targetUser.OrgUnitId = dto.OrgUnitId;
+        }
 
         // 6. Save
         return await _userRepo.UpdateAsync(targetUser);
@@ -166,7 +173,7 @@ public class UserService : IUserService
         // 4. Execute
         return await _userRepo.DeleteAsync(targetUser);
     }
-    
+
     public async Task<UserResponseDto?> GetUserByIdAsync(string id)
     {
         var user = await _userRepo.GetByIdAsync(id);

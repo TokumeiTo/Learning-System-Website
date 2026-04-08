@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import {
-  Box, Button, TextField, Typography, Paper, Stack, MenuItem, CircularProgress
+  Box, Button, TextField, Typography, Paper, Stack, MenuItem, CircularProgress,
+  IconButton
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { checkTestName, fetchQuizById, saveTestContent } from '../../api/test.api';
 import { uploadMediaFile } from '../../api/filemanager.api'; // Don't forget this!
 import type { Test, Question, QuizType } from '../../types_interfaces/test';
@@ -34,7 +36,7 @@ const QuizFormPage = () => {
 
   // EDIT MODE CHANGE
   useEffect(() => {
-    console.log ("i am here!");
+    console.log("i am here!");
     console.log(testId);
     if (testId) {
       const loadTestData = async () => {
@@ -190,10 +192,47 @@ const QuizFormPage = () => {
     <PageLayout>
       <Box sx={{ px: 4, mx: 'auto' }}>
         <Box sx={{ p: 3, mb: 4 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{testId ? `Modifying: ${test.title}` : "Publishing New Test"}</Typography>
-            <Button onClick={() => navigate('/admin/quizzes')}>Back to List</Button>
-          </Box>
+          <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+            {/* Consistent Admin Back Navigation */}
+            <IconButton
+              onClick={() => navigate('/admin/quizzes')}
+              sx={{
+                color: 'text.primary',
+                bgcolor: 'action.hover',
+                borderRadius: '12px',
+                p: 1.2,
+                transition: '0.2s',
+                '&:hover': {
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  transform: 'translateX(-4px)'
+                }
+              }}
+            >
+              <ArrowBackIosNewIcon sx={{ fontSize: 32 }} />
+            </IconButton>
+
+            <Box>
+              <Typography
+                variant="overline"
+                color="primary"
+                fontWeight="bold"
+                sx={{ letterSpacing: 1.2, lineHeight: 1 }}
+              >
+                {testId ? "Management Mode" : "Creation Mode"}
+              </Typography>
+              <Typography
+                variant="h4"
+                fontWeight={800}
+                sx={{
+                  lineHeight: 1.2,
+                  color: 'text.primary'
+                }}
+              >
+                {testId ? `Modifying: ${test.title}` : "Publishing New Test"}
+              </Typography>
+            </Box>
+          </Stack>
 
 
           <Stack spacing={3}>
@@ -277,10 +316,10 @@ const QuizFormPage = () => {
           sx={{ mt: 6, py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
           onClick={handleSave}
         >
-          {isSaving 
-          ? "Uploading Files..." 
-          : (test.hasAttempts && !attemptExistConfirm) 
-              ? "Confirm & Create New Version" 
+          {isSaving
+            ? "Uploading Files..."
+            : (test.hasAttempts && !attemptExistConfirm)
+              ? "Confirm & Create New Version"
               : "Publish Test to Hikari Learning"}
         </Button>
       </Box>

@@ -86,7 +86,7 @@ const LibraryPage: React.FC = () => {
 
     return (
         <PageLayout>
-            <Box sx={{ px: { xs: 2, md: 6 } }}>
+            <Box sx={{ p: { xs: 2, md: 6 } }}>
 
                 <Stack spacing={1} sx={{ mb: 4 }}>
                     <Typography variant="h3" fontWeight={900}>Knowledge Base</Typography>

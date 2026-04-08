@@ -6,7 +6,6 @@ import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import AppLoader from "../feedback/AppLoader";
 import AnnouncementBanner from "../announcement/AnnouncementBanner";
-import { useTheme, Container } from "@mui/material";
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -82,12 +81,6 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
                   // ... your existing scrollbar styles ...
                 }}
               >
-                {/* --- ANNOUNCEMENT AREA --- */}
-                {/* We use a Container to keep the banner aligned with your content width */}
-                <Box sx={{ mt: 2, bgcolor:'trasparent', width:'100%', mx: 'auto'}}>
-                   <AnnouncementBanner />
-                </Box>
-
                 {/* --- PAGE CHILDREN --- */}
                 {children}
               </Box>

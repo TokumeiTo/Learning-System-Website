@@ -111,10 +111,10 @@ const AnnouncementManagementPage = () => {
                     <Table>
                         <TableHead sx={{ bgcolor: 'action.hover' }}>
                             <TableRow>
-                                <TableCell width="120px">Status</TableCell>
                                 <TableCell>Title</TableCell>
                                 <TableCell>Target</TableCell>
                                 <TableCell>Expires</TableCell>
+                                <TableCell width="120px">Status</TableCell>
                                 <TableCell align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
@@ -129,12 +129,6 @@ const AnnouncementManagementPage = () => {
                                 </TableRow>
                             ) : filteredList.map((item) => (
                                 <TableRow key={item.id} hover sx={{ opacity: isExpired(item.displayUntil) ? 0.6 : 1 }}>
-                                    <TableCell>
-                                        {isExpired(item.displayUntil) ?
-                                            <Chip size="small" label="Expired" variant="outlined" /> :
-                                            <Chip size="small" color="success" label="Active" />
-                                        }
-                                    </TableCell>
                                     <TableCell>
                                         <Typography variant="subtitle2">{item.title}</Typography>
                                         <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: 200, display: 'block' }}>
@@ -162,6 +156,12 @@ const AnnouncementManagementPage = () => {
                                         <Typography variant="body2">
                                             {format(new Date(item.displayUntil), 'MMM dd, yyyy')}
                                         </Typography>
+                                    </TableCell>
+                                      <TableCell>
+                                        {isExpired(item.displayUntil) ?
+                                            <Chip size="small" label="Expired" variant="outlined" /> :
+                                            <Chip size="small" color="success" label="Active" />
+                                        }
                                     </TableCell>
                                     <TableCell align="right">
                                         <Stack direction="row" justifyContent="flex-end">
@@ -238,6 +238,18 @@ const AnnouncementManagementPage = () => {
                                 InputLabelProps={{ shrink: true }}
                                 value={selected?.displayUntil ? selected.displayUntil.substring(0, 16) : ''}
                                 onChange={(e) => setSelected(prev => ({ ...prev!, displayUntil: e.target.value }))}
+                                sx={{
+                                    // 1. Ensures the text and icons are visible
+                                    "& input::-webkit-calendar-picker-indicator": {
+                                        display: 'block',
+                                        cursor: 'pointer',
+                                        filter: 'invert(60%) saturate(100%) hue-rotate(190deg)',
+                                    },
+                                    // 2. Sometimes the padding hides it
+                                    "& .MuiInputBase-input": {
+                                        paddingRight: '10px',
+                                    }
+                                }}
                             />
                         </Stack>
                     </DialogContent>

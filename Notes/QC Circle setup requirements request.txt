@@ -34,6 +34,8 @@ dotnet tool install dotnet-ef --version 8.* --add-source https://api.nuget.org/v
 dotnet add package Kawazu
 dotnet add package Microsoft.AspNetCore.StaticFiles
 dotnet add package Bcrypt.Net-Next
+dotnet add package Serilog.AspNetCore
+dotnet add package Serilog.Sinks.File
 
 dotnet ef database update
 
@@ -59,6 +61,7 @@ npm install react-player
 npm install jwt-decode
 npm install @microsoft/signalr
 npm install react-quill-new
+npm install @react-pdf-viewer/core @react-pdf-viewer/default-layout pdfjs-dist@3.4.120
 
 
 External APIs

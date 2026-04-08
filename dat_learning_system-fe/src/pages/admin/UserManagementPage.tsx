@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Box, Button, TextField, Typography, Paper, IconButton, Chip, Stack,
-  InputAdornment, Avatar, Badge, useTheme, Table, TableBody, TableCell,
+  InputAdornment, Avatar, useTheme, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, CircularProgress,
   FormControl,
   InputLabel,
@@ -142,7 +142,7 @@ const UserManagementPage = () => {
 
   return (
     <PageLayout>
-      <Box sx={{ px: 4, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 4, display: 'flex', flexDirection: 'column' }}>
 
         {/* Header Section */}
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>

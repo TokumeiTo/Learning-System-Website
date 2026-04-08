@@ -13,6 +13,7 @@ import RankingSidebar from '../../components/dashboard/RankingSidebar';
 // API & Types
 import { getCourses } from '../../api/course.api';
 import type { Course } from '../../types_interfaces/course';
+import AnnouncementBanner from '../../components/announcement/AnnouncementBanner';
 
 const Home: React.FC = () => {
     const [mandatoryCourses, setMandatoryCourses] = useState<Course[]>([]);
@@ -37,6 +38,12 @@ const Home: React.FC = () => {
     return (
         <PageLayout>
             <Box sx={{ p: 4, maxWidth: 1300, mx: 'auto', width: '100%' }}>
+                {/* --- ANNOUNCEMENT AREA --- */}
+                {/* We use a Container to keep the banner aligned with your content width */}
+                <Box sx={{ bgcolor: 'trasparent', width: '100%', mx: 'auto' }}>
+                    <AnnouncementBanner />
+                </Box>
+
                 <HeroCarousel />
 
                 <Box sx={{ display: 'flex', gap: 4, mt: 4, flexWrap: { xs: 'wrap', lg: 'nowrap' } }}>

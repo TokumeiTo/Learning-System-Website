@@ -17,8 +17,21 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
+
+///////////////////// Logger /////////////////////////////////
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/hikari-log-.txt",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 14,
+        fileSizeLimitBytes: 10 * 1024 * 1024,
+        rollOnFileSizeLimit: true)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 /////////////////////Builder Created/////////////////////////////////

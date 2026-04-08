@@ -51,9 +51,9 @@ export const fetchQuizById = async (testId: string): Promise<Test> => {
 /**
  * GLOBAL: Fetch practice tests by level (N5-N1)
  */
-export const fetchPracticeQuizzes = async (level: string, category: string): Promise<Test[]> => {
+export const fetchPracticeQuizzes = async (level: string, category: string, searchTerm: string): Promise<Test[]> => {
     const res = await api.get<Test[]>("/api/Test/practice", {
-        params: { level, category }
+        params: { level, category, title: searchTerm || undefined }
     });
     return res.data;
 };

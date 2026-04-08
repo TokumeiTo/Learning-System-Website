@@ -1,48 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, Fade, IconButton, Stack, Chip } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Fade, IconButton, Stack } from '@mui/material';
 import { Campaign, Close, ChevronLeft, ChevronRight } from '@mui/icons-material';
-import { keyframes, styled } from '@mui/system';
+import { keyframes, styled, useTheme } from '@mui/material/styles';
 import { useNotifications } from '../../context/NotificationContext';
 
-const pulse = keyframes`
-  0% { transform: scale(1); filter: drop-shadow(0 0 2px #00e5ff); }
-  50% { transform: scale(1.05); filter: drop-shadow(0 0 8px #00e5ff); }
-  100% { transform: scale(1); filter: drop-shadow(0 0 2px #00e5ff); }
+// 1. Keyframes moved outside and parameterized
+const pulse = (color: string) => keyframes`
+  0% { transform: scale(1); filter: drop-shadow(0 0 2px ${color}); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 8px ${color}); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 2px ${color}); }
 `;
 
+// 2. Styled component handles its own theme injection
 const GlassBanner = styled(Box, {
     shouldForwardProp: (prop) => prop !== 'isTargeted',
-})(({ isTargeted }: { isTargeted: boolean; theme?: any }) => ({
-    background: isTargeted
-        ? 'linear-gradient(90deg, rgba(255, 145, 0, 0.12) 0%, rgba(15, 15, 15, 0.9) 100%)'
-        : 'linear-gradient(90deg, rgba(0, 229, 255, 0.12) 0%, rgba(15, 15, 15, 0.9) 100%)',
-    backdropFilter: 'blur(12px)',
-    borderLeft: `4px solid ${isTargeted ? '#ff9100' : '#00e5ff'}`,
-    borderRadius: '12px',
-    padding: '10px 20px',
-    display: 'flex',
-    alignItems: 'center',
-    minHeight: '70px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    position: 'relative',
-    overflow: 'hidden'
-}));
+})(({ isTargeted, theme }: { isTargeted: boolean; theme?: any }) => {
+    const isDark = theme.palette.mode === 'dark';
+    const mainColor = isTargeted ? '#ff9100' : (isDark ? '#00e5ff' : '#1976d2');
+
+    return {
+        background: isDark
+            ? `linear-gradient(90deg, rgba(61, 167, 253, 0.1) 0%, ${theme.palette.background.paper}e6 100%)`
+            : `linear-gradient(90deg, rgba(25, 118, 210, 0.05) 0%, ${theme.palette.background.paper}f2 100%)`,
+        backdropFilter: 'blur(12px)',
+        borderLeft: `4px solid ${mainColor}`,
+        borderRadius: '12px',
+        padding: '10px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        minHeight: '70px',
+        boxShadow: isDark
+            ? '0 8px 32px rgba(0,0,0,0.4)'
+            : '0 4px 20px rgba(0,0,0,0.08)',
+        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'}`,
+        position: 'relative',
+        overflow: 'hidden'
+    };
+});
 
 const AnnouncementBanner = () => {
     const { announcements } = useNotifications();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [visible, setVisible] = useState(true);
     const [fade, setFade] = useState(true);
+    
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
 
     // Auto-slide every 8 seconds
     useEffect(() => {
         if (announcements.length <= 1) return;
-
-        const timer = setInterval(() => {
-            handleNext();
-        }, 8000);
-
+        const timer = setInterval(() => handleNext(), 8000);
         return () => clearInterval(timer);
     }, [announcements.length, currentIndex]);
 
@@ -50,6 +58,7 @@ const AnnouncementBanner = () => {
 
     const current = announcements[currentIndex];
     const isTargeted = !!current.targetPosition;
+    const accentColor = isTargeted ? '#ff9100' : (isDark ? '#00e5ff' : '#1976d2');
 
     const handleNext = () => {
         setFade(false);
@@ -69,47 +78,60 @@ const AnnouncementBanner = () => {
 
     return (
         <Box sx={{ mb: 3, width: '100%', px: 1 }}>
+            {/* Note: theme prop is NOT passed here manually anymore */}
             <GlassBanner isTargeted={isTargeted}>
-                {/* Status Icon */}
-                <Box sx={{ mr: 2, color: isTargeted ? '#ff9100' : '#00e5ff', animation: `${pulse} 2s infinite` }}>
+                <Box sx={{
+                    mr: 2,
+                    color: accentColor,
+                    animation: `${pulse(accentColor)} 2s infinite`
+                }}>
                     <Campaign fontSize="large" />
                 </Box>
 
-                {/* Content with Fade Transition */}
                 <Fade in={fade} timeout={300}>
                     <Stack spacing={0} sx={{ flexGrow: 1 }}>
-                        <Typography variant="caption" sx={{ color: isTargeted ? '#ff9100' : '#00e5ff', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.6rem', letterSpacing: 1 }}>
+                        <Typography variant="caption" sx={{
+                            color: accentColor,
+                            fontWeight: 800,
+                            textTransform: 'uppercase',
+                            fontSize: '0.6rem',
+                            letterSpacing: 1
+                        }}>
                             {isTargeted ? `Priority: ${current.targetPosition}` : "Broadcast Message"}
                             {announcements.length > 1 && ` (${currentIndex + 1} of ${announcements.length})`}
                         </Typography>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#fff' }}>
+
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
                             {current.title}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mt: -0.5 }}>
+
+                        <Typography variant="body2" sx={{ color: 'text.secondary', mt: -0.5 }}>
                             {current.content}
                         </Typography>
                     </Stack>
                 </Fade>
 
-                {/* Navigation Controls (Only show if > 1) */}
                 <Stack direction="row" spacing={1} sx={{ ml: 2 }}>
                     {announcements.length > 1 && (
                         <>
-                            <IconButton size="small" onClick={handlePrev} sx={{ color: 'rgba(255,255,255,0.3)' }}><ChevronLeft /></IconButton>
-                            <IconButton size="small" onClick={handleNext} sx={{ color: 'rgba(255,255,255,0.3)' }}><ChevronRight /></IconButton>
+                            <IconButton size="small" onClick={handlePrev} sx={{ color: 'text.disabled' }}>
+                                <ChevronLeft />
+                            </IconButton>
+                            <IconButton size="small" onClick={handleNext} sx={{ color: 'text.disabled' }}>
+                                <ChevronRight />
+                            </IconButton>
                         </>
                     )}
                     <IconButton
                         size="small"
                         onClick={() => setVisible(false)}
-                        sx={{ color: 'rgba(255,255,255,0.5)', zIndex: 20, position: 'relative' }}
+                        sx={{ color: 'text.disabled' }}
                     >
                         <Close fontSize="small" />
                     </IconButton>
                 </Stack>
             </GlassBanner>
 
-            {/* Pagination Dots */}
             {announcements.length > 1 && (
                 <Stack direction="row" justifyContent="center" spacing={1} sx={{ mt: 1 }}>
                     {announcements.map((_, i) => (
@@ -119,7 +141,7 @@ const AnnouncementBanner = () => {
                                 width: i === currentIndex ? 12 : 6,
                                 height: 6,
                                 borderRadius: 3,
-                                bgcolor: i === currentIndex ? (isTargeted ? '#ff9100' : '#00e5ff') : 'rgba(255,255,255,0.2)',
+                                bgcolor: i === currentIndex ? accentColor : 'text.disabled',
                                 transition: 'all 0.3s ease'
                             }}
                         />

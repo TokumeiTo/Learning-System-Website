@@ -53,11 +53,21 @@ public class ExceptionMiddleware
                 };
                 break;
 
+            case FileNotFoundException fileEx:
+                statusCode = (int)HttpStatusCode.NotFound;
+                response = new { message = "The requested file or resource was not found." };
+                break;
+
+            case KeyNotFoundException keyEx:
+                statusCode = (int)HttpStatusCode.NotFound;
+                response = new { message = keyEx.Message };
+                break;
+
             default:
                 response = new
                 {
-                    message = exception.Message
-                    // optional: stackTrace = exception.StackTrace
+                    message = exception.Message,
+                    stackTrace = exception.StackTrace
                 };
                 break;
         }

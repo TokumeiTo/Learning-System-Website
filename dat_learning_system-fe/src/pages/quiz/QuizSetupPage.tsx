@@ -1,4 +1,4 @@
-import { Box, Card, Tab, Tabs, Typography, Button } from "@mui/material";
+import { Box, Card, Tab, Tabs, Typography, Stack, alpha, useTheme } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "../../components/layout/PageLayout";
@@ -6,6 +6,8 @@ import ProgressCircle from "../../components/chartAndProgress/ProgressCircle";
 import JapaneseTabLoader from "../../components/feedback/TabLoader";
 import { fetchGlobalStats } from "../../api/test.api";
 import type { CategoryProgress } from "../../types_interfaces/test";
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import MenuBookIcon from '@mui/icons-material/MenuBook'; // Example icon
 
 const LEVELS = ["N5", "N4", "N3", "N2", "N1"] as const;
 type Level = typeof LEVELS[number];
@@ -14,6 +16,7 @@ export default function QuizSetupPage() {
     const [level, setLevel] = useState<Level>("N5");
     const [stats, setStats] = useState<CategoryProgress[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const theme = useTheme();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -25,7 +28,6 @@ export default function QuizSetupPage() {
             } catch (error) {
                 console.error("Failed to load DB stats", error);
             } finally {
-                // Keep the loader visible for a smooth float cycle
                 setTimeout(() => setLoading(false), 800);
             }
         };
@@ -47,19 +49,30 @@ export default function QuizSetupPage() {
                 minHeight: '80vh',
             }}>
                 
+                {/* Header Title for Context */}
+                {!loading && stats.length > 0 && (
+                    <Box sx={{ textAlign: 'center', mb: 6 }}>
+                        <Typography variant="h3" fontWeight={900} gutterBottom>
+                            Practice Mode
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary">
+                            Select a category to view your {level} progress and start a quiz.
+                        </Typography>
+                    </Box>
+                )}
+
                 {loading ? (
                     <Box sx={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         <JapaneseTabLoader />
                     </Box>
                 ) : stats.length > 0 ? (
-                    /* The Card Grid */
                     <Box sx={{ 
                         display: "flex", 
                         justifyContent: "center", 
                         flexWrap: "wrap", 
-                        gap: 3, 
+                        gap: 4, 
                         width: '100%',
-                        maxWidth: '900px'
+                        maxWidth: '1000px'
                     }}>
                         {stats.map((item) => (
                             <Card
@@ -67,53 +80,77 @@ export default function QuizSetupPage() {
                                 key={item.category}
                                 onClick={() => handleClick(item.category)}
                                 sx={{ 
-                                    textAlign: "center", 
-                                    width: { xs: "45%", sm: "40%" }, 
+                                    flex: { xs: '1 1 100%', sm: '1 1 280px' },
+                                    maxWidth: { sm: '320px' },
                                     p: 3, 
                                     cursor: "pointer", 
-                                    minWidth: '160px',
-                                    borderRadius: '24px',
+                                    borderRadius: '28px',
                                     bgcolor: 'background.paper', 
-                                    border: '1px solid #4a5568',
-                                    transition: 'all 0.2s ease-in-out',
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    position: 'relative',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    overflow: 'visible',
                                     '&:hover': { 
-                                        transform: 'scale(1.03)',
-                                        bgcolor: 'background.gray'
+                                        transform: 'translateY(-8px)',
+                                        borderColor: 'primary.main',
+                                        boxShadow: `0 20px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
+                                        '& .arrow-icon': { opacity: 1, transform: 'translateX(0)' }
                                     }
                                 }}
                             >
-                                <Typography variant="h6" sx={{ fontWeight: '900', color: '#f6ad55', mb: 2 }}>
+                                {/* Top Icon/Badge Decoration */}
+                                <Box sx={{ 
+                                    position: 'absolute', 
+                                    top: -20, 
+                                    bgcolor: 'primary.main', 
+                                    color: 'white', 
+                                    p: 1.5, 
+                                    borderRadius: '16px',
+                                    boxShadow: theme.shadows[4]
+                                }}>
+                                    <MenuBookIcon fontSize="small" />
+                                </Box>
+
+                                <Typography variant="h5" sx={{ fontWeight: '900', mt: 2, mb: 3, textTransform: 'uppercase', letterSpacing: 1 }}>
                                     {item.category}
                                 </Typography>
                                 
-                                <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
+                                <Box sx={{ mb: 3, transform: 'scale(1.1)' }}>
                                     <ProgressCircle value={item.progressPercentage} />
                                 </Box>
                                 
-                                <Typography variant="caption" sx={{ color: '#a0aec0', fontWeight: 'bold' }}>
-                                    {item.passedCount} / {item.totalCount} COMPLETED
-                                </Typography>
+                                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ width: '100%', mt: 'auto' }}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 'bold', display: 'block' }}>
+                                            COMPLETION
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: '900', color: 'primary.main' }}>
+                                            {item.passedCount} / {item.totalCount} Tests
+                                        </Typography>
+                                    </Box>
+                                    
+                                    <ChevronRightIcon 
+                                        className="arrow-icon"
+                                        sx={{ 
+                                            opacity: 0, 
+                                            transform: 'translateX(-10px)', 
+                                            transition: '0.3s',
+                                            color: 'primary.main'
+                                        }} 
+                                    />
+                                </Stack>
                             </Card>
                         ))}
                     </Box>
                 ) : (
-                    /* Styled Empty State - Triggered when stats.length === 0 */
-                    <Box sx={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        alignItems: 'center', 
-                        justifyContent: 'center',
-                        flex: 1,
-                        textAlign: 'center',
-                        color: '#a0aec0'
-                    }}>
-                        <Typography sx={{ fontSize: 60, mb: 2, opacity: 0.5 }}>📂</Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'white' }}>
-                            No tests available for {level}
-                        </Typography>
-                        <Typography variant="body2" sx={{ maxWidth: 300, mt: 1 }}>
-                            We haven't added practice materials for this level yet. Check back soon!
-                        </Typography>
+                    <Box sx={{ textAlign: 'center', py: 10 }}>
+                        <Typography sx={{ fontSize: 80, mb: 2 }}>empty</Typography>
+                        <Typography variant="h5" fontWeight="bold">No Content Found</Typography>
+                        <Typography color="text.secondary">We're still preparing {level} materials.</Typography>
                     </Box>
                 )}
 
@@ -121,12 +158,13 @@ export default function QuizSetupPage() {
                 <Box sx={{ 
                     position: 'fixed', 
                     bottom: 30, 
-                    bgcolor: '#34a8fb', 
+                    bgcolor: 'primary.main', 
                     borderRadius: '50px', 
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                    px: 1,
-                    py: 0.5,
-                    zIndex: 1000
+                    boxShadow: '0 12px 40px rgba(0,0,0,0.3)',
+                    px: 1, py: 0.5,
+                    zIndex: 1000,
+                    border: '1px solid',
+                    borderColor: alpha('#fff', 0.2)
                 }}>
                     <Tabs 
                         value={level} 
@@ -134,20 +172,14 @@ export default function QuizSetupPage() {
                         centered 
                         TabIndicatorProps={{ style: { display: 'none' } }}
                         sx={{ 
-                            minHeight: '44px',
-                            '& .MuiTabs-flexContainer': { gap: '4px' },
+                            minHeight: '48px',
                             '& .MuiTab-root': { 
-                                color: "white", 
+                                color: alpha('#fff', 0.7), 
                                 fontWeight: '900',
                                 minWidth: '80px',
-                                minHeight: '40px',
                                 borderRadius: '40px',
-                                fontSize: '0.9rem',
-                                transition: '0.2s',
-                                '&.Mui-selected': { 
-                                    bgcolor: 'white', 
-                                    color: '#34a8fb' 
-                                } 
+                                fontSize: '0.95rem',
+                                '&.Mui-selected': { color: 'primary.main', bgcolor: 'white' } 
                             } 
                         }}
                     >

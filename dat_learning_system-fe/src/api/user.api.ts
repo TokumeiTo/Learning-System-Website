@@ -36,7 +36,7 @@ export const updateUser = async (id: string, data: UserUpdateFields): Promise<Ap
   const payload = {
     fullName: data.fullName,
     position: positionLabel, // Send the STRING label as the DTO expects
-    orgUnitId: data.orgUnitId.toString() === "" ? null : Number(data.orgUnitId),
+    orgUnitId: data.orgUnitId ? Number(data.orgUnitId) : null,
     updatedReason: data.updatedReason
   };
 
