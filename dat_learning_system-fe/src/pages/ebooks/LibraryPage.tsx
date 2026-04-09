@@ -123,7 +123,7 @@ const LibraryPage: React.FC = () => {
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: 5,
-                    justifyContent: { xs: 'center', lg: 'flex-start' },
+                    justifyContent: 'center',
                     minHeight: '400px',
                     position: 'relative'
                 }}>

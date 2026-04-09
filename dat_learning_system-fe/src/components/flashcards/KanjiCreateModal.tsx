@@ -136,11 +136,11 @@ export default function KanjiCreateModal({ open, onClose, onSuccess, kanjiToEdit
                     ))}
                     <Button startIcon={<AddIcon />} onClick={() => setKunyomi([...kunyomi, ""])}>Add Kunyomi</Button>
 
-                    <Divider sx={{ my: 1 }}>Example Sentences</Divider>
+                    <Divider sx={{ my: 1 }}>Example Words</Divider>
 
                     {examples.map((ex, i) => (
                         <Box key={i} sx={{ display: "flex", flexDirection: "column", gap: 1, p: 1, border: '1px dashed grey' }}>
-                            <TextField label="Sentence or word" value={ex.word} onChange={(e) => {
+                            <TextField label="Word" value={ex.word} onChange={(e) => {
                                 const copy = [...examples];
                                 copy[i].word = e.target.value;
                                 setExamples(copy);

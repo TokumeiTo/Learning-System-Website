@@ -14,7 +14,8 @@ export const fetchAllBooks = async (
     page: number = 1,
     pageSize: number = 10,
     category?: string,
-    search?: string // Add this 4th parameter
+    search?: string,
+    isActive?: boolean
 ): Promise<PagedLibraryResponse<EBook>> => {
 
     const params = new URLSearchParams({
@@ -25,6 +26,7 @@ export const fetchAllBooks = async (
     // Only append if they have values
     if (category && category !== 'All') params.append('category', category);
     if (search) params.append('search', search);
+    if (isActive !== undefined) params.append('isActive', isActive.toString());
 
     const response = await api.get(`/api/Library?${params.toString()}`);
     return response.data;

@@ -34,7 +34,7 @@ const OrgPage: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 3,
-                px: 4,
+                p: 4,
                 minHeight: '100vh',
                 transition: 'background-color 0.3s'
             }}>
@@ -91,9 +91,9 @@ const OrgPage: React.FC = () => {
                         width: { xs: '100%', lg: '320px' },
                         gap: 2
                     }}>
-                        <Paper sx={{ 
-                            p: 3, 
-                            borderRadius: 4, 
+                        <Paper sx={{
+                            p: 3,
+                            borderRadius: 4,
                             bgcolor: 'background.paper',
                             border: `1px solid ${theme.palette.divider}`,
                             backgroundImage: 'none'
@@ -112,10 +112,10 @@ const OrgPage: React.FC = () => {
                             </Stack>
                         </Paper>
 
-                        <Paper sx={{ 
-                            p: 3, 
-                            borderRadius: 4, 
-                            bgcolor: theme.palette.mode === 'dark' ? 'primary.dark' : 'primary.main', 
+                        <Paper sx={{
+                            p: 3,
+                            borderRadius: 4,
+                            bgcolor: theme.palette.mode === 'dark' ? 'primary.dark' : 'primary.main',
                             color: 'primary.contrastText',
                             boxShadow: theme.shadows[4]
                         }}>
@@ -141,9 +141,9 @@ const OrgPage: React.FC = () => {
                         backgroundImage: 'none'
                     }}>
                         {/* Internal Search Bar */}
-                        <Box sx={{ 
-                            p: 2, 
-                            borderBottom: `1px solid ${theme.palette.divider}`, 
+                        <Box sx={{
+                            p: 2,
+                            borderBottom: `1px solid ${theme.palette.divider}`,
                             bgcolor: theme.palette.background.gray
                         }}>
                             <TextField

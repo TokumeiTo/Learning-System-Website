@@ -3,7 +3,8 @@ import {
     Box, Typography, Button, Paper, Table, TableBody,
     TableCell, TableContainer, TableHead, TableRow,
     IconButton, Chip, Tooltip, CircularProgress, Stack, Avatar, TablePagination,
-    TextField, MenuItem, InputAdornment
+    TextField, MenuItem, InputAdornment,
+    useTheme
 } from '@mui/material';
 import { Add, Edit, Delete, FileDownload, Visibility, FiberManualRecord, Search } from '@mui/icons-material';
 import PageLayout from '../../components/layout/PageLayout';
@@ -14,12 +15,14 @@ import MessagePopup from '../../components/feedback/MessagePopup';
 import ConfirmModal from '../../components/feedback/ConfirmModal';
 
 const LibraryAdminPage: React.FC = () => {
+    const theme = useTheme();
     const [books, setBooks] = useState<EBook[]>([]);
     const [loading, setLoading] = useState(true);
 
     const [totalCount, setTotalCount] = useState(0);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(30);
+    const [visibility, setVisibility] = useState('All');
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedBook, setSelectedBook] = useState<EBook | null>(null);
@@ -36,7 +39,7 @@ const LibraryAdminPage: React.FC = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [category, setCategory] = useState('All');
-    const [categories] = useState(['All', 'Japanese', 'English', 'IT', 'Business', 'Grammar']);
+    const [categories] = useState(['All', 'Japanese', 'English', 'IT']);
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -44,7 +47,7 @@ const LibraryAdminPage: React.FC = () => {
         }, 500); // Wait 500ms after last keystroke
 
         return () => clearTimeout(delayDebounceFn);
-    }, [searchQuery, category, page, rowsPerPage]);
+    }, [searchQuery, category, visibility, page, rowsPerPage]);
 
     const loadData = async () => {
         setLoading(true);
@@ -54,7 +57,8 @@ const LibraryAdminPage: React.FC = () => {
                 page + 1,
                 rowsPerPage,
                 category === 'All' ? undefined : category,
-                searchQuery
+                searchQuery,
+                visibility === 'All' ? undefined : (visibility === 'Published')
             );
             setBooks(data.items);
             setTotalCount(data.totalCount);
@@ -152,36 +156,59 @@ const LibraryAdminPage: React.FC = () => {
 
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 3 }}>
                     {/* Search Field */}
-                    <TextField
-                        placeholder="Search by title or author..."
-                        size="small"
-                        value={searchQuery}
-                        onChange={(e) => { setSearchQuery(e.target.value); setPage(0); }}
-                        sx={{ flexGrow: 1, bgcolor: 'background.paper', borderRadius: 1 }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <Search sx={{ color: 'text.secondary', fontSize: 20 }} />
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
+                    <Box sx={{ flexGrow: 1 }}>
+                        {/* Search and Filters */}
+                        <Paper elevation={0} sx={{
+                            p: 2, borderRadius: 3,
+                            bgcolor: 'background.paper',
+                            border: `1px solid ${theme.palette.divider}`,
+                            display: 'flex', gap: 2
+                        }}>
+                            <TextField
+                                placeholder="Search by title or author..."
+                                size="small"
+                                value={searchQuery}
+                                onChange={(e) => { setSearchQuery(e.target.value); setPage(0); }}
+                                sx={{ flexGrow: 1, bgcolor: 'background.paper', borderRadius: 1 }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Search sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
 
-                    {/* Category Filter */}
-                    <TextField
-                        select
-                        size="small"
-                        label="Category"
-                        value={category}
-                        onChange={(e) => { setCategory(e.target.value); setPage(0); }}
-                        sx={{ minWidth: 150, bgcolor: 'background.paper', borderRadius: 1 }}
-                    >
-                        {categories.map((cat) => (
-                            <MenuItem key={cat} value={cat}>
-                                {cat}
-                            </MenuItem>
-                        ))}
-                    </TextField>
+                            <TextField
+                                select
+                                size="small"
+                                label="Visibility"
+                                value={visibility}
+                                onChange={(e) => { setVisibility(e.target.value); setPage(0); }}
+                                sx={{ minWidth: 130, bgcolor: 'background.paper', borderRadius: 1 }}
+                            >
+                                <MenuItem value="All">All Status</MenuItem>
+                                <MenuItem value="Published">Published</MenuItem>
+                                <MenuItem value="Hidden">Hidden</MenuItem>
+                            </TextField>
+
+                            {/* Category Filter */}
+                            <TextField
+                                select
+                                size="small"
+                                label="Category"
+                                value={category}
+                                onChange={(e) => { setCategory(e.target.value); setPage(0); }}
+                                sx={{ minWidth: 150, bgcolor: 'background.paper', borderRadius: 1 }}
+                            >
+                                {categories.map((cat) => (
+                                    <MenuItem key={cat} value={cat}>
+                                        {cat}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Paper>
+                    </Box>
                 </Stack>
 
                 {loading ? (
@@ -191,7 +218,7 @@ const LibraryAdminPage: React.FC = () => {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: 800, color: '#475569' }}>Resource Information</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, color: '#475569' }}>Book Information</TableCell>
                                     <TableCell align="center" sx={{ fontWeight: 800, color: '#475569' }}>Description</TableCell>
                                     <TableCell align="center" sx={{ fontWeight: 800, color: '#475569' }}>Visibility</TableCell>
                                     <TableCell align="center" sx={{ fontWeight: 800, color: '#475569' }}>Engagement</TableCell>

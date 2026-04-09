@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import {
   Box, Button, TextField, Typography, Paper, Stack, MenuItem, CircularProgress,
-  IconButton
+  IconButton,
+  alpha,
+  useTheme
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
@@ -16,6 +18,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ConfirmModal from '../../components/feedback/ConfirmModal';
 
 const QuizFormPage = () => {
+  const theme = useTheme();
   const [isSaving, setIsSaving] = useState(false);
   const { testId } = useParams<{ testId: string }>();
   const [test, setTest] = useState<Test>({
@@ -300,12 +303,53 @@ const QuizFormPage = () => {
           ))}
         </Stack>
 
-        <Paper sx={{ p: 2, mt: 4, border: '1px dashed gray', textAlign: 'center' }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, color: '#666' }}>ADD NEW QUESTION</Typography>
-          <Stack direction="row" spacing={2} justifyContent="center">
-            <Button variant="outlined" startIcon={<AddIcon />} onClick={() => addQuestion("MultipleChoice")}>Text Quiz</Button>
-            <Button variant="outlined" color="secondary" startIcon={<AddIcon />} onClick={() => addQuestion("StarPuzzle")}>Star Puzzle</Button>
-            <Button variant="outlined" color="success" startIcon={<AddIcon />} onClick={() => addQuestion("MediaOption")}>Image Options</Button>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4, mt: 4,
+            borderRadius: '24px',
+            border: '2px dashed',
+            borderColor: 'divider',
+            bgcolor: alpha(theme.palette.primary.main, 0.02),
+            textAlign: 'center'
+          }}
+        >
+          <Typography variant="h6" fontWeight={900} sx={{ mb: 1, color: 'text.primary' }}>
+            ADD NEW CONTENT
+          </Typography>
+          <Typography variant="body2" sx={{ mb: 4, color: 'text.secondary' }}>
+            Select the question format that best fits your JLPT assessment goal.
+          </Typography>
+
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent="center">
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={() => addQuestion("MultipleChoice")}
+              sx={{ borderRadius: '12px', px: 3, py: 1.5, borderWidth: 2, fontWeight: 800 }}
+            >
+              Standard Quiz
+            </Button>
+
+            <Button
+              variant="outlined"
+              color="secondary"
+              startIcon={<AddIcon />}
+              onClick={() => addQuestion("StarPuzzle")}
+              sx={{ borderRadius: '12px', px: 3, py: 1.5, borderWidth: 2, fontWeight: 800 }}
+            >
+              Star Puzzle (★)
+            </Button>
+
+            <Button
+              variant="outlined"
+              color="success"
+              startIcon={<AddIcon />}
+              onClick={() => addQuestion("MediaOption")}
+              sx={{ borderRadius: '12px', px: 3, py: 1.5, borderWidth: 2, fontWeight: 800 }}
+            >
+              Visual/Image Quiz
+            </Button>
           </Stack>
         </Paper>
 

@@ -36,7 +36,7 @@ const LibraryBookCard: React.FC<BookProps> = ({ book, onRead }) => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             whileHover={{ y: -10 }}
-            sx={{ width: 230 }} // Slightly wider for description
+            sx={{ width: 250 }}
         >
             <Card sx={{ borderRadius: 5, bgcolor: 'background.paper', overflow: 'hidden', boxShadow: theme.shadows[2] }}>
                 <Box sx={{ position: 'relative', height: 280, '&:hover .book-overlay': { opacity: 1 } }}>

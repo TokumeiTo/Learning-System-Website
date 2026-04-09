@@ -41,23 +41,10 @@ const EnrollmentApprovalPage = () => {
                     <Container maxWidth="xl">
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
                             <Box>
-                                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
-                                    <Box sx={{
-                                        p: 0.8,
-                                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(61, 167, 253, 0.1)' : 'rgba(25, 118, 210, 0.1)',
-                                        borderRadius: 1.5,
-                                        display: 'flex'
-                                    }}>
-                                        <Shield sx={{ color: 'primary.main', fontSize: 20 }} />
-                                    </Box>
-                                    <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: 1.5 }}>
-                                        Admin Dashboard
-                                    </Typography>
-                                </Stack>
-                                <Typography variant="h3" sx={{ color: 'text.primary', fontWeight: 900, letterSpacing: '-0.02em' }}>
+                                <Typography variant="h4" sx={{ color: 'text.primary', fontWeight: 900, letterSpacing: '-0.02em' }}>
                                     Enrollment Requests
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary'}}>
                                     Review student applications and payment proof to grant access.
                                 </Typography>
                             </Box>
@@ -103,7 +90,7 @@ const EnrollmentApprovalPage = () => {
                 </Box>
 
                 {/* --- CONTENT AREA --- */}
-                <Container maxWidth="xl" sx={{ mt: 5 }}>
+                <Container maxWidth="xl" sx={{ mt: 3 }}>
                     <Fade in={true} timeout={600}>
                         <Box sx={{ color: 'text.primary' }}>
                             {tab === 0 ? (
