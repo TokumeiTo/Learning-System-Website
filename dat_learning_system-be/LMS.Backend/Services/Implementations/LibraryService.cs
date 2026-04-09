@@ -20,16 +20,16 @@ public class LibraryService(
         return mapper.Map<IEnumerable<EBookResponseDto>>(books);
     }
 
-    // Services/Implement/LibraryService.cs
     public async Task<PagedLibraryResponseDto> GetPagedBooksAsync(
         string userId,
         string? category,
         string? search,
+        bool? isActive,
         int page,
         int pageSize)
     {
         // 1. Get books from Repo
-        var (books, totalCount) = await repo.GetAllPagedAsync(category, search, page, pageSize);
+        var (books, totalCount) = await repo.GetAllPagedAsync(category, search, isActive, page, pageSize);
 
         // 2. Get all progress for this user
         var userProgressList = await repo.GetUserProgressListAsync(userId);

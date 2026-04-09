@@ -27,7 +27,8 @@ public class LibraryRepository(AppDbContext context) : ILibraryRepository
 
     public async Task<(IEnumerable<EBook> Items, int TotalCount)> GetAllPagedAsync(
      string? category,
-     string? search, // Add this parameter
+     string? search,
+     bool? isActive,
      int page,
      int pageSize)
     {
@@ -45,8 +46,10 @@ public class LibraryRepository(AppDbContext context) : ILibraryRepository
                 b.Author.ToLower().Contains(searchLower));
         }
 
-        int totalCount = await query.CountAsync();
+        if (isActive.HasValue)
+            query = query.Where(b => b.IsActive == isActive.Value);
 
+        int totalCount = await query.CountAsync();
         var items = await query
             .OrderByDescending(b => b.CreatedAt)
             .Skip((page - 1) * pageSize)

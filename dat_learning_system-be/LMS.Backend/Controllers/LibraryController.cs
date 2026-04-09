@@ -17,14 +17,15 @@ public class LibraryController(ILibraryService libraryService) : ControllerBase
     public async Task<ActionResult<PagedLibraryResponseDto>> GetAll(
         [FromQuery] string? category,
         [FromQuery] string? search,
+        [FromQuery] bool? isActive,
         [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 12) // Match to React hook
+        [FromQuery] int pageSize = 12)
     {
         if (page < 1) page = 1;
         if (pageSize > 100) pageSize = 100;
 
         var userId = GetUserId();
-        var result = await libraryService.GetPagedBooksAsync(userId, category, search, page, pageSize);
+        var result = await libraryService.GetPagedBooksAsync(userId, category, search, isActive, page, pageSize);
         return Ok(result);
     }
 

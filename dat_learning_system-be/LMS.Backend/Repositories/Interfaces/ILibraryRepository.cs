@@ -11,7 +11,7 @@ public interface ILibraryRepository
     Task<EBook> CreateBookAsync(EBook book);
     Task<bool> UpdateBookAsync(EBook book);
     Task<bool> DeleteBookAsync(int id);
-    Task<(IEnumerable<EBook> Items, int TotalCount)> GetAllPagedAsync(string? category, string? search, int page, int pageSize);
+    Task<(IEnumerable<EBook> Items, int TotalCount)> GetAllPagedAsync(string? category, string? search, bool? isActive, int page, int pageSize);
     Task<IEnumerable<UserBookProgress>> GetUserProgressListAsync(string userId);
 
     // Activity & Tracking
